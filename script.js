@@ -201,11 +201,7 @@ map.on('click', () => {
   menu.style.display = 'none'; 
 });
 
-function hideInfoAfterDelay() {
-  setTimeout(() => {
-    document.getElementById("info").style.display = "none";
-  }, 5000); // 5 sekuntia
-}
+
 
 hideInfoAfterDelay();
  // --- Klikkaus kartalla: näytä revontulitilanne ---
