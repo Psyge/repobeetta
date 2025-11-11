@@ -113,7 +113,11 @@ function drawAuroraOverlay(points) {
 }
 
 
-
+function hideInfoAfterDelay() {
+  setTimeout(() => {
+    document.getElementById("info").style.display = "none";
+  }, 5000); // 5 sekuntia
+}
 
 
 
