@@ -180,6 +180,14 @@ header.banner::after {
 .popup-content button:hover {
   background: #45a049;
 }
+.popup-img {
+  width: 60px;       /* haluttu koko */
+  height: 60px;      /* sama kuin leveys */
+  border-radius: 50%; /* tekee kuvasta pyöreän */
+  object-fit: cover; /* varmistaa ettei kuva veny */
+  display: block;
+  margin: 8px auto;  /* keskittää kuvan popupissa */
+}
 
 /* Mobiili */
 @media (max-width: 768px) {
