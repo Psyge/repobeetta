@@ -15,10 +15,13 @@ function addMarkers() {
       popupAnchor: [0, -32]
     });
 
-    const popupContent = `
-      <strong>${place.name}</strong><br>
-      ${place.url}More info</a>
-    `;
+    
+const popupContent = `
+  <strong>${place.name}</strong><br>
+  <img src="${place.icon}" alt="${place.name}" style="width:50px;"><br>
+  <a href="${place.url}" target="_blank" rel="noopener noreferrer">More info</a>
+`;
+
 
     L.marker([place.lat, place.lon], { icon: customIcon })
       .bindPopup(popupContent)
