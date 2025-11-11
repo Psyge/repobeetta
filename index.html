@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RepoTracker - Follow the northern lights</title>
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="style.css">
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-21PPCXCRRH"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-21PPCXCRRH');
+</script>
+</head>
+<body>
+
+<header class="banner">
+  <div id="menu-btn">☰</div>
+
+  <div class="banner-left">
+    <img src="repo-neon.png" alt="RepoTracker Logo" class="logo">
+  </div>
+
+  <div class="banner-right">
+    <a href="https://instagram.com/repotracker_" target="_blank" class="social-btn instagram">
+      <img src="ig-icon.png" alt="Instagram" class="icon">
+    </a>
+ <a href="https://www.buymeacoffee.com/repotracker" target="_blank">
+    <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" style="height: 50px; width: auto;">
+
+  </div>
+  
+<nav id="menu">
+  <a href="index.html">Front page</a>
+  <a href="contact.html">Contact / Feedback</a>
+  <a href="#" id="show-help">Help</a>
+</nav>
+
+</header>
+
+<!-- Pop-up Help -->
+<!-- Pop-up Help -->
+<div id="help-popup" class="popup" style="display:none;">
+  <div class="popup-content">
+    <h2>How to use RepoTracker</h2>
+    <p>Click anywhere on the map to see the aurora forecast for that location.<br>
+       Use the 📍 button to check your current position.<br><br>
+    <strong>Note:</strong> Cloud cover can affect visibility even if aurora activity is strong.
+    </p>
+    <label>
+      <input type="checkbox" id="dont-show-again"> Don’t show again
+    </label>
+    <br>
+    <button id="close-popup">Close</button>
+  </div>
+</div>
+
+
+
+<div id="container">
+  <div id="map">
+  <button id="locate-btn">📍 Show my location</button>
+  <button id="markers-btn">Show markers</button>  
+  </div>
+</div>
+<div id="info" class="loading">⏳ Loading northern lights forecast...</div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Kartta ja NOAA-data -->
+<script src="script.js"></script>
+
+<!-- Markerit -->
+<script src="markers.js"></script>
+<script>
+  // Lisää markerit kartalle
+  addMarkers();
+
+  // Napin toiminta
+  document.getElementById('markers-btn').addEventListener('click', () => {
+    if (!map.hasLayer(markersLayer)) {
+      markersLayer.addTo(map);
+    } else {
+      map.removeLayer(markersLayer);
+    }
+  });
+
+  // Näkyvyys zoomin mukaan
+  map.on('zoomend', () => {
+    const zoom = map.getZoom();
+    if (zoom >= 6) {
+      if (!map.hasLayer(markersLayer)) markersLayer.addTo(map);
+    } else {
+      if (map.hasLayer(markersLayer)) map.removeLayer(markersLayer);
+    }
+  });
+</script>
+
+</body>
+</html>
