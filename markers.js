@@ -16,11 +16,13 @@ function addMarkers() {
     });
 
     
+
 const popupContent = `
   <strong>${place.name}</strong><br>
-  <img src="${place.icon}" alt="${place.name}" style="width:50px;"><br>
+  <img src="${place.icon}" alt="${place.name}" class="popup-img"><br>
   <a href="${place.url}" target="_blank" rel="noopener noreferrer">More info</a>
 `;
+
 
 
     L.marker([place.lat, place.lon], { icon: customIcon })
