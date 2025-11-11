@@ -11,6 +11,7 @@ function addMarkers() {
     const customIcon = L.icon({
       iconUrl: place.icon,
       iconSize: [32, 32],
+      className: 'circle-icon',
       iconAnchor: [16, 32],
       popupAnchor: [0, -32]
     });
