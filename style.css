@@ -74,7 +74,7 @@ header.banner::after {
 /* Info-paneeli */
 #info {
   position: absolute;
-  top: 110px;
+  top: 190px;
   left: 10px;
   z-index: 500;
   color: white;
