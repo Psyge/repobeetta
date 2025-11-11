@@ -189,6 +189,12 @@ header.banner::after {
   margin: 8px auto;  /* keskittää kuvan popupissa */
 }
 
+.circle-icon {
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+
+
 /* Mobiili */
 @media (max-width: 768px) {
   header.banner {
