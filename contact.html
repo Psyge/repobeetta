@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact & Feedback - RepoTracker</title>
+<link rel="stylesheet" href="style.css"> <!-- Käytä samaa CSS-tiedostoa -->
+</head>
+<body>
+
+<header class="banner">
+  <div id="menu-btn">☰</div>
+
+  <div class="banner-left">
+    <img src="repo-neon.png" alt="RepoTracker Logo" class="logo">
+  </div>
+
+  <div class="banner-right">
+    <a href="https://instagram.com/repotracker_" target="_blank" class="social-btn instagram">
+      <img src="ig-icon.png" alt="Instagram" class="icon">
+    </a>
+    <a href="https://www.buymeacoffee.com/repotracker" target="_blank">
+    <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" style="height: 50px; width: auto;">
+
+  </div>
+  
+<nav id="menu">
+  <a href="index.html">Front page</a>
+  <a href="contact.html">Contact / Feedback</a>
+</nav>
+
+</header>
+
+<!-- Sama menu -->
+<nav id="menu">
+  <a href="index.html">Front page</a>
+  <a href="contact.html">Contact / Feedback</a>
+</nav>
+
+<!-- Lomake -->
+<div id="container" style="margin-top:120px; text-align:center;">
+  <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdnjjYcD008LAMcvo0g2riXAtQ80_Xtfy-2vQ2vrEo6xbSuXQ/viewform?embedded=true" width="640" height="800" frameborder="0" marginheight="0" marginwidth="0">Ladataan…</iframe>
+</div>
+
+<script>
+const menuBtn = document.getElementById("menu-btn");
+const menu = document.getElementById("menu");
+menuBtn.addEventListener("click", () => {
+  menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+});
+</script>
+
+</body>
+</html>
+
