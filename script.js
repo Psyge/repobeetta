@@ -288,13 +288,13 @@ document.head.appendChild(chartScript);
 
 // Näytä popup
 document.getElementById('forecast-btn').addEventListener('click', () => {
-  document.getElementById('forecast-overlay').style.display = 'flex';
+  document.getElementById('forecast-popup').style.display = 'flex';
   fetchAuroraForecast();
 });
 
 // Sulje popup
 document.getElementById('close-forecast').addEventListener('click', () => {
-  document.getElementById('forecast-popup').style.display = 'none';
+  document.getElementById('forecast-overlay').style.display = 'none';
 });
 
 // Hae NOAA-data ja piirrä graafi
