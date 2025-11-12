@@ -15,7 +15,7 @@ const map = L.map('map', {
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> & <a href="https://carto.com/">CARTO</a>',
   subdomains: 'abcd',
-  maxZoom:
+  maxZoom: 19
 }).addTo(map);
 
 map.setMaxBounds([[-90, -180], [90, 180]]);
@@ -30,7 +30,7 @@ function fetchAuroraData() {
   const directUrl = 'https://services.swpc.noaa.gov/json/ovation_aurora_latest.json';
   const proxyUrl = 'https://corsproxy.io/?' + directUrl;
 
- Url).catch(() => fetch(proxyUrl))
+  fetch(directUrl).catch(() => fetch(proxyUrl))
     .then(res => {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return res.json();
@@ -43,7 +43,6 @@ function fetchAuroraData() {
       info.className = '';
       info.innerHTML = `<strong>📡 Northern Lights forecast</strong><br>
         <small>Observation: ${obsTime}<br>Forecast: ${forecastTime}<br>Points: ${data.coordinates.length}</small>`;
-      console.log("Aurora data loaded:", data.coordinates.length);
       animateAurora(data.coordinates);
     })
     .catch(err => {
@@ -111,6 +110,8 @@ function animateAurora(points) {
 
   requestAnimationFrame(() => animateAurora(points));
 }
+
+
 
 // --- Käyttäjän sijainti ---
 if (navigator.geolocation) {
