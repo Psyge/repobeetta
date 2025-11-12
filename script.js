@@ -323,7 +323,7 @@ async function fetchAuroraForecast() {
         data: dataPoints,
         borderColor: 'blue',
         pointBackgroundColor: colors,
-        pointRadius: 15,
+        pointRadius: 9,
         fill: false,
         tension: 0.3
       }]
