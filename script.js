@@ -2,6 +2,7 @@ let auroraLayer = [];
 let userMarker = null;
 let currentData = null;
 let offset = 0;
+let direction = 1;
 
 // --- Kartta ---
 const map = L.map('map', {
@@ -105,11 +106,13 @@ function animateAurora(points) {
   createCanvasOverlay(offset - canvasWidth);
   createCanvasOverlay(offset + canvasWidth);
 
-  offset += 5;
-  if (offset > canvasWidth) offset = 0;
+  // Liiku vain vähän edestakaisin
+  offset += direction * 0.5; // nopeus (0.5 px per frame)
+  if (offset > 50 || offset < -50) direction *= -1; // vaihda suunta
 
   requestAnimationFrame(() => animateAurora(points));
 }
+
 
 
 
