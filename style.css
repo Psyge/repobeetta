@@ -193,7 +193,28 @@ header.banner::after {
   border-radius: 50%;
   border: 2px solid #fff;
 }
+#forecast-btn {
+  position: absolute;
+  top: 90px; /* Show my location on top, markers below, forecast next */
+  left: 10px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 1000;
+}
 
+#forecast-overlay {
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  background: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  z-index: 2000;
+}
 
 /* Mobiili */
 @media (max-width: 768px) {
