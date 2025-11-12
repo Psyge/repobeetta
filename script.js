@@ -287,7 +287,7 @@ document.head.appendChild(chartScript);
 
 // Näytä popup
 document.getElementById('forecast-btn').addEventListener('click', () => {
-  document.getElementById('forecast-popup').style.display = 'flex';
+  document.getElementById('forecast-overlay').style.display = 'flex';
   fetchAuroraForecast();
 });
 
