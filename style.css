@@ -69,6 +69,7 @@ header.banner::after {
   width: 100%;
   height: calc(100vh - 100px); /* täyttää loput ruudusta */
   z-index: 1;
+  background-color: rgba(0,0,0,0.7);
 }
 
 /* Info-paneeli */
