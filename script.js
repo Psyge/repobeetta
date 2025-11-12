@@ -315,7 +315,7 @@ async function fetchAuroraForecast() {
     data: {
       labels: labels,
       datasets: [{
-        label: 'Kp-indeksi ennuste',
+        label: 'Kp index forecast',
         data: dataPoints,
         borderColor: 'blue',
         pointBackgroundColor: colors,
