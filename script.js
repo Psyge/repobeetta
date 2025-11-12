@@ -1,4 +1,4 @@
-let auroraLayer = null;
+let auroraLayer = [];
 let userMarker = null;
 let currentData = null;
 let notificationPermissionRequested = false;
