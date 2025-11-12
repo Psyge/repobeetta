@@ -96,19 +96,22 @@ function drawAuroraOnce(points) {
     ctx.fill();
   });
 
-  const bounds = [[40, -180], [90, 180]];
-  const overlay = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.75 }).addTo(map);
-  auroraLayer.push(overlay);
 
-  // Lisää CSS-animaatio overlay-elementtiin
-  overlay.getElement().classList.add('aurora-move');
+    const bounds = [[40, -180], [90, 180]];
+    const overlay = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.75 }).addTo(map);
+    auroraLayer.push(overlay);
+
+    if (addAnimation) {
+      overlay.getElement().classList.add('aurora-move');
+    }
+  };
+
+  // ✅ Piirrä kolme overlayta
+  createCanvasOverlay(0, true); // keskimmäinen liikkuu
+  createCanvasOverlay(-canvasWidth); // vasen kopio
+  createCanvasOverlay(canvasWidth);  // oikea kopio
 }
 
-function hideInfoAfterDelay() {
-  setTimeout(() => {
-    document.getElementById("info").style.display = "none";
-  }, 5000); // 5 sekuntia
-}
 
 
 
