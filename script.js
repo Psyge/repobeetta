@@ -1,7 +1,6 @@
 let auroraLayer = [];
 let userMarker = null;
 let currentData = null;
-let notificationPermissionRequested = false;
 let offset = 0;
 
 // --- Kartta ---
@@ -16,7 +15,7 @@ const map = L.map('map', {
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> & <a href="https://carto.com/">CARTO</a>',
   subdomains: 'abcd',
-  maxZoom: 19
+  maxZoom:
 }).addTo(map);
 
 map.setMaxBounds([[-90, -180], [90, 180]]);
@@ -31,8 +30,13 @@ function fetchAuroraData() {
   const directUrl = 'https://services.swpc.noaa.gov/json/ovation_aurora_latest.json';
   const proxyUrl = 'https://corsproxy.io/?' + directUrl;
 
-  fetch(directUrl).catch(() => fetch(proxyUrl))
-    .then(res => { if(!res.ok) throw new Error(`HTTP ${res.status}`); return res      if (!data.coordinates || !Array.isArray(data.coordinates)) throw new Error("The data does not contain a 'coordinates' table.");
+ Url).catch(() => fetch(proxyUrl))
+    .then(res => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
+    .then(data => {
+      if (!data.coordinates || !Array.isArray(data.coordinates)) throw new Error("No 'coordinates' in data");
       currentData = data;
       const obsTime = formatTime(data["Observation Time"]);
       const forecastTime = formatTime(data["Forecast Time"]);
@@ -58,7 +62,7 @@ function formatTime(timeStr) {
 
 // --- Animaatio ---
 function animateAurora(points) {
-  if (auroraLayer) auroraLayer.forEach(l => map.removeLayer(l));
+  auroraLayer.forEach(l => map.removeLayer(l));
   auroraLayer = [];
 
   const canvasWidth = 3600;
@@ -94,7 +98,7 @@ function animateAurora(points) {
     });
 
     const bounds = [[40, -180], [90, 180]];
-    const overlay = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.75, interactive: false }).addTo(map);
+    const overlay = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.75 }).addTo(map);
     auroraLayer.push(overlay);
   };
 
@@ -142,9 +146,44 @@ document.getElementById("locate-btn").addEventListener("click", () => {
   });
 });
 
-// --- Päivitys ---
-fetchAuroraData();
-setInterval(fetchAuroraData, 5*60*1000);
+// --- Klikkaus kartalla: näytä lähin intensiteetti ---
+map.on('click', (e) => {
+  const lat = e.latlng.lat;
+  const lon = e.latlng.lng;
+  showAuroraAtClickedLocation(lat, lon);
+});
+
+function showAuroraAtClickedLocation(lat, lon) {
+  if (!currentData || !currentData.coordinates) {
+    L.popup().setLatLng([lat, lon]).setContent("❌ No aurora data available.").openOn(map);
+    return;
+  }
+
+  let nearest = null, minDist = Infinity;
+  currentData.coordinates.forEach(p => {
+    let pointLon = p[0] < 0 ? p[0] + 360 : p[0];
+    let pointLat = p[1];
+    let intensity = p[2];
+    const latDiff = pointLat - lat;
+    const lonDiff = Math.abs(pointLon - lon);
+    const lonDiffNormalized = Math.min(lonDiff, 360 - lonDiff);
+    const dist = Math.hypot(latDiff, lonDiffNormalized * Math.cos(lat * Math.PI / 180));
+    if (dist < minDist) {
+      minDist = dist;
+      nearest = { lat: pointLat, lon: pointLon, intensity, distance: dist };
+    }
+  });
+
+  let message = '';
+  if (nearest.intensity > 80) message = '🌟 Strong aurora activity!';
+  else if (nearest.intensity > 60) message = '🌌 Very likely visible';
+  else if (nearest.intensity > 40) message = '✨ Moderate activity';
+  else if (nearest.intensity > 20) message = '🌙 Low activity';
+  else message = '😕 Not much northern lights';
+
+  message += `<br>Intensity: ${nearest.intensity.toFixed(1)}<br><small>Distance: ~${(nearest.distance * 111).toFixed(0)} km</small>`;
+  L.popup().setLatLng([lat, lon]).setContent(message).openOn(map);
+}
 
 // --- Valikko ---
 const menuBtn = document.getElementById("menu-btn");
@@ -205,3 +244,7 @@ async function fetchAuroraForecast() {
     }
   });
 }
+
+// --- Käynnistä ---
+fetchAuroraData();
+setInterval(fetchAuroraData, 5*60*1000);
