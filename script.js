@@ -1,7 +1,8 @@
-let auroraLayer = null;
+let auroraLayer = [];
 let userMarker = null;
 let currentData = null;
 let notificationPermissionRequested = false;
+let offset = 0;
 
 // --- Kartta ---
 const map = L.map('map', {
@@ -15,12 +16,8 @@ const map = L.map('map', {
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> & <a href="https://carto.com/">CARTO</a>',
   subdomains: 'abcd',
-  maxZoom: 19,
-  
-}).addTo(map);
-
-// Rajoitetaan näkymä yhteen maapallon levyiseen alueeseen
-map.setMaxBounds([[-90, -180], [90, 180]]);
+  maxZoom: 19
+}).map.setMaxBounds([[-90, -180], [90, 180]]);
 map.on('drag', () => map.panInsideBounds([[-90, -180],[90,180]], {animate:false}));
 
 const info = document.getElementById("info");
@@ -42,7 +39,7 @@ function fetchAuroraData() {
       info.className = '';
       info.innerHTML = `<strong>📡 Northern Lights forecast</strong><br>
         <small>Observation: ${obsTime}<br>Forecast: ${forecastTime}<br>Points: ${data.coordinates.length}</small>`;
-      drawAuroraOverlay(data.coordinates);
+      animateAurora(data.coordinates); // Käynnistä animaatio
     })
     .catch(err => {
       console.error('Error retrieving northern light data', err);
@@ -58,17 +55,9 @@ function formatTime(timeStr) {
   } catch { return timeStr; }
 }
 
-// --- Piirrä revontulet gradienttina ---
-// --- Piirrä revontulet gradienttina ympäri palloa ---
-// --- Piirrä revontulet samalla tyylillä kuin liittämässäsi ---
-let auroraLayer = [];
-let offset = 0;
-
+// --- Animaatio ---
 function animateAurora(points) {
-  // Poista vanhat overlayt
-  if (auroraLayer) {
-    auroraLayer.forEach(l => map.removeLayer(l));
-  }
+  if (auroraLayer) auroraLayer.forEach(l => map.removeLayer(l));
   auroraLayer = [];
 
   const canvasWidth = 3600;
@@ -108,55 +97,15 @@ function animateAurora(points) {
     auroraLayer.push(overlay);
   };
 
-  // Piirrä kolme overlayta offsetilla
   createCanvasOverlay(offset);
   createCanvasOverlay(offset - canvasWidth);
   createCanvasOverlay(offset + canvasWidth);
 
-  // Päivitä offset ja animaatio
-  offset += 5; // nopeus
+  offset += 5;
   if (offset > canvasWidth) offset = 0;
 
   requestAnimationFrame(() => animateAurora(points));
 }
-
-
-function hideInfoAfterDelay() {
-  setTimeout(() => {
-    document.getElementById("info").style.display = "none";
-  }, 5000); // 5 sekuntia
-}
-
-
-
-// --- Tarkista käyttäjän sijainti ja revontulet ---
-function checkAuroraAtLocation(userLat,userLon) {
-  if(!currentData||!currentData.coordinates) return;
-  let nearest=null,minDist=Infinity;
-  currentData.coordinates.forEach(p=>{
-    let lon = p[0]<0? p[0]+360:p[0];
-    let lat=p[1]; let intensity=p[2];
-    const latDiff = lat-userLat;
-    const lonDiff = Math.abs(lon-userLon);
-    const lonDiffNormalized = Math.min(lonDiff,360-lonDiff);
-    const dist=Math.hypot(latDiff,lonDiffNormalized*Math.cos(userLat*Math.PI/180));
-    if(dist<minDist){minDist=dist;nearest={lat,lon,intensity,distance:dist};}
-  });
-  if(nearest){
-    let message='',emoji='';
-    if(nearest.intensity>80){emoji='🌟';message=`${emoji} <strong>Strong aurora activity!</strong><br>Intensiteetti: ${nearest.intensity.toFixed(1)}`;}
-    else if(nearest.intensity>60){emoji='🌌';message=`${emoji} <strong>Northern lights very likely to be visible</strong><br>Intensiteetti: ${nearest.intensity.toFixed(1)}`;}
-    else if(nearest.intensity>40){emoji='✨';message=`${emoji} <strong>Moderate activity</strong><br>Intensiteetti: ${nearest.intensity.toFixed(1)}`;}
-    else if(nearest.intensity>20){emoji='🌙';message=`${emoji} <strong>Low activity</strong><br>Intensiteetti: ${nearest.intensity.toFixed(1)}`;}
-    else{emoji='😕';message=`${emoji} <strong>Not much northern lights</strong><br>Intensiteetti: ${nearest.intensity.toFixed(1)}`;}
-    message+=`<br><small>Distance to data point: ~${(nearest.distance*111).toFixed(0)} km</small>`;
-    L.popup().setLatLng([userLat,userLon]).setContent(message).openOn(map);
-    if(Notification.permission==="granted"&&nearest.intensity>5){
-      new Notification("🌌 Northern Lights alert",{body:message.replace(/<[^>]*>/g,'')});
-    }
-  }
-}
-
 
 // --- Käyttäjän sijainti ---
 if (navigator.geolocation) {
@@ -167,8 +116,6 @@ if (navigator.geolocation) {
     userMarker = L.marker([lat, lon]).addTo(map).bindPopup('Your location');
     checkAuroraAtLocation(lat, lon);
   });
-} else {
-  alert("Your browser does not support location detection.");
 }
 
 // --- Nappi oman sijainnin näyttämiseen ---
@@ -191,155 +138,18 @@ document.getElementById("locate-btn").addEventListener("click", () => {
 
     userMarker.openPopup();
     checkAuroraAtLocation(lat, lon);
-  }, err => {
-    alert("Location determination failed: " + err.message);
   });
 });
 
-
-   
-// --- Säännöllinen päivitys ---
+// --- Päivitys ---
 fetchAuroraData();
 setInterval(fetchAuroraData, 5*60*1000);
 
-// --- Valikon toiminta ---
+// --- Valikko ---
 const menuBtn = document.getElementById("menu-btn");
 const menu = document.getElementById("menu");
-
 menuBtn.addEventListener("click", () => {
   menu.style.display = menu.style.display === "flex" ? "none" : "flex";
 });
-map.on('click', () => { 
-  menu.style.display = 'none'; 
-});
+map.on('click', () => { menu.style.display = 'none'; });
 
-
-
-hideInfoAfterDelay();
- // --- Klikkaus kartalla: näytä revontulitilanne ---
-map.on('click', (e) => {
-  const lat = e.latlng.lat;
-  const lon = e.latlng.lng;
-  showAuroraAtClickedLocation(lat, lon);
-});
-
-function showAuroraAtClickedLocation(lat, lon) {
-  if (!currentData || !currentData.coordinates) {
-    L.popup()
-      .setLatLng([lat, lon])
-      .setContent("❌ No aurora data available.")
-      .openOn(map);
-    return;
-  }
-
-  let nearest = null, minDist = Infinity;
-  currentData.coordinates.forEach(p => {
-    let pointLon = p[0] < 0 ? p[0] + 360 : p[0];
-    let pointLat = p[1];
-    let intensity = p[2];
-    const latDiff = pointLat - lat;
-    const lonDiff = Math.abs(pointLon - lon);
-    const lonDiffNormalized = Math.min(lonDiff, 360 - lonDiff);
-    const dist = Math.hypot(latDiff, lonDiffNormalized * Math.cos(lat * Math.PI / 180));
-    if (dist < minDist) {
-      minDist = dist;
-      nearest = { lat: pointLat, lon: pointLon, intensity, distance: dist };
-    }
-  });
-
-  let message = '', emoji = '';
-  if (nearest.intensity > 80) { emoji = '🌟'; message = `${emoji} <strong>Strong aurora activity!</strong>`; }
-  else if (nearest.intensity > 60) { emoji = '🌌'; message = `${emoji} <strong>Very likely visible</strong>`; }
-  else if (nearest.intensity > 40) { emoji = '✨'; message = `${emoji} <strong>Moderate activity</strong>`; }
-  else if (nearest.intensity > 20) { emoji = '🌙'; message = `${emoji} <strong>Low activity</strong>`; }
-  else { emoji = '😕'; message = `${emoji} <strong>Not much northern lights</strong>`; }
-
-  message += `<br>Intensity: ${nearest.intensity.toFixed(1)}<br><small>Distance to data point: ~${(nearest.distance * 111).toFixed(0)} km</small>`;
-
-  L.popup()
-    .setLatLng([lat, lon])
-    .setContent(message)
-    .openOn(map);
-} 
-
-// --- Pop-up Help Logic ---
-document.addEventListener('DOMContentLoaded', () => {
-  const helpPopup = document.getElementById('help-popup');
-  const closePopupBtn = document.getElementById('close-popup');
-  const dontShowAgainCheckbox = document.getElementById('dont-show-again');
-
-  // Show popup only if user hasn't disabled it
-  if (!localStorage.getItem('hideHelpPopup')) {
-    helpPopup.style.display = 'flex';
-  }
-
-  closePopupBtn.addEventListener('click', () => {
-    if (dontShowAgainCheckbox.checked) {
-      localStorage.setItem('hideHelpPopup', 'true');
-    }
-    helpPopup.style.display = 'none';
-  });
-});
-  
-
-const showHelpLink = document.getElementById('show-help');
-showHelpLink.addEventListener('click', (e) => {
-  e.preventDefault(); // estää #-linkin hyppäämisen
-  document.getElementById('help-popup').style.display = 'flex';
-});
-
-// Chart.js CDN
-// Lisää Chart.js
-const chartScript = document.createElement('script');
-chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js';
-document.head.appendChild(chartScript);
-
-// Näytä popup
-document.getElementById('forecast-btn').addEventListener('click', () => {
-  document.getElementById('forecast-popup').style.display = 'flex';
-  fetchAuroraForecast();
-});
-
-// Sulje popup
-document.getElementById('close-forecast').addEventListener('click', () => {
-  document.getElementById('forecast-popup').style.display = 'none';
-});
-
-// Hae NOAA-data ja piirrä graafi
-async function fetchAuroraForecast() {
-  const response = await fetch('https://services.swpc.noaa.gov/text/3-day-forecast.txt');
-  const text = await response.text();
-
-  const kpRegex = /(\d{2}-\d{2}UT)\s+(\d+\.\d+)/g;
-  const kpValues = [];
-  let match;
-  while ((match = kpRegex.exec(text)) !== null) {
-    kpValues.push({ time: match[1], kp: parseFloat(match[2]) });
-  }
-
-  const labels = kpValues.map(v => v.time);
-  const dataPoints = kpValues.map(v => v.kp);
-  const colors = kpValues.map(v => v.kp < 3 ? 'green' : v.kp < 5 ? 'orange' : 'red');
-
-  const ctx = document.getElementById('kpChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Kp index forecast',
-        data: dataPoints,
-        borderColor: 'blue',
-        pointBackgroundColor: colors,
-        pointRadius: 9,
-        fill: false,
-        tension: 0.3
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { title: { display: true, text: 'Northern Lights forecast (NOAA)' } },
-      scales: { y: { min: 0, max: 9 } }
-    }
-  });
-}
