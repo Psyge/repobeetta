@@ -223,6 +223,7 @@ header.banner::after {
   background-size: 600% 600%;
   animation: aurora 20s ease infinite;
   z-index: -1; /* taustalle */
+  opacity: 1;
 }
 
 @keyframes aurora {
