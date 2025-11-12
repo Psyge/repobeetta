@@ -326,7 +326,7 @@ async function fetchAuroraForecast() {
     },
     options: {
       responsive: true,
-      plugins: { title: { display: true, text: 'Revontulien Kp-ennuste (NOAA)' } },
+      plugins: { title: { display: true, text: 'Northern Lights Kp forecast (NOAA)' } },
       scales: { y: { min: 0, max: 9 } }
     }
   });
