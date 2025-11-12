@@ -8,7 +8,7 @@ const map = L.map('map', {
   center: [65, 25],
   zoom: 4,
   minZoom: 2,
-  maxZoom: 12,
+  maxZoom: 15,
   worldCopyJump: false
 });
 
