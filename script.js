@@ -61,57 +61,48 @@ function formatTime(timeStr) {
 // --- Piirrä revontulet gradienttina ---
 // --- Piirrä revontulet gradienttina ympäri palloa ---
 // --- Piirrä revontulet samalla tyylillä kuin liittämässäsi ---
-function drawAuroraOverlay(points) {
-  if (auroraLayer) {
-    auroraLayer.forEach(l => map.removeLayer(l));
-  }
+function drawAuroraOnce(points) {
+  auroraLayer.forEach(l => map.removeLayer(l));
   auroraLayer = [];
 
   const canvasWidth = 3600;
   const canvasHeight = 500;
 
-  const createCanvasOverlay = (xOffset = 0, clipStart = -Infinity, clipEnd = Infinity) => {
-    const canvas = document.createElement('canvas');
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
-    const ctx = canvas.getContext('2d');
+  const canvas = document.createElement('canvas');
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
+  const ctx = canvas.getContext('2d');
 
-    points.forEach(p => {
-      let lon = p[0]; 
-      if (lon < 0) lon += 360; // normalize 0-360
-      if (lon < clipStart || lon > clipEnd) return; // piirrä vain sallitulle alueelle
-      const lat = p[1];
-      const intensity = p[2];
-      if (intensity < 1) return;
+  points.forEach(p => {
+    let lon = p[0];
+    if (lon < 0) lon += 360;
+    const lat = p[1];
+    const intensity = p[2];
+    if (intensity < 1) return;
 
-      const x = ((lon + 180) / 360) * canvasWidth + xOffset;
-      const y = ((90 - lat) / 50) * canvasHeight;
+    const x = ((lon + 180) / 360) * canvasWidth;
+    const y = ((90 - lat) / 50) * canvasHeight;
 
-      const radius = Math.min(60, Math.max(10, intensity * 3));
+    const radius = Math.min(60, Math.max(10, intensity * 3));
 
-      const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
-      grad.addColorStop(0, `rgba(50,255,100,${Math.min(0.3, intensity / 10)})`);
-      grad.addColorStop(0.5, `rgba(0,200,100,${Math.min(0.1, intensity / 15)})`);
-      grad.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = grad;
+    const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
+    grad.addColorStop(0, `rgba(50,255,100,${Math.min(0.3, intensity / 10)})`);
+    grad.addColorStop(0.5, `rgba(0,200,100,${Math.min(0.1, intensity / 15)})`);
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grad;
 
-      ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI*2);
-      ctx.fill();
-    });
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fill();
+  });
 
-    const bounds = [[40, -180], [90, 180]];
-    const overlay = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.75, interactive: false }).addTo(map);
-    auroraLayer.push(overlay);
-  };
+  const bounds = [[40, -180], [90, 180]];
+  const overlay = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.75 }).addTo(map);
+  auroraLayer.push(overlay);
 
-  // piirretään kolme overlayta, mutta rajoitetaan missä alueella pisteitä piirretään
-  createCanvasOverlay(0);       // alkuperäinen
-  createCanvasOverlay(-canvasWidth); // vasen kopio
-  createCanvasOverlay(canvasWidth);   // oikea kopio
-
+  // Lisää CSS-animaatio overlay-elementtiin
+  overlay.getElement().classList.add('aurora-move');
 }
-
 
 function hideInfoAfterDelay() {
   setTimeout(() => {
