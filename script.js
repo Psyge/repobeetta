@@ -108,16 +108,7 @@ function animateAurora(points) {
   createCanvasOverlay(-canvasWidth); // vasen kopio
   createCanvasOverlay(canvasWidth);   // oikea kopio
   
-  // Piirrä kolme overlayta offsetilla
-  createCanvasOverlay(offset);
-  createCanvasOverlay(offset - canvasWidth);
-  createCanvasOverlay(offset + canvasWidth);
 
-  // Päivitä offset ja animaatio
-  offset += 5; // nopeus
-  if (offset > canvasWidth) offset = 0;
-
-  requestAnimationFrame(() => animateAurora(points));
 }
 
 
