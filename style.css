@@ -221,6 +221,14 @@ header.banner::after {
   font-size: 24px; /* isompi koko */
   font-weight: bold; /* tekee pisteestä paksumman */
 }
+.aurora-move {
+  animation: auroraShift 10s ease-in-out infinite alternate;
+}
+
+@keyframes auroraShift {
+  0% { transform: translateX(0px); }
+  100% { transform: translateX(30px); }
+}
 
 /* Mobiili */
 @media (max-width: 768px) {
