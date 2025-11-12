@@ -61,7 +61,11 @@ function formatTime(timeStr) {
 // --- Piirrä revontulet gradienttina ---
 // --- Piirrä revontulet gradienttina ympäri palloa ---
 // --- Piirrä revontulet samalla tyylillä kuin liittämässäsi ---
-function drawAuroraOverlay(points) {
+let auroraLayer = [];
+let offset = 0;
+
+function animateAurora(points) {
+  // Poista vanhat overlayt
   if (auroraLayer) {
     auroraLayer.forEach(l => map.removeLayer(l));
   }
@@ -70,16 +74,15 @@ function drawAuroraOverlay(points) {
   const canvasWidth = 3600;
   const canvasHeight = 500;
 
-  const createCanvasOverlay = (xOffset = 0, clipStart = -Infinity, clipEnd = Infinity) => {
+  const createCanvasOverlay = (xOffset = 0) => {
     const canvas = document.createElement('canvas');
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
     const ctx = canvas.getContext('2d');
 
     points.forEach(p => {
-      let lon = p[0]; 
-      if (lon < 0) lon += 360; // normalize 0-360
-      if (lon < clipStart || lon > clipEnd) return; // piirrä vain sallitulle alueelle
+      let lon = p[0];
+      if (lon < 0) lon += 360;
       const lat = p[1];
       const intensity = p[2];
       if (intensity < 1) return;
@@ -96,7 +99,7 @@ function drawAuroraOverlay(points) {
       ctx.fillStyle = grad;
 
       ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI*2);
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
       ctx.fill();
     });
 
@@ -105,11 +108,16 @@ function drawAuroraOverlay(points) {
     auroraLayer.push(overlay);
   };
 
-  // piirretään kolme overlayta, mutta rajoitetaan missä alueella pisteitä piirretään
-  createCanvasOverlay(0);       // alkuperäinen
-  createCanvasOverlay(-canvasWidth); // vasen kopio
-  createCanvasOverlay(canvasWidth);   // oikea kopio
-  
+  // Piirrä kolme overlayta offsetilla
+  createCanvasOverlay(offset);
+  createCanvasOverlay(offset - canvasWidth);
+  createCanvasOverlay(offset + canvasWidth);
+
+  // Päivitä offset ja animaatio
+  offset += 5; // nopeus
+  if (offset > canvasWidth) offset = 0;
+
+  requestAnimationFrame(() => animateAurora(points));
 }
 
 
