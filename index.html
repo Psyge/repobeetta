@@ -67,8 +67,15 @@
   <div id="map">
   <button id="locate-btn">📍 Show my location</button>
   <button id="markers-btn">Show markers</button>  
+  <button id="forecast-btn">Aurora Forecast</button>  
   </div>
 </div>
+
+<div id="forecast-overlay" style="display:none;">
+  <button id="close-forecast" style="float:right;">✖</button>
+  <canvas id="kpChart" width="300" height="200"></canvas>
+</div>
+  
 <div id="info" class="loading">⏳ Loading northern lights forecast...</div>
 
 <!-- Leaflet JS -->
