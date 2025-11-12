@@ -71,10 +71,15 @@
   </div>
 </div>
 
-<div id="forecast-overlay" style="display:none;">
-  <button id="close-forecast" style="float:right;">✖</button>
-  <canvas id="kpChart" width="300" height="200"></canvas>
+
+<div id="forecast-popup" class="popup" style="display:none;">
+  <div class="popup-content">
+    <h2>Northern Lights forecast (NOAA)</h2>
+    <canvas id="kpChart" width="280" height="180"></canvas>
+    <button id="close-forecast">Close</button>
+  </div>
 </div>
+
   
 <div id="info" class="loading">⏳ Loading northern lights forecast...</div>
 
