@@ -279,3 +279,55 @@ showHelpLink.addEventListener('click', (e) => {
   e.preventDefault(); // estää #-linkin hyppäämisen
   document.getElementById('help-popup').style.display = 'flex';
 });
+
+// Chart.js CDN
+const chartScript = document.createElement('script');
+chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+document.head.appendChild(chartScript);
+
+document.getElementById('forecast-btn').addEventListener('click', () => {
+  document.getElementById('forecast-overlay').style.display = 'block';
+  fetchAuroraForecast();
+});
+
+document.getElementById('close-forecast').addEventListener('click', () => {
+  document.getElementById('forecast-overlay').style.display = 'none';
+});
+
+async function fetchAuroraForecast() {
+  const response = await fetch('https://services.swpc.noaa.gov/text/3-day-forecast.txt');
+  const text = await response.text();
+
+  const kpRegex = /(\d{2}-\d{2}UT)\s+(\d+\.\d+)/g;
+  const kpValues = [];
+  let match;
+  while ((match = kpRegex.exec(text)) !== null) {
+    kpValues.push({ time: match[1], kp: parseFloat(match[2]) });
+  }
+
+  const labels = kpValues.map(v => v.time);
+  const dataPoints = kpValues.map(v => v.kp);
+  const colors = kpValues.map(v => v.kp < 3 ? 'green' : v.kp < 5 ? 'orange' : 'red');
+
+  const ctx = document.getElementById('kpChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Kp-indeksi ennuste',
+        data: dataPoints,
+        borderColor: 'blue',
+        pointBackgroundColor: colors,
+        pointRadius: 6,
+        fill: false,
+        tension: 0.3
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { title: { display: true, text: 'Revontulien Kp-ennuste (NOAA)' } },
+      scales: { y: { min: 0, max: 9 } }
+    }
+  });
+}
