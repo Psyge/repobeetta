@@ -196,7 +196,7 @@ header.banner::after {
 #forecast-btn {
   position: absolute;
   top: 90px; /* Show my location on top, markers below, forecast next */
-  left: 10px;
+  right: 10px;
   padding: 8px 12px;
   background: #fff;
   border: 1px solid #ccc;
@@ -207,7 +207,7 @@ header.banner::after {
 
 #forecast-overlay {
   position: absolute;
-  top: 60px;
+  top: 140px;
   right: 20px;
   background: #fff;
   padding: 10px;
