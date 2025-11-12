@@ -107,8 +107,8 @@ function animateAurora(points) {
   createCanvasOverlay(offset + canvasWidth);
 
   // Liiku vain vähän edestakaisin
-  offset += direction * 0.5; // nopeus (0.5 px per frame)
-  if (offset > 50 || offset < -50) direction *= -1; // vaihda suunta
+  offset += direction * 0.2; // nopeus (0.5 px per frame)
+  if (offset > 25 || offset < -25) direction *= -1; // vaihda suunta
 
   requestAnimationFrame(() => animateAurora(points));
 }
