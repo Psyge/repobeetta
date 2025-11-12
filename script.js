@@ -319,14 +319,14 @@ async function fetchAuroraForecast() {
         data: dataPoints,
         borderColor: 'blue',
         pointBackgroundColor: colors,
-        pointRadius: 6,
+        pointRadius: 9,
         fill: false,
         tension: 0.3
       }]
     },
     options: {
       responsive: true,
-      plugins: { title: { display: true, text: 'Northern Lights Kp forecast (NOAA)' } },
+      plugins: { title: { display: true, text: 'Northern Lights forecast (NOAA)' } },
       scales: { y: { min: 0, max: 9 } }
     }
   });
