@@ -319,7 +319,7 @@ async function fetchAuroraForecast() {
     data: {
       labels: labels,
       datasets: [{
-        label: 'Kp-indeksi ennuste',
+        label: 'Kp index forecast',
         data: dataPoints,
         borderColor: 'blue',
         pointBackgroundColor: colors,
@@ -330,7 +330,7 @@ async function fetchAuroraForecast() {
     },
     options: {
       responsive: true,
-      plugins: { title: { display: true, text: 'Revontulien Kp-ennuste (NOAA)' } },
+      plugins: { title: { display: true, text: 'Northern Lights forecast (NOAA)' } },
       scales: { y: { min: 0, max: 9 } }
     }
   });
