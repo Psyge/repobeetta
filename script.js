@@ -42,7 +42,7 @@ function fetchAuroraData() {
       info.className = '';
       info.innerHTML = `<strong>📡 Northern Lights forecast</strong><br>
         <small>Observation: ${obsTime}<br>Forecast: ${forecastTime}<br>Points: ${data.coordinates.length}</small>`;
-      drawAuroraOverlay(data.coordinates);
+      drawAuroraOnce(data.coordinates);
     })
     .catch(err => {
       console.error('Error retrieving northern light data', err);
