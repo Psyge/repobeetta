@@ -62,20 +62,15 @@ function formatTime(timeStr) {
 // --- Piirrä revontulet gradienttina ympäri palloa ---
 // --- Piirrä revontulet samalla tyylillä kuin liittämässäsi ---
 function drawAuroraOverlay(points) {
-let auroraLayer = [];
-let offset = 0;
-
-function animateAurora(points) {
-  // Poista vanhat overlayt
   if (auroraLayer) {
     auroraLayer.forEach(l => map.removeLayer(l));
   }
-@@ -70,16 +74,15 @@
+  auroraLayer = [];
+
   const canvasWidth = 3600;
   const canvasHeight = 500;
 
   const createCanvasOverlay = (xOffset = 0, clipStart = -Infinity, clipEnd = Infinity) => {
-  const createCanvasOverlay = (xOffset = 0) => {
     const canvas = document.createElement('canvas');
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
@@ -85,21 +80,28 @@ function animateAurora(points) {
       let lon = p[0]; 
       if (lon < 0) lon += 360; // normalize 0-360
       if (lon < clipStart || lon > clipEnd) return; // piirrä vain sallitulle alueelle
-      let lon = p[0];
-      if (lon < 0) lon += 360;
       const lat = p[1];
       const intensity = p[2];
       if (intensity < 1) return;
-@@ -96,7 +99,7 @@
+
+      const x = ((lon + 180) / 360) * canvasWidth + xOffset;
+      const y = ((90 - lat) / 50) * canvasHeight;
+
+      const radius = Math.min(60, Math.max(10, intensity * 3));
+
+      const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
+      grad.addColorStop(0, `rgba(50,255,100,${Math.min(0.3, intensity / 10)})`);
+      grad.addColorStop(0.5, `rgba(0,200,100,${Math.min(0.1, intensity / 15)})`);
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = grad;
 
       ctx.beginPath();
       ctx.arc(x, y, radius, 0, Math.PI*2);
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
       ctx.fill();
     });
 
-@@ -105,233 +108,238 @@
+    const bounds = [[40, -180], [90, 180]];
+    const overlay = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.75, interactive: false }).addTo(map);
     auroraLayer.push(overlay);
   };
 
@@ -107,7 +109,6 @@ function animateAurora(points) {
   createCanvasOverlay(0);       // alkuperäinen
   createCanvasOverlay(-canvasWidth); // vasen kopio
   createCanvasOverlay(canvasWidth);   // oikea kopio
-  
 
 }
 
@@ -323,6 +324,7 @@ async function fetchAuroraForecast() {
         borderColor: 'blue',
         pointBackgroundColor: colors,
         pointRadius: 9,
+        
         fill: false,
         tension: 0.3
       }]
