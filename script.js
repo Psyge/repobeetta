@@ -13,12 +13,14 @@ const map = L.map('map', {
   worldCopyJump: false
 });
 
+
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> & <a href="https://carto.com/">CARTO</a>',
   subdomains: 'abcd',
   maxZoom: 19
-}).map.setMaxBounds([[-90, -180], [90, 180]]);
-map.on('drag', () => map.panInsideBounds([[-90, -180],[90,180]], {animate:false}));
+}).addTo(map);
+
+map.setMaxBounds([[-90, -180], [90, 180]]);
 
 const info = document.getElementById("info");
 
@@ -54,7 +56,7 @@ function formatTime(timeStr) {
     return date.toLocaleString('fi-FI',{day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'});
   } catch { return timeStr; }
 }
-
+console.log("Aurora data loaded:", data.coordinates.length);
 // --- Animaatio ---
 function animateAurora(points) {
   if (auroraLayer) auroraLayer.forEach(l => map.removeLayer(l));
