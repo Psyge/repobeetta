@@ -285,13 +285,15 @@ const chartScript = document.createElement('script');
 chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js';
 document.head.appendChild(chartScript);
 
+// Näytä popup
 document.getElementById('forecast-btn').addEventListener('click', () => {
-  document.getElementById('forecast-overlay').style.display = 'block';
+  document.getElementById('forecast-popup').style.display = 'flex';
   fetchAuroraForecast();
 });
 
+// Sulje popup
 document.getElementById('close-forecast').addEventListener('click', () => {
-  document.getElementById('forecast-overlay').style.display = 'none';
+  document.getElementById('forecast-popup').style.display = 'none';
 });
 
 async function fetchAuroraForecast() {
