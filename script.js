@@ -1,4 +1,4 @@
-let auroraLayer = [];
+let auroraLayer = null;
 let userMarker = null;
 let currentData = null;
 let notificationPermissionRequested = false;
@@ -42,7 +42,7 @@ function fetchAuroraData() {
       info.className = '';
       info.innerHTML = `<strong>📡 Northern Lights forecast</strong><br>
         <small>Observation: ${obsTime}<br>Forecast: ${forecastTime}<br>Points: ${data.coordinates.length}</small>`;
-      drawAuroraOnce(data.coordinates);
+      drawAuroraOverlay(data.coordinates);
     })
     .catch(err => {
       console.error('Error retrieving northern light data', err);
@@ -61,57 +61,71 @@ function formatTime(timeStr) {
 // --- Piirrä revontulet gradienttina ---
 // --- Piirrä revontulet gradienttina ympäri palloa ---
 // --- Piirrä revontulet samalla tyylillä kuin liittämässäsi ---
-function drawAuroraOnce(points) {
-  auroraLayer.forEach(l => map.removeLayer(l));
-  auroraLayer = [];
+function drawAuroraOverlay(points) {
+let auroraLayer = [];
+let offset = 0;
 
+function animateAurora(points) {
+  // Poista vanhat overlayt
+  if (auroraLayer) {
+    auroraLayer.forEach(l => map.removeLayer(l));
+  }
+@@ -70,16 +74,15 @@
   const canvasWidth = 3600;
   const canvasHeight = 500;
 
-  const canvas = document.createElement('canvas');
-  canvas.width = canvasWidth;
-  canvas.height = canvasHeight;
-  const ctx = canvas.getContext('2d');
+  const createCanvasOverlay = (xOffset = 0, clipStart = -Infinity, clipEnd = Infinity) => {
+  const createCanvasOverlay = (xOffset = 0) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+    const ctx = canvas.getContext('2d');
 
-  points.forEach(p => {
-    let lon = p[0];
-    if (lon < 0) lon += 360;
-    const lat = p[1];
-    const intensity = p[2];
-    if (intensity < 1) return;
+    points.forEach(p => {
+      let lon = p[0]; 
+      if (lon < 0) lon += 360; // normalize 0-360
+      if (lon < clipStart || lon > clipEnd) return; // piirrä vain sallitulle alueelle
+      let lon = p[0];
+      if (lon < 0) lon += 360;
+      const lat = p[1];
+      const intensity = p[2];
+      if (intensity < 1) return;
+@@ -96,7 +99,7 @@
+      ctx.fillStyle = grad;
 
-    const x = ((lon + 180) / 360) * canvasWidth;
-    const y = ((90 - lat) / 50) * canvasHeight;
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI*2);
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fill();
+    });
 
-    const radius = Math.min(60, Math.max(10, intensity * 3));
-
-    const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
-    grad.addColorStop(0, `rgba(50,255,100,${Math.min(0.3, intensity / 10)})`);
-    grad.addColorStop(0.5, `rgba(0,200,100,${Math.min(0.1, intensity / 15)})`);
-    grad.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = grad;
-
-    ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
-    ctx.fill();
-  });
-
-
-    const bounds = [[40, -180], [90, 180]];
-    const overlay = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.75 }).addTo(map);
+@@ -105,233 +108,238 @@
     auroraLayer.push(overlay);
-
-    if (addAnimation) {
-      overlay.getElement().classList.add('aurora-move');
-    }
   };
 
-  // ✅ Piirrä kolme overlayta
-  createCanvasOverlay(0, true); // keskimmäinen liikkuu
+  // piirretään kolme overlayta, mutta rajoitetaan missä alueella pisteitä piirretään
+  createCanvasOverlay(0);       // alkuperäinen
   createCanvasOverlay(-canvasWidth); // vasen kopio
-  createCanvasOverlay(canvasWidth);  // oikea kopio
+  createCanvasOverlay(canvasWidth);   // oikea kopio
+  
+  // Piirrä kolme overlayta offsetilla
+  createCanvasOverlay(offset);
+  createCanvasOverlay(offset - canvasWidth);
+  createCanvasOverlay(offset + canvasWidth);
+
+  // Päivitä offset ja animaatio
+  offset += 5; // nopeus
+  if (offset > canvasWidth) offset = 0;
+
+  requestAnimationFrame(() => animateAurora(points));
 }
 
+
+function hideInfoAfterDelay() {
+  setTimeout(() => {
+    document.getElementById("info").style.display = "none";
+  }, 5000); // 5 sekuntia
+}
 
 
 
@@ -275,6 +289,7 @@ showHelpLink.addEventListener('click', (e) => {
 });
 
 // Chart.js CDN
+// Lisää Chart.js
 const chartScript = document.createElement('script');
 chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js';
 document.head.appendChild(chartScript);
@@ -290,6 +305,7 @@ document.getElementById('close-forecast').addEventListener('click', () => {
   document.getElementById('forecast-popup').style.display = 'none';
 });
 
+// Hae NOAA-data ja piirrä graafi
 async function fetchAuroraForecast() {
   const response = await fetch('https://services.swpc.noaa.gov/text/3-day-forecast.txt');
   const text = await response.text();
@@ -327,4 +343,3 @@ async function fetchAuroraForecast() {
     }
   });
 }
-
