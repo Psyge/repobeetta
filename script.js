@@ -324,4 +324,4 @@ async function fetchAuroraForecast() {
     }
   });
 }
-drawAuroraOnce(data.coordinates);
+
