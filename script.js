@@ -281,19 +281,23 @@ showHelpLink.addEventListener('click', (e) => {
 });
 
 // Chart.js CDN
+// Lisää Chart.js
 const chartScript = document.createElement('script');
 chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js';
 document.head.appendChild(chartScript);
 
+// Näytä popup
 document.getElementById('forecast-btn').addEventListener('click', () => {
-  document.getElementById('forecast-overlay').style.display = 'block';
+  document.getElementById('forecast-popup').style.display = 'flex';
   fetchAuroraForecast();
 });
 
+// Sulje popup
 document.getElementById('close-forecast').addEventListener('click', () => {
-  document.getElementById('forecast-overlay').style.display = 'none';
+  document.getElementById('forecast-popup').style.display = 'none';
 });
 
+// Hae NOAA-data ja piirrä graafi
 async function fetchAuroraForecast() {
   const response = await fetch('https://services.swpc.noaa.gov/text/3-day-forecast.txt');
   const text = await response.text();
@@ -315,7 +319,7 @@ async function fetchAuroraForecast() {
     data: {
       labels: labels,
       datasets: [{
-        label: 'Kp index forecast',
+        label: 'Kp-indeksi ennuste',
         data: dataPoints,
         borderColor: 'blue',
         pointBackgroundColor: colors,
@@ -326,7 +330,7 @@ async function fetchAuroraForecast() {
     },
     options: {
       responsive: true,
-      plugins: { title: { display: true, text: 'Northern Lights Kp forecast (NOAA)' } },
+      plugins: { title: { display: true, text: 'Revontulien Kp-ennuste (NOAA)' } },
       scales: { y: { min: 0, max: 9 } }
     }
   });
