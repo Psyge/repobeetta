@@ -5,6 +5,7 @@ const places = [
   { name: 'Ylläs', lat: 67.57, lon: 24.20, url: 'https://yllas.fi/', icon: 'yllas.png' }
 ];
     
+
 const customIcon = L.divIcon({
   className: 'drop-icon',
   html: `
@@ -17,6 +18,7 @@ const customIcon = L.divIcon({
   iconAnchor: [16, 40],
   popupAnchor: [0, -40]
 });
+
 
 
     
