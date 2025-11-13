@@ -316,16 +316,19 @@ async function fetchAuroraForecast() {
     }
 
     // --- Parsitaan NOAA:n data ---
-    const kpRegex = /^\s*(\d{2}-\d{2}UT)\s+([\d\.\s\(\)G]+)/gm;
+    // sallitaan sekä välilyönnit että tabit ja mahdolliset (G1) tms.
+    const kpRegex = /[ \t]*(\d{2}-\d{2}UT)[ \t]+([\d\.\(\)G \t]+)/g;
     const times = [];
     const day1 = [], day2 = [], day3 = [];
     let match;
+    let lineCount = 0;
 
     while ((match = kpRegex.exec(text)) !== null) {
-      const time = match[1];
+      lineCount++;
+      const time = match[1].trim();
       const clean = match[2]
-        .replace(/\(G\d\)/g, '')   // poista G-tasot
-        .replace(/\s+/g, ' ')      // tasoita välilyönnit
+        .replace(/\(G\d\)/g, '')   // poista (G1),(G2),(G3)
+        .replace(/[ \t]+/g, ' ')   // tasoita välit
         .trim();
 
       const values = clean.split(' ').map(Number);
@@ -335,10 +338,16 @@ async function fetchAuroraForecast() {
         day1.push(values[0]);
         day2.push(values[1]);
         day3.push(values[2]);
+      } else {
+        console.log("Ohitettiin rivi:", match[0], " -> tulkittiin:", values);
       }
     }
 
-    if (times.length === 0) throw new Error("Kp-arvoja ei löytynyt datasta – formaatti on voinut muuttua.");
+    console.log(`Löydettiin ${lineCount} riviä, joista ${times.length} kelvollista.`);
+
+    if (times.length === 0) {
+      throw new Error("Kp-arvoja ei löytynyt datasta – tarkista regex tai datan muoto.");
+    }
 
     console.log("Aikavälit:", times);
     console.log("Päivä 1:", day1);
