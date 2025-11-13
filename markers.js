@@ -9,12 +9,20 @@ const markersLayer = L.layerGroup().addTo(map);
 
 function addMarkers() {
   places.forEach(place => {
-    const customIcon = L.icon({
-      iconUrl: 'pinni.png', // tämä on pisaran muotoinen pinni
-      iconSize: [50, 70],        // sama kuin kuvan koko
-      iconAnchor: [25, 70],      // kärki osoittaa oikeaan paikkaan
-      popupAnchor: [0, -70]
-    });
+    
+const customIcon = L.divIcon({
+  className: '',
+  html: `
+    <div class="marker-wrapper">
+      <img src="images/pin.png" class="pin">
+      <img src="${place.icon}" class="pin-icon">
+    </div>
+  `,
+  iconSize: [50, 70],
+  iconAnchor: [25, 70],
+  popupAnchor: [0, -70]
+});
+
 
     const popupContent = `
       <strong>${place.name}</strong><br>
