@@ -231,6 +231,25 @@ header.banner::after {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-5px); }
 }
+.marker-wrapper {
+  position: relative;
+  width: 50px;
+  height: 70px;
+}
+.pin {
+  width: 100%;
+}
+.pin-icon {
+  position: absolute;
+  top: 6px; /* siirtää ympyrän yläosaan */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: white;
+  padding: 2px;
+}
 
 
 /* Mobiili */
