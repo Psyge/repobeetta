@@ -229,8 +229,12 @@ header.banner::after {
 }
 
 .pin {
-  width: 100%;
+ 
+ width: 100%;
   height: auto;
+  max-width: 32px;   /* pakottaa oikean koon */
+  max-height: 48px;
+
 }
 
 .pin-icon {
