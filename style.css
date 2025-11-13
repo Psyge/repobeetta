@@ -235,6 +235,19 @@ header.banner::after {
   border-radius: 50%;
 }
 
+.marker-wrapper {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px); /* liike ylös */
+  }
+}
+
 
 .pin {
  
