@@ -17,15 +17,10 @@ function addMarkers() {
           <img src="${place.icon}" class="pin-icon">
         </div>
       `,
-      iconSize: [32, 48],      // pienempi koko
-      iconAnchor: [16, 48],    // kärki osoittaa oikeaan paikkaan
+      iconSize: [32, 48],
+      iconAnchor: [16, 48],
       popupAnchor: [0, -48]
     });
-
- document.querySelectorAll('.marker-wrapper').forEach(el => {
-    el.style.animationDelay = `${Math.random() * 2}s`;
-  });
-}
 
     const popupContent = `
       <strong>${place.name}</strong><br>
@@ -36,6 +31,11 @@ function addMarkers() {
     L.marker([place.lat, place.lon], { icon: customIcon })
       .bindPopup(popupContent)
       .addTo(markersLayer);
+  });
+
+  // Nyt markerit ovat DOMissa → lisätään satunnainen viive
+  document.querySelectorAll('.marker-wrapper').forEach(el => {
+    el.style.animationDelay = `${Math.random() * 2}s`;
   });
 }
 
