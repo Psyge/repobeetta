@@ -302,11 +302,16 @@ async function fetchAuroraForecast() {
   const response = await fetch('https://services.swpc.noaa.gov/text/3-day-forecast.txt');
   const text = await response.text();
 
-  const kpRegex = /(\d{2}-\d{2}UT)\s+(\d+\.\d+)/g;
+  const kpRegex = /^(\d{2}-\d{2}UT)\s+([\d\.\s]+)/gm;
   const kpValues = [];
   let match;
+
   while ((match = kpRegex.exec(text)) !== null) {
-    kpValues.push({ time: match[1], kp: parseFloat(match[2]) });
+    const time = match[1];
+    const values = match[2].trim().split(/\s+/).map(Number);
+    values.forEach((kp, i) => {
+      kpValues.push({ time: `${time} (Day ${i+1})`, kp });
+    });
   }
 
   const labels = kpValues.map(v => v.time);
@@ -323,8 +328,7 @@ async function fetchAuroraForecast() {
         data: dataPoints,
         borderColor: 'blue',
         pointBackgroundColor: colors,
-        pointRadius: 9,
-        
+        pointRadius: 6,
         fill: false,
         tension: 0.3
       }]
