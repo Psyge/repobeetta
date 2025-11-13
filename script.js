@@ -303,13 +303,16 @@ async function fetchAuroraForecast() {
   const response = await fetch('https://services.swpc.noaa.gov/text/3-day-forecast.txt');
   const text = await response.text();
 
-  // Hae päivämäärät
-  const dateRegex = /(\d{1,2}\s+\w+\s+\d{4})\s+(\d{1,2}\s+\w+\s+\d{4})\s+(\d{1,2}\s+\w+\s+\d{4})/;
-  const dateMatch = text.match(dateRegex);
-  const dayLabels = dateMatch ? [dateMatch[1], dateMatch[2], dateMatch[3]] : ['Day 1','Day 2','Day 3'];
-  console.log('Päivämäärät:', dayLabels);
+  // Luo päivämäärät alkaen tänään
+  const today = new Date();
+  const dayLabels = [];
+  for (let i = 0; i < 3; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    dayLabels.push(d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }));
+  }
 
-  // Hae Kp-arvot
+  // Hae Kp-arvot NOAA:n datasta
   const kpRegex = /^(\d{2}-\d{2}UT)\s+([\d\.\s]+)/gm;
   const times = [];
   const day1 = [], day2 = [], day3 = [];
