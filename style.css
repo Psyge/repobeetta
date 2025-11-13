@@ -223,27 +223,35 @@ header.banner::after {
 }
 
 
+.marker-wrapper {
+  position: relative;
+  width: 32px;
+  height: 48px;
+  animation: float 3s ease-in-out infinite;
+}
+
 .marker-wrapper img.pin {
   width: 32px !important;
   height: 48px !important;
   object-fit: contain;
-  animation: float 3s ease-in-out infinite;
 }
 
 .marker-wrapper img.pin-icon {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
   width: 20px !important;
   height: 20px !important;
   border-radius: 50%;
-  animation: float 3s ease-in-out infinite;
+  background: white;
+  padding: 2px;
+  box-shadow: 0 0 2px rgba(0,0,0,0.3);
 }
 
 @keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px); /* liike ylös */
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
 }
 
 
