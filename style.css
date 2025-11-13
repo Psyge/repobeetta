@@ -222,11 +222,19 @@ header.banner::after {
   font-weight: bold; /* tekee pisteestä paksumman */
 }
 
-.marker-wrapper {
-  position: relative;
-  width: 32px;
-  height: 48px;
+
+.marker-wrapper img.pin {
+  width: 32px !important;
+  height: 48px !important;
+  object-fit: contain;
 }
+
+.marker-wrapper img.pin-icon {
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 50%;
+}
+
 
 .pin {
  
