@@ -312,7 +312,7 @@ async function fetchAuroraForecast() {
     dayLabels.push(d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }));
   }
 
-  // Hae Kp-arvot NOAA:n datasta
+  // Parsitaan NOAA:n data
   const kpRegex = /^(\d{2}-\d{2}UT)\s+([\d\.\s]+)/gm;
   const times = [];
   const day1 = [], day2 = [], day3 = [];
@@ -338,21 +338,21 @@ async function fetchAuroraForecast() {
           label: dayLabels[0],
           data: day1,
           borderColor: '#007bff',
-          pointBackgroundColor: day1.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'),
+          pointBackgroundColor: day1.map(kp => kp === null ? 'gray' : kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'),
           pointRadius: 6
         },
         {
           label: dayLabels[1],
           data: day2,
           borderColor: '#6f42c1',
-          pointBackgroundColor: day2.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'),
+          pointBackgroundColor: day2.map(kp => kp === null ? 'gray' : kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'),
           pointRadius: 6
         },
         {
           label: dayLabels[2],
           data: day3,
           borderColor: '#20c997',
-          pointBackgroundColor: day3.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'),
+          pointBackgroundColor: day3.map(kp => kp === null ? 'gray' : kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'),
           pointRadius: 6
         }
       ]
@@ -361,7 +361,17 @@ async function fetchAuroraForecast() {
       responsive: true,
       plugins: {
         title: { display: true, text: 'Northern Lights forecast (NOAA)' },
-        legend: { position: 'top' }
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const kp = context.parsed.y;
+              if (kp === null) return 'No data available';
+              if (kp >= 5) return `Kp ${kp} - High chance`;
+              if (kp >= 3) return `Kp ${kp} - Moderate chance`;
+              return `Kp ${kp} - Low chance`;
+            }
+          }
+        }
       },
       scales: {
         y: { min: 0, max: 9 },
@@ -370,5 +380,4 @@ async function fetchAuroraForecast() {
     }
   });
 }
-
 
