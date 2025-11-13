@@ -317,15 +317,16 @@ async function fetchAuroraForecast() {
   const times = [];
   const day1 = [], day2 = [], day3 = [];
   let match;
+  
+while ((match = kpRegex.exec(text)) !== null) {
+  const time = match[1];
+  const values = match[2].trim().split(/\s+/).map(Number);
+  times.push(time);
+  day1.push(values[0] ?? null);
+  day2.push(values[1] ?? null);
+  day3.push(values[2] ?? null);
+}
 
-  while ((match = kpRegex.exec(text)) !== null) {
-    const time = match[1];
-    const values = match[2].trim().split(/\s+/).map(Number);
-    times.push(time);
-    day1.push(values[0] ?? null);
-    day2.push(values[1] ?? null);
-    day3.push(values[2] ?? null);
-  }
 
   const ctx = document.getElementById('kpChart').getContext('2d');
 
