@@ -13,11 +13,17 @@ function addMarkers() {
     const customIcon = L.divIcon({
       className: 'drop-icon',
       html: `
-        <svg width="32" height="40" viewBox="0 0 32 40">
-          <path d="M16 0 C26 15, 26 30, 16 40 C6 30, 6 15, 16 0" fill="#00aaff">
-            <animateTransform attributeName="transform" type="translate" values="0,0; 0,-5; 0,0" dur="3s" repeatCount="indefinite"/>
-          </path>
-        </svg>
+     
+      <svg width="40" height="50" viewBox="0 0 40 50">
+      <!-- Kuvake pisaran yläosaan -->
+      <image href="roic.png" x="4" y="2" width="32" height="32" />
+
+      <!-- Vesipisaran muoto -->
+      <path d="M20 0 C32 18, 32 36, 20 50 C8 36, 8 18, 20 0" fill="#00aaff" opacity="0.6">
+        <animateTransform attributeName="transform" type="translate" values="0,0; 0,-5; 0,0" dur="3s" repeatCount="indefinite"/>
+      </path>
+    </svg>
+
       `,
       iconAnchor: [16, 40],
       popupAnchor: [0, -40]
