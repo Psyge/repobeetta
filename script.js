@@ -309,54 +309,59 @@ async function fetchAuroraForecast() {
 
   // Hae Kp-arvot
   const kpRegex = /^(\d{2}-\d{2}UT)\s+([\d\.\s]+)/gm;
-  const kpValues = [];
+  const times = [];
+  const day1 = [], day2 = [], day3 = [];
   let match;
 
   while ((match = kpRegex.exec(text)) !== null) {
     const time = match[1];
     const values = match[2].trim().split(/\s+/).map(Number);
-    values.forEach((kp, i) => {
-      kpValues.push({ time, day: i + 1, kp });
-    });
+    times.push(time);
+    day1.push(values[0] || null);
+    day2.push(values[1] || null);
+    day3.push(values[2] || null);
   }
-
-  const day1 = kpValues.filter(v => v.day === 1);
-  const day2 = kpValues.filter(v => v.day === 2);
-  const day3 = kpValues.filter(v => v.day === 3);
 
   const ctx = document.getElementById('kpChart').getContext('2d');
 
   new Chart(ctx, {
     type: 'line',
     data: {
-      labels: day1.map(v => v.time),
+      labels: times,
       datasets: [
         {
           label: dayLabels[0],
-          data: day1.map(v => v.kp),
-          borderColor: 'green',
-          pointBackgroundColor: day1.map(v => v.kp < 3 ? 'green' : v.kp < 5 ? 'orange' : 'red')
+          data: day1,
+          borderColor: '#007bff', // sininen
+          pointBackgroundColor: day1.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'),
+          pointRadius: 6
         },
         {
           label: dayLabels[1],
-          data: day2.map(v => v.kp),
-          borderColor: 'orange',
-          pointBackgroundColor: day2.map(v => v.kp < 3 ? 'green' : v.kp < 5 ? 'orange' : 'red')
+          data: day2,
+          borderColor: '#6f42c1', // violetti
+          pointBackgroundColor: day2.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'),
+          pointRadius: 6
         },
         {
           label: dayLabels[2],
-          data: day3.map(v => v.kp),
-          borderColor: 'red',
-          pointBackgroundColor: day3.map(v => v.kp < 3 ? 'green' : v.kp < 5 ? 'orange' : 'red')
+          data: day3,
+          borderColor: '#20c997', // turkoosi
+          pointBackgroundColor: day3.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'),
+          pointRadius: 6
         }
       ]
     },
     options: {
       responsive: true,
       plugins: {
-        title: { display: true, text: 'Northern Lights forecast (NOAA)' }
+        title: { display: true, text: 'Northern Lights forecast (NOAA)' },
+        legend: { position: 'top' }
       },
-      scales: { y: { min: 0, max: 9 } }
+      scales: {
+        y: { min: 0, max: 9 },
+        x: { title: { display: true, text: 'UT Time' } }
+      }
     }
   });
 }
