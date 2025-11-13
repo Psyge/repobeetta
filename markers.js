@@ -21,19 +21,21 @@ const customIcon = L.divIcon({
 
     
 
-const popupContent = `
-  <strong>${place.name}</strong><br>
-  <img src="${place.icon}" alt="${place.name}" class="popup-img"><br>
-  <a href="${place.url}" target="_blank" rel="noopener noreferrer">More info</a>
-`;
 
-
+function addMarkers() {
+  places.forEach(place => {
+    const popupContent = `
+      <strong>${place.name}</strong><br>
+      <img src="${place.icon}" alt="${place.name}" class="popup-img"><br>
+      <a href="${place.url}" target="_blank" rel="noopener noreferrer">More info</a>
+    `;
 
     L.marker([place.lat, place.lon], { icon: customIcon })
       .bindPopup(popupContent)
       .addTo(markersLayer);
   });
 }
+
 
 
     
