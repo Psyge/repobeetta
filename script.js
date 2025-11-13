@@ -303,34 +303,25 @@ async function fetchAuroraForecast() {
   try {
     const response = await fetch('https://services.swpc.noaa.gov/text/3-day-forecast.txt');
     if (!response.ok) throw new Error(`Verkkovirhe: ${response.status}`);
-    
     const text = await response.text();
-    console.log("Raaka data NOAA:lta:", text);
+    console.log("Raaka data NOAA:", text);
 
     // --- Hae päivämäärät ---
-    const dateLineMatch = text.match(/3-day forecast for (.+)/);
-    let dayLabels = ['Day 1', 'Day 2', 'Day 3'];
-
+    let dayLabels = ['Day 1','Day 2','Day 3'];
+    const dateLineMatch = text.match(/#\s*([A-Za-z]+ \d{1,2} \d{4}),\s*([A-Za-z]+ \d{1,2} \d{4}),\s*and\s*([A-Za-z]+ \d{1,2} \d{4})/i);
     if (dateLineMatch) {
-      const dates = dateLineMatch[1]
-        .replace(/and\s+/g, '')   // poista "and"
-        .replace(/\s+/g, ' ')     // siivoa ylimääräiset välilyönnit
-        .split(',')
-        .map(d => d.trim())
-        .filter(Boolean);
-      if (dates.length === 3) dayLabels = dates;
+      dayLabels = [ dateLineMatch[1], dateLineMatch[2], dateLineMatch[3] ];
     }
-
     console.log('Päivämäärät:', dayLabels);
 
     // --- Hae Kp-arvot ---
-    const kpRegex = /^\s*(\d{2}-\d{2}UT)\s+([\d\.\s]+)$/gm;
-    const times = [];
-    const day1 = [], day2 = [], day3 = [];
+    // ensimmäinen regex
+    let kpRegex = /^\s*(\d{2}-\d{2}\s*UT)\s+([\d\.]+\s+[\d\.]+\s+[\d\.]+)/gm;
+    let times = [];
+    let day1 = [], day2 = [], day3 = [];
     let match;
-
     while ((match = kpRegex.exec(text)) !== null) {
-      const time = match[1];
+      const time = match[1].replace(/\s+/g,'');
       const values = match[2].trim().split(/\s+/).map(Number);
       if (values.length === 3) {
         times.push(time);
@@ -339,64 +330,44 @@ async function fetchAuroraForecast() {
         day3.push(values[2]);
       }
     }
+    console.log('Löydetty rivejä (ensimmäisellä):', times.length);
 
-    if (times.length === 0) throw new Error("Kp-arvoja ei löytynyt datasta – NOAA:n tiedosto voi olla muuttunut.");
+    // jos ei löytynyt tarpeeksi rivejä, kokeillaan laajempaa regexiä
+    if (times.length < 5) {
+      console.log("Käytetään laajempaa regexiä Kp-arvoihin");
+      kpRegex = /^\s*(\d{2}-\d{2}UT)\s+([\d\.\s]+)/gm;
+      times = []; day1 = []; day2 = []; day3 = [];
+      while ((match = kpRegex.exec(text)) !== null) {
+        const time = match[1];
+        const values = match[2].trim().split(/\s+/).map(Number);
+        if (values.length >=3) {
+          times.push(time);
+          day1.push(values[0]);
+          day2.push(values[1]);
+          day3.push(values[2]);
+        }
+      }
+      console.log('Löydetty rivejä (toisella):', times.length);
+    }
 
-    console.log('Aikavälit:', times);
-    console.log('Kp-arvot päivä 1:', day1);
-    console.log('Kp-arvot päivä 2:', day2);
-    console.log('Kp-arvot päivä 3:', day3);
+    if (times.length === 0) throw new Error("Kp-arvoja ei löytynyt datasta – formaatti voi olla muuttunut.");
 
-    // --- Luo Chart.js kaavio ---
+    // --- Chart.js kaavio ---
     const ctx = document.getElementById('kpChart').getContext('2d');
-
     new Chart(ctx, {
       type: 'line',
       data: {
         labels: times,
         datasets: [
-          {
-            label: dayLabels[0],
-            data: day1,
-            borderColor: '#007bff',
-            pointBackgroundColor: day1.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'),
-            pointRadius: 6,
-            tension: 0.3
-          },
-          {
-            label: dayLabels[1],
-            data: day2,
-            borderColor: '#6f42c1',
-            pointBackgroundColor: day2.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'),
-            pointRadius: 6,
-            tension: 0.3
-          },
-          {
-            label: dayLabels[2],
-            data: day3,
-            borderColor: '#20c997',
-            pointBackgroundColor: day3.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'),
-            pointRadius: 6,
-            tension: 0.3
-          }
+          { label: dayLabels[0], data: day1, borderColor: '#007bff', pointBackgroundColor: day1.map(kp => kp <3 ? 'green' : kp <5 ? 'orange' : 'red'), pointRadius:6, tension:0.3 },
+          { label: dayLabels[1], data: day2, borderColor: '#6f42c1', pointBackgroundColor: day2.map(kp => kp <3 ? 'green' : kp <5 ? 'orange' : 'red'), pointRadius:6, tension:0.3 },
+          { label: dayLabels[2], data: day3, borderColor: '#20c997', pointBackgroundColor: day3.map(kp => kp <3 ? 'green' : kp <5 ? 'orange' : 'red'), pointRadius:6, tension:0.3 }
         ]
       },
       options: {
         responsive: true,
-        plugins: {
-          title: { display: true, text: 'Northern Lights Forecast (NOAA)' },
-          legend: { position: 'top' }
-        },
-        scales: {
-          y: {
-            min: 0,
-            max: 9,
-            title: { display: true, text: 'Kp Index' }
-          },
-          x: {
-            title: { display: true, text: 'UT Time (3-hour intervals)' }
-          }
-        }
+        plugins: { title: { display:true, text:'Northern Lights Forecast (NOAA)' }, legend:{ position:'top'} },
+        scales: { y:{ min:0, max:9, title:{display:true, text:'Kp Index'} }, x:{ title:{ display:true, text:'UT Time (3-h intervals)'} } }
       }
     });
 
@@ -410,4 +381,5 @@ async function fetchAuroraForecast() {
     }
   }
 }
+
 
