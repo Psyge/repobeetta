@@ -22,6 +22,11 @@ function addMarkers() {
       popupAnchor: [0, -48]
     });
 
+ document.querySelectorAll('.marker-wrapper').forEach(el => {
+    el.style.animationDelay = `${Math.random() * 2}s`;
+  });
+}
+
     const popupContent = `
       <strong>${place.name}</strong><br>
       <img src="${place.icon}" alt="${place.name}" style="width:50px;height:50px;border-radius:50%;"><br>
