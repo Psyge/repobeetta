@@ -13,20 +13,19 @@ function addMarkers() {
     const customIcon = L.divIcon({
       className: 'drop-icon',
       html: `
-     
-      <svg width="40" height="50" viewBox="0 0 40 50">
-      <!-- Kuvake pisaran yläosaan -->
-      <image href="${place.icon}" x="4" y="2" width="32" height="32" />
-
-      <!-- Vesipisaran muoto -->
-      <path d="M20 0 C32 18, 32 36, 20 50 C8 36, 8 18, 20 0" fill="#00aaff" opacity="0.6">
-        <animateTransform attributeName="transform" type="translate" values="0,0; 0,-5; 0,0" dur="3s" repeatCount="indefinite"/>
-      </path>
-    </svg>
-
+        <svg width="50" height="70" viewBox="0 0 50 70" xmlns="http://www.w3.org/2000/svg">
+          <!-- Pisaran muoto -->
+          <path d="M25 0 C40 20, 40 45, 25 70 C10 45, 10 20, 25 0" fill="#007bff" stroke="#0056b3" stroke-width="2"/>
+          
+          <!-- Valkoinen ympyrä taustaksi -->
+          <circle cx="25" cy="20" r="14" fill="white" stroke="#0056b3" stroke-width="2"/>
+          
+          <!-- Paikan ikoni ympyrän sisään -->
+          <image href="${place.icon}" x="11" y="6" width="28" height="28" clip-path="circle(14px at 25px 20px)"/>
+        </svg>
       `,
-      iconAnchor: [16, 40],
-      popupAnchor: [0, -40]
+      iconAnchor: [25, 70],
+      popupAnchor: [0, -70]
     });
 
     const popupContent = `
@@ -40,5 +39,4 @@ function addMarkers() {
       .addTo(markersLayer);
   });
 }
-
 addMarkers();
