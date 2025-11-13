@@ -16,7 +16,7 @@ function addMarkers() {
      
       <svg width="40" height="50" viewBox="0 0 40 50">
       <!-- Kuvake pisaran yläosaan -->
-      <image href="roic.png" x="4" y="2" width="32" height="32" />
+      <image href="${place.icon}" x="4" y="2" width="32" height="32" />
 
       <!-- Vesipisaran muoto -->
       <path d="M20 0 C32 18, 32 36, 20 50 C8 36, 8 18, 20 0" fill="#00aaff" opacity="0.6">
