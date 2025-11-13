@@ -310,32 +310,46 @@ async function fetchAuroraForecast() {
     const time = match[1];
     const values = match[2].trim().split(/\s+/).map(Number);
     values.forEach((kp, i) => {
-      kpValues.push({ time: `${time} (Day ${i+1})`, kp });
+      kpValues.push({ time: time, day: i + 1, kp });
     });
   }
 
-  const labels = kpValues.map(v => v.time);
-  const dataPoints = kpValues.map(v => v.kp);
-  const colors = kpValues.map(v => v.kp < 3 ? 'green' : v.kp < 5 ? 'orange' : 'red');
+  const day1 = kpValues.filter(v => v.day === 1);
+  const day2 = kpValues.filter(v => v.day === 2);
+  const day3 = kpValues.filter(v => v.day === 3);
 
   const ctx = document.getElementById('kpChart').getContext('2d');
+
   new Chart(ctx, {
     type: 'line',
     data: {
-      labels: labels,
-      datasets: [{
-        label: 'Kp index forecast',
-        data: dataPoints,
-        borderColor: 'blue',
-        pointBackgroundColor: colors,
-        pointRadius: 6,
-        fill: false,
-        tension: 0.3
-      }]
+      labels: day1.map(v => v.time), // sama kaikille
+      datasets: [
+        {
+          label: 'Day 1',
+          data: day1.map(v => v.kp),
+          borderColor: 'green',
+          pointBackgroundColor: 'green'
+        },
+        {
+          label: 'Day 2',
+          data: day2.map(v => v.kp),
+          borderColor: 'orange',
+          pointBackgroundColor: 'orange'
+        },
+        {
+          label: 'Day 3',
+          data: day3.map(v => v.kp),
+          borderColor: 'red',
+          pointBackgroundColor: 'red'
+        }
+      ]
     },
     options: {
       responsive: true,
-      plugins: { title: { display: true, text: 'Northern Lights forecast (NOAA)' } },
+      plugins: {
+        title: { display: true, text: 'Northern Lights forecast (NOAA)' }
+      },
       scales: { y: { min: 0, max: 9 } }
     }
   });
