@@ -56,10 +56,10 @@ marker.on('popupopen', (e) => {
     const popupWrapper = e.popup.getElement().querySelector('.leaflet-popup-content-wrapper');
     popupWrapper.style.width = container.dataset.width + 'px';
 
-     setTimeout(() => {
-      map.updatePopup();     // ei aina ole olemassa, joten käytä vaihtoehtoa:
-      map._popup._updateLayout();
-      map._popup._adjustPan();
+      setTimeout(() => {
+      e.popup._updateLayout();
+      e.popup._updatePosition();
+      e.popup._adjustPan();
     }, 50);
   }
 });
