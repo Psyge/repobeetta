@@ -292,7 +292,9 @@ header.banner::after {
   display: block;
   max-width: none; /* varmistaa ettei popupin ulkopuolelle */
 }
-
+.leaflet-popup-pane {
+  z-index: 9000 !important;
+}
 
 /* Mobiili */
 @media (max-width: 768px) {
