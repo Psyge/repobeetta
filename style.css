@@ -324,7 +324,7 @@ header.banner::after {
     left: 10px;
     font-size: 12px;
     max-width: 70%;
-    height: auto;
+    height: 60px;
     padding: 4px 8px;
   }
 
