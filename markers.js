@@ -57,7 +57,7 @@ marker.on('popupopen', (e) => {
     popupWrapper.style.width = container.dataset.width + 'px';
   }
 });
-
+});
 
   // Satunnainen animaatioviive markereille
   document.querySelectorAll('.marker-wrapper').forEach(el => {
