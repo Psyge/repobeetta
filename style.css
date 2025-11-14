@@ -295,7 +295,11 @@ header.banner::after {
 .leaflet-popup-pane {
   z-index: 9000; 
 }
-
+.popup-open #locate-btn,
+.popup-open #forecast-btn,
+.popup-open #menu-btn {
+  pointer-events: none;
+}
 /* Mobiili */
 @media (max-width: 768px) {
   header.banner {
