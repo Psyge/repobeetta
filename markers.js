@@ -1,6 +1,6 @@
 const places = [
   { name: 'Rovaniemi', lat: 66.5, lon: 25.7, url: 'https://visitrovaniemi.fi', icon: 'roic.png' },
-  { name: 'Joulupukin Pajakylä', lat: 66.54, lon: 25.84, url: 'https://santaclausvillage.info/', icon: 'pukki.png', stream: 'https://www.youtube.com/embed/Cp4RRAEgpeU'},
+  { name: 'Joulupukin Pajakylä', lat: 66.54, lon: 25.84, url: 'https://santaclausvillage.info/', icon: 'pukki.png', stream: 'https://www.youtube.com/embed/Cp4RRAEgpeU', streamWidth: 320, streamHeight: 180},
   { name: 'Levi', lat: 67.80, lon: 24.80, url: 'https://www.levi.fi/', icon: 'levi.png' },
   { name: 'Ylläs', lat: 67.57, lon: 24.20, url: 'https://yllas.fi/', icon: 'yllas.png' }
 ];
@@ -23,30 +23,29 @@ function addMarkers() {
       });
 
       // Popupin perussisältö
-      const popupContent = `
-        <strong>${place.name}</strong><br>
-        <img src="${place.icon}" alt="${place.name}" style="width:50px;height:50px;border-radius:50%;"><br>
-        <a href="${place.url}" target="_blank">More info</a>
-        ${place.stream ? `<div class="popup-stream" data-stream="${place.stream}" style="margin-top:10px;"></div>` : ''}
-      `;
+     const popupContent = `
+  <strong>${place.name}</strong><br>
+  <img src="${place.icon}" alt="${place.name}" style="width:50px;height:50px;border-radius:50%;"><br>
+  <a href="${place.url}" target="_blank">More info</a>
+  ${place.stream ? `<div class="popup-stream" 
+    data-stream="${place.stream}" 
+    data-width="${place.streamWidth || 320}" 
+    data-height="${place.streamHeight || 180}" 
+    style="margin-top:10px;"></div>` : ''}
+`;
 
-      const marker = L.marker([place.lat, place.lon], { icon: customIcon })
-        .bindPopup(popupContent, { 
-              maxWidth: 'auto',
-              className: 'custom-popup'
-         })
-        .addTo(markersLayer);
-
-      // Lazy load stream iframe kun popup avataan
-      marker.on('popupopen', (e) => {
-        const container = e.popup.getElement().querySelector('.popup-stream');
-        if (container && !container.querySelector('iframe')) {
-          const iframe = document.createElement('iframe');
-          iframe.src = container.dataset.stream;
-          container.appendChild(iframe);
-        }
-      });
-    });
+marker.on('popupopen', (e) => {
+  const container = e.popup.getElement().querySelector('.popup-stream');
+  if (container && !container.querySelector('iframe')) {
+    const iframe = document.createElement('iframe');
+    iframe.src = container.dataset.stream;
+    iframe.width = container.dataset.width;
+    iframe.height = container.dataset.height;
+    iframe.style.border = 'none';
+    iframe.style.display = 'block';
+    container.appendChild(iframe);
+  }
+});
 
     // Satunnainen animaatioviive markereille
     document.querySelectorAll('.marker-wrapper').forEach(el => {
