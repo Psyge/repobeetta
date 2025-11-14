@@ -19,7 +19,7 @@ function addMarkers() {
       `,
       iconSize: [32, 48],
       iconAnchor: [16, 48],
-      popupAnchor: [0, -48]
+      popupAnchor: [0, -52]
     });
 
     // Popupin perussisältö
