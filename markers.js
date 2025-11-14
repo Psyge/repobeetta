@@ -50,6 +50,11 @@ function addMarkers() {
         iframe.style.border = 'none';
         iframe.style.display = 'block';
         container.appendChild(iframe);
+
+        
+    const popupWrapper = e.popup.getElement().querySelector('.leaflet-popup-content-wrapper');
+    popupWrapper.style.width = container.dataset.width + 'px';
+
       }
     });
   });
