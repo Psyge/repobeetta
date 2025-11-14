@@ -31,7 +31,10 @@ function addMarkers() {
       `;
 
       const marker = L.marker([place.lat, place.lon], { icon: customIcon })
-        .bindPopup(popupContent, { maxWidth: 320 })
+        .bindPopup(popupContent, { 
+              maxWidth: 'auto',
+              className: 'custom-popup'
+         })
         .addTo(markersLayer);
 
       // Lazy load stream iframe kun popup avataan
