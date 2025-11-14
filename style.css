@@ -277,6 +277,23 @@ header.banner::after {
   box-shadow: 0 0 2px rgba(0,0,0,0.3);
 }
 
+.custom-popup .leaflet-popup-content-wrapper {
+  width: auto !important;
+  max-width: none !important;
+}
+
+.custom-popup .leaflet-popup-content {
+  width: auto !important;
+  padding: 0;
+}
+
+.popup-stream iframe {
+  display: block;
+  width: 100%; /* täyttää popupin leveyden */
+  height: auto; /* säilyttää suhteet */
+  aspect-ratio: 16 / 9; /* moderni tapa pitää oikea kuvasuhde */
+}
+
 
 /* Mobiili */
 @media (max-width: 768px) {
