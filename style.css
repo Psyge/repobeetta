@@ -289,9 +289,7 @@ header.banner::after {
 
 .popup-stream iframe {
   display: block;
-  width: 100%; /* täyttää popupin leveyden */
-  height: auto; /* säilyttää suhteet */
-  aspect-ratio: 16 / 9; /* moderni tapa pitää oikea kuvasuhde */
+  max-width: 100%; /* varmistaa ettei popupin ulkopuolelle */
 }
 
 
