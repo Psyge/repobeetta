@@ -228,6 +228,7 @@ header.banner::after {
   width: 32px;
   height: 48px;
   animation: float 3s ease-in-out infinite;
+  transform-origin: bottom center;
 }
 
 .marker-wrapper img.pin {
