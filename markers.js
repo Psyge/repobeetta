@@ -40,24 +40,24 @@ function addMarkers() {
       .addTo(markersLayer);
 
     // Lazy load iframe kun popup avataan
-    marker.on('popupopen', (e) => {
-      const container = e.popup.getElement().querySelector('.popup-stream');
-      if (container && !container.querySelector('iframe')) {
-        const iframe = document.createElement('iframe');
-        iframe.src = container.dataset.stream;
-        iframe.width = container.dataset.width;
-        iframe.height = container.dataset.height;
-        iframe.style.border = 'none';
-        iframe.style.display = 'block';
-        container.appendChild(iframe);
+    
+marker.on('popupopen', (e) => {
+  const container = e.popup.getElement().querySelector('.popup-stream');
+  if (container && !container.querySelector('iframe')) {
+    const iframe = document.createElement('iframe');
+    iframe.src = container.dataset.stream;
+    iframe.width = container.dataset.width;
+    iframe.height = container.dataset.height;
+    iframe.style.border = 'none';
+    iframe.style.display = 'block';
+    container.appendChild(iframe);
 
-        
+    // Pakota popupin leveys iframe-leveyden mukaan
     const popupWrapper = e.popup.getElement().querySelector('.leaflet-popup-content-wrapper');
     popupWrapper.style.width = container.dataset.width + 'px';
+  }
+});
 
-      }
-    });
-  });
 
   // Satunnainen animaatioviive markereille
   document.querySelectorAll('.marker-wrapper').forEach(el => {
