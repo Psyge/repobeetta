@@ -4,17 +4,14 @@ let currentData = null;
 let notificationPermissionRequested = false;
 
 // --------------------------------------------------
-//  ✓ Lon-muunnos NOAA 0–360 → Leaflet -180–180
+//  Lon conversion: NOAA 0–360 → Leaflet -180–180 with wrap at Bering Strait
 // --------------------------------------------------
 function convertLonNOAAtoLeaflet(lon) {
-    // Siirretään NOAA:n wrap-point 180° kohtaan (Beringin salmi)
-    lon = (lon + 180) % 360;      // käännetään NOAA-dataa 180° oikealle
-    if (lon < 0) lon += 360;
-
-    // Muunnetaan takaisin Leafletin -180...180 asteisiin
-    return lon > 180 ? lon - 360 : lon;
+    // Shift wrap point from Greenwich (0°) to Bering Strait (180°)
+    lon = lon - 180;
+    if (lon < -180) lon += 360;
+    return lon;
 }
-
 
 // --- Kartta ---
 const map = L.map('map', {
@@ -47,13 +44,6 @@ async function fetchAuroraData() {
     console.error("Aurora data error:", err);
   }
 }
-function lonTo360(lon) {
-    return (lon + 360) % 360;
-}
-function lonDiffWrapped(lon1, lon2) {
-    let diff = Math.abs(lon1 - lon2);
-    return Math.min(diff, 360 - diff);
-}
 
 function formatTime(timeStr) {
   try {
@@ -63,7 +53,7 @@ function formatTime(timeStr) {
 }
 
 // --------------------------------------------------
-//  ✓ Revontuli–overlay: vain lon-muunnos lisätty
+//  Aurora overlay with wrap at Bering Strait
 // --------------------------------------------------
 function drawAuroraOverlay(points) {
 
@@ -106,7 +96,7 @@ function drawAuroraOverlay(points) {
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, Math.PI*2);
     ctx.fill();
-});
+  });
 
   const bounds = [[40, -180], [90, 180]];
   auroraLayer = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.7 });
@@ -119,27 +109,33 @@ function hideInfoAfterDelay() {
   }, 5000);
 }
 
-
 // --------------------------------------------------
-//  ✓ Käyttäjän sijaintiin lisätty lon-muunnos
+//  Check aurora at user location
 // --------------------------------------------------
 function checkAuroraAtLocation(userLat, userLon) {
   if (!currentData || !currentData.coordinates) return;
 
   let nearest = null, minDist = Infinity;
-  const userLon360 = lonTo360(userLon);
 
   currentData.coordinates.forEach(p => {
-    const lat = p[1];
-    const lon = lonTo360(p[0]);
+    const pointLon = convertLonNOAAtoLeaflet(p[0]);
+    const pointLat = p[1];
     const intensity = p[2];
 
-    const latDiff = lat - userLat;
-    const dist = Math.hypot(latDiff, lonDiffWrapped(lon, userLon360) * Math.cos(userLat * Math.PI / 180));
+    const latDiff = pointLat - userLat;
+    const lonDiff = pointLon - userLon;
+    
+    // Handle longitude wrap-around for distance calculation
+    let adjustedLonDiff = lonDiff;
+    if (Math.abs(lonDiff) > 180) {
+      adjustedLonDiff = lonDiff > 0 ? lonDiff - 360 : lonDiff + 360;
+    }
+    
+    const dist = Math.hypot(latDiff, adjustedLonDiff * Math.cos(userLat * Math.PI / 180));
 
     if (dist < minDist) {
       minDist = dist;
-      nearest = { lat, lon, intensity, distance: dist };
+      nearest = { lat: pointLat, lon: pointLon, intensity, distance: dist };
     }
   });
 
@@ -194,10 +190,8 @@ document.getElementById("locate-btn").addEventListener("click", () => {
   });
 });
 
-
-
 // --------------------------------------------------
-// ✓ Karttaklikkaus: lon-muunnos lisätty
+// Map click handler
 // --------------------------------------------------
 map.on('click', (e) => {
   const lat = e.latlng.lat;
@@ -211,13 +205,20 @@ function showAuroraAtClickedLocation(lat, lon) {
 
   let nearest = null, minDist = Infinity;
   currentData.coordinates.forEach(p => {
-    let pointLon = convertLonNOAAtoLeaflet(p[0]);   // ✓ korjaus
-
+    let pointLon = convertLonNOAAtoLeaflet(p[0]);
     let pointLat = p[1];
     let intensity = p[2];
+    
     const latDiff = pointLat - lat;
-    const dist = Math.hypot(latDiff, lonDiffWrapped(pointLon, lon) * Math.cos(lat * Math.PI / 180));
-
+    const lonDiff = pointLon - lon;
+    
+    // Handle longitude wrap-around for distance calculation
+    let adjustedLonDiff = lonDiff;
+    if (Math.abs(lonDiff) > 180) {
+      adjustedLonDiff = lonDiff > 0 ? lonDiff - 360 : lonDiff + 360;
+    }
+    
+    const dist = Math.hypot(latDiff, adjustedLonDiff * Math.cos(lat * Math.PI / 180));
 
     if (dist < minDist) {
       minDist = dist;
@@ -237,10 +238,8 @@ function showAuroraAtClickedLocation(lat, lon) {
   L.popup().setLatLng([lat, lon]).setContent(message).openOn(map);
 }
 
-
-
 // --------------------------------------------------
-// POPUP HELP – ei muutettu, toimii taas
+// POPUP HELP
 // --------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
   const helpPopup = document.getElementById('help-popup');
@@ -259,14 +258,14 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// --- “Näytä ohjeet” linkki ---
+// --- "Näytä ohjeet" linkki ---
 document.getElementById('show-help').addEventListener('click', (e) => {
   e.preventDefault();
   document.getElementById('help-popup').style.display = 'flex';
 });
 
 // --------------------------------------------------
-// Kp-ennusteen nouto – ei muutettu
+// Kp-ennusteen nouto
 // --------------------------------------------------
 const chartScript = document.createElement('script');
 chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js';
@@ -300,7 +299,6 @@ async function fetchAuroraForecast() {
     }
 
     // --- Parsitaan NOAA:n data ---
-    // sallitaan sekä välilyönnit että tabit ja mahdolliset (G1) tms.
     const kpRegex = /[ \t]*(\d{2}-\d{2}UT)[ \t]+([\d\.\(\)G \t]+)/g;
     const times = [];
     const day1 = [], day2 = [], day3 = [];
@@ -403,6 +401,7 @@ async function fetchAuroraForecast() {
     }
   }
 }
+
 fetchAuroraData();
 setInterval(fetchAuroraData, 5*60*1000);
 
