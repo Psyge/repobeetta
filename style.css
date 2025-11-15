@@ -279,8 +279,8 @@ header.banner::after {
 }
 
 .custom-popup .leaflet-popup-content-wrapper {
-  width: auto !important;
-  max-width: none !important;
+  width: 280px !important;
+  max-width: 280px !important;
 }
 
 .custom-popup .leaflet-popup-content {
