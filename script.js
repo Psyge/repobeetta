@@ -3,6 +3,10 @@ let userMarker = null;
 let currentData = null;
 let notificationPermissionRequested = false;
 
+  // lon-muunnosfunktio tähän
+  function convertLonNOAAtoLeaflet(lon) {
+    return lon > 180 ? lon - 360 : lon;
+}
 // --- Kartta ---
 const map = L.map('map', {
   center: [65, 25],
@@ -46,10 +50,7 @@ function formatTime(timeStr) {
 
 function drawAuroraOverlay(points) {
 
-  // lon-muunnosfunktio tähän
-  function convertLonNOAAtoLeaflet(lon) {
-    return lon > 180 ? lon - 360 : lon;
-}
+
 
   if (auroraLayer) map.removeLayer(auroraLayer);
 
