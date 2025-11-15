@@ -59,6 +59,11 @@ function drawAuroraOverlay(points) {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
 
+  canvas.width = 800;
+  canvas.height = 500;
+  const canvasWidth = canvas.width;
+  const canvasHeight = canvas.height;
+  
   points.forEach(p => {
 
       let lon = convertLonNOAAtoLeaflet(p[0]);  // <<< TÄSSÄ SITÄ KÄYTETÄÄN
