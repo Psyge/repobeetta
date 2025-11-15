@@ -102,8 +102,8 @@ x = ((x + 180) / 360) * canvasWidth;
       ctx.fill();
   });
 
-  const bounds = [[40, -180], [90, 180]];
-  auroraLayer = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.7 });
+  const bounds = [[40, wrapLon - 180], [90, wrapLon + 180]];
+auroraLayer = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.7 });
   auroraLayer.addTo(map);
 }
 
