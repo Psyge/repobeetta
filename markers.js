@@ -54,7 +54,7 @@ function addMarkers() {
       <a href="${place.url}" target="_blank">More info</a>
 
       <div class="weather-box" style="margin-top:10px;">
-        <em>Haetaan säätietoja…</em>
+        <em>Retrieving weather data...</em>
       </div>
 
       ${place.stream ? `<div class="popup-stream" 
