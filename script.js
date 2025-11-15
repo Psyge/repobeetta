@@ -76,7 +76,7 @@ function drawAuroraOverlay(points) {
   
   points.forEach(p => {
 
-      let lon = convertLonNOAAtoLeaflet(p[0]);   // ✓ lisätty
+      let lon = convertLonNOAAtoLeaflet(p[0] + 180);   // ✓ lisätty
       const lat = p[1];
       const intensity = Math.min(p[2], 100);
       if (intensity < 1) return;
