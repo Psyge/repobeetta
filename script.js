@@ -4,12 +4,13 @@ let currentData = null;
 let notificationPermissionRequested = false;
 
 // --------------------------------------------------
-//  Lon conversion: NOAA 0–360 → Leaflet -180–180 with wrap at Bering Strait
+//  Lon conversion: NOAA 0–360 → Leaflet -180–180
 // --------------------------------------------------
 function convertLonNOAAtoLeaflet(lon) {
-    // Shift wrap point from Greenwich (0°) to Bering Strait (180°)
-    lon = lon - 180;
-    if (lon < -180) lon += 360;
+    // Simple conversion: values > 180 become negative
+    if (lon > 180) {
+        lon = lon - 360;
+    }
     return lon;
 }
 
@@ -73,15 +74,13 @@ function drawAuroraOverlay(points) {
     const intensity = Math.min(p[2], 100);
     if (intensity < 1) return;
 
-    // Shift NOAA data so wrap point moves from Greenwich (0°) to Bering Strait (180°)
-    // NOAA uses 0-360 with wrap at 0°/360° (Greenwich)
-    // We want wrap at 180° (Bering Strait) instead
-    // So we rotate: 0° → -180°, 180° → 0°, 360° → 180°
-    lon = lon - 180;
-    if (lon < -180) lon += 360;
+    // Rotate the entire world by 180° so wrap point moves to Bering Strait
+    // This means: Alaska/Russia border becomes the left/right edge
+    // and Greenwich becomes the center
+    lon = (lon + 180) % 360;
     
-    // Map to canvas coordinates (canvas spans -180 to 180)
-    const x = ((lon + 180) / 360) * canvasWidth;
+    // Map to canvas coordinates (0-360 range)
+    const x = (lon / 360) * canvasWidth;
     const y = ((90 - lat) / 50) * canvasHeight;
 
     const radius = 30 + intensity * 0.5;
@@ -98,6 +97,7 @@ function drawAuroraOverlay(points) {
     ctx.fill();
   });
 
+  // The canvas now represents: left edge = -180° (Bering west), right edge = 180° (Bering east)
   const bounds = [[40, -180], [90, 180]];
   auroraLayer = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.7 });
   auroraLayer.addTo(map);
