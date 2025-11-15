@@ -76,12 +76,16 @@ function drawAuroraOverlay(points) {
   
   points.forEach(p => {
 
-      let lon = convertLonNOAAtoLeaflet(p[0] + 180);   // ✓ lisätty
+      let lon = convertLonNOAAtoLeaflet(p[0]);   // ✓ lisätty
       const lat = p[1];
       const intensity = Math.min(p[2], 100);
       if (intensity < 1) return;
 
-      const x = ((lon + 180) / 360) * canvasWidth;
+      const wrapLon = 180;
+      let x = lon - wrapLon;
+if (x < -180) x += 360;
+if (x > 180) x -= 360;
+x = ((x + 180) / 360) * canvasWidth;
       const y = ((90 - lat) / 50) * canvasHeight;
 
       const radius = 30 + intensity * 0.5;
