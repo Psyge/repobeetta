@@ -78,16 +78,18 @@ function drawAuroraOverlay(points) {
   const canvasHeight = canvas.height;
   
   points.forEach(p => {
-    let lon = p[0]; // suoraan NOAA 0–360
+    let lon = p[0]; // NOAA 0–360
     const lat = p[1];
     const intensity = Math.min(p[2], 100);
     if (intensity < 1) return;
 
-    // Siirrä wrap point Beringin salmelle (n. 180°)
-    let x = lon - 180; 
-    if (x < 0) x += 360;        // siirrä negatiiviset +360
-    x = (x / 360) * canvasWidth;
-
+    // Shift wrap point to Bering Strait (~180°)
+    // Normalize to -180 to 180 range centered on Bering Strait
+    lon = (lon + 180) % 360; // Rotate coordinate system
+    if (lon > 180) lon -= 360; // Normalize to -180..180
+    
+    // Map to canvas coordinates (canvas spans -180 to 180)
+    const x = ((lon + 180) / 360) * canvasWidth;
     const y = ((90 - lat) / 50) * canvasHeight;
 
     const radius = 30 + intensity * 0.5;
@@ -104,10 +106,8 @@ function drawAuroraOverlay(points) {
     ctx.fill();
 });
 
-
-
   const bounds = [[40, -180], [90, 180]];
-auroraLayer = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.7 });
+  auroraLayer = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.7 });
   auroraLayer.addTo(map);
 }
 
