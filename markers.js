@@ -1,7 +1,5 @@
 async function getWeather(lat, lon) {
-  const apiKey = "";
-
-  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=en`;
+  const url = `https://repotracker.masto84.workers.dev/?lat=${lat}&lon=${lon}`;
 
   try {
     const res = await fetch(url);
