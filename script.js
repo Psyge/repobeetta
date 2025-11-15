@@ -83,12 +83,12 @@ function drawAuroraOverlay(points) {
     const intensity = Math.min(p[2], 100);
     if (intensity < 1) return;
 
-    // Convert NOAA longitude (0-360) to Leaflet longitude (-180 to 180)
-    // NOAA: 0° = Greenwich, 180° = dateline, 360° = Greenwich again
-    // Leaflet: -180° = dateline (west), 0° = Greenwich, 180° = dateline (east)
-    if (lon > 180) {
-      lon = lon - 360; // Convert 180-360 to -180-0
-    }
+    // Shift NOAA data so wrap point moves from Greenwich (0°) to Bering Strait (180°)
+    // NOAA uses 0-360 with wrap at 0°/360° (Greenwich)
+    // We want wrap at 180° (Bering Strait) instead
+    // So we rotate: 0° → -180°, 180° → 0°, 360° → 180°
+    lon = lon - 180;
+    if (lon < -180) lon += 360;
     
     // Map to canvas coordinates (canvas spans -180 to 180)
     const x = ((lon + 180) / 360) * canvasWidth;
