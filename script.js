@@ -107,7 +107,7 @@ function checkAuroraAtLocation(userLat,userLon) {
   if(!currentData||!currentData.coordinates) return;
   let nearest=null,minDist=Infinity;
   currentData.coordinates.forEach(p=>{
-    let lon = p[0]<0? p[0]+360:p[0];
+    let lon = convertLonNOAAtoLeaflet(p[0]);
     let lat=p[1]; let intensity=p[2];
     const latDiff = lat-userLat;
     const lonDiff = Math.abs(lon-userLon);
