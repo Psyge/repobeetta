@@ -47,6 +47,10 @@ async function fetchAuroraData() {
     console.error("Aurora data error:", err);
   }
 }
+function lonDiffWrapped(lon1, lon2) {
+    let diff = Math.abs(lon1 - lon2);
+    return Math.min(diff, 360 - diff);
+}
 
 function formatTime(timeStr) {
   try {
@@ -119,9 +123,8 @@ function checkAuroraAtLocation(userLat,userLon) {
     let intensity=p[2];
 
     const latDiff = lat-userLat;
-    const lonDiff = Math.abs(lon-userLon);
-    const lonDiffNormalized = Math.min(lonDiff,360-lonDiff);
-    const dist=Math.hypot(latDiff,lonDiffNormalized*Math.cos(userLat*Math.PI/180));
+    const dist = Math.hypot(latDiff, lonDiffWrapped(lon, userLon) * Math.cos(userLat * Math.PI/180));
+
 
     if(dist<minDist){
         minDist=dist;
@@ -204,9 +207,8 @@ function showAuroraAtClickedLocation(lat, lon) {
     let pointLat = p[1];
     let intensity = p[2];
     const latDiff = pointLat - lat;
-    const lonDiff = Math.abs(pointLon - lon);
-    const lonDiffNormalized = Math.min(lonDiff, 360 - lonDiff);
-    const dist = Math.hypot(latDiff, lonDiffNormalized * Math.cos(lat * Math.PI / 180));
+    const dist = Math.hypot(latDiff, lonDiffWrapped(pointLon, lon) * Math.cos(lat * Math.PI / 180));
+
 
     if (dist < minDist) {
       minDist = dist;
