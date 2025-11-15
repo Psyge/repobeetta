@@ -60,11 +60,11 @@ function drawAuroraOverlay(points) {
 
  points.forEach(p => {
     let lon = p[0];
-  if (lon < 0) lon += 360;
+  
   const lat = p[1];
   const intensity = Math.min(p[2], 100);
 
-  const x = (lon / 360) * canvasWidth;
+  const x = ((lon + 180) / 360) * canvasWidth;
   const y = ((90 - lat) / 50) * canvasHeight;
 
     const radius = 30 + intensity * 0.5;
