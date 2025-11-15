@@ -58,19 +58,18 @@ function drawAuroraOverlay(points) {
   canvas.height = canvasHeight;
   const ctx = canvas.getContext('2d');
 
-  points.forEach(p => {
-    let lon = p[0];
-    if (lon < 0) lon += 360;
+ points.forEach(p => {
+    let lon = p[0]; // käytä suoraan -180…180
     const lat = p[1];
     const intensity = Math.min(p[2], 100);
     if (intensity < 1) return;
 
-    const x = (lon / 360) * canvasWidth;
+    const x = ((lon + 180) / 360) * canvasWidth; // skaalaa -180…180 -> 0…canvasWidth
     const y = ((90 - lat) / 50) * canvasHeight;
-    const radius = 30 + intensity * 0.5;
 
+    const radius = 30 + intensity * 0.5;
     const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
-    const alpha = Math.min(0.2, intensity / 200); // tasaisempi alpha
+    const alpha = Math.min(0.2, intensity / 200);
     grad.addColorStop(0, `rgba(50,255,100,${alpha})`);
     grad.addColorStop(0.5, `rgba(0,200,100,${alpha/2})`);
     grad.addColorStop(1, 'rgba(0,0,0,0)');
@@ -79,7 +78,8 @@ function drawAuroraOverlay(points) {
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, Math.PI*2);
     ctx.fill();
-  });
+});
+
 
   const bounds = [[40, -180], [90, 180]];
   auroraLayer = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.7 });
