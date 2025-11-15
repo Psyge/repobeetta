@@ -59,13 +59,15 @@ function drawAuroraOverlay(points) {
   const ctx = canvas.getContext('2d');
 
  points.forEach(p => {
-    let lon = p[0];
-  
-  const lat = p[1];
-  const intensity = Math.min(p[2], 100);
+   let lon = p[0];
+    if (lon < -180) lon += 360;
+    if (lon > 180) lon -= 360;
+    const lat = p[1];
+    const intensity = Math.min(p[2], 100);
+    if (intensity < 1) return;
 
-  const x = ((lon + 180) / 360) * canvasWidth;
-  const y = ((90 - lat) / 50) * canvasHeight;
+    const x = ((lon + 180) / 360) * canvasWidth; // -180->0, 180->canvasWidth
+    const y = ((90 - lat) / 50) * canvasHeight; 
 
     const radius = 30 + intensity * 0.5;
     const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
