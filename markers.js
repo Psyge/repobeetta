@@ -104,6 +104,12 @@ function addMarkers() {
         iframe.style.display = 'block';
 
         container.appendChild(iframe);
+
+          setTimeout(() => {
+      e.popup._updateLayout();
+      e.popup._updatePosition();
+      e.popup._adjustPan();
+    }, 50);
       }
     });
 
