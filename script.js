@@ -47,7 +47,7 @@ function formatTime(timeStr) {
 }
 
 // --------------------------------------------------
-//  Filter out problematic points near 0°/360° boundary
+//  Smart filter: Remove only problematic wrap artifacts
 // --------------------------------------------------
 function drawAuroraOverlay(points) {
   if (auroraLayer) map.removeLayer(auroraLayer);
@@ -60,19 +60,8 @@ function drawAuroraOverlay(points) {
   const canvasWidth = canvas.width;
   const canvasHeight = canvas.height;
   
-  // FILTER: Remove points within 15° of the 0°/360° boundary
-  // These are the problematic points causing the "blob"
-  const BOUNDARY_THRESHOLD = 15; // degrees
-  
-  const filteredPoints = points.filter(p => {
-    const lon = p[0]; // NOAA 0–360
-    // Keep only points that are NOT near 0° or 360°
-    return lon > BOUNDARY_THRESHOLD && lon < (360 - BOUNDARY_THRESHOLD);
-  });
-  
-  console.log(`Filtered ${points.length - filteredPoints.length} boundary points. Drawing ${filteredPoints.length} points.`);
-  
-  filteredPoints.forEach(p => {
+  // Draw points twice near the edges to create smooth wrapping
+  points.forEach(p => {
     let lon = p[0]; // NOAA 0–360
     const lat = p[1];
     const intensity = Math.min(p[2], 100);
@@ -83,20 +72,39 @@ function drawAuroraOverlay(points) {
       lon = lon - 360;
     }
     
-    const x = ((lon + 180) / 360) * canvasWidth;
-    const y = ((90 - lat) / 50) * canvasHeight;
     const radius = 30 + intensity * 0.5;
-
-    const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
     const alpha = Math.min(0.2, intensity / 200);
-    grad.addColorStop(0, `rgba(50,255,100,${alpha})`);
-    grad.addColorStop(0.5, `rgba(0,200,100,${alpha/2})`);
-    grad.addColorStop(1, 'rgba(0,0,0,0)');
 
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI*2);
-    ctx.fill();
+    function drawBlob(longitude) {
+      const x = ((longitude + 180) / 360) * canvasWidth;
+      const y = ((90 - lat) / 50) * canvasHeight;
+      
+      // Skip if outside canvas bounds
+      if (x < -radius || x > canvasWidth + radius) return;
+      
+      const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
+      grad.addColorStop(0, `rgba(50,255,100,${alpha})`);
+      grad.addColorStop(0.5, `rgba(0,200,100,${alpha/2})`);
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    // Draw at primary position
+    drawBlob(lon);
+    
+    // If near left edge, also draw on right side
+    if (lon < -160) {
+      drawBlob(lon + 360);
+    }
+    
+    // If near right edge, also draw on left side  
+    if (lon > 160) {
+      drawBlob(lon - 360);
+    }
   });
 
   const bounds = [[40, -180], [90, 180]];
