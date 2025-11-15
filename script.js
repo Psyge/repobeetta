@@ -48,11 +48,8 @@ function drawAuroraOverlay(points) {
 
   // lon-muunnosfunktio tähän
   function convertLonNOAAtoLeaflet(lon) {
-      if (lon > 180) {
-          return lon - 360; // 270 → -90, 300 → -60, 350 → -10
-      }
-      return lon;
-  }
+    return lon > 180 ? lon - 360 : lon;
+}
 
   if (auroraLayer) map.removeLayer(auroraLayer);
 
@@ -214,7 +211,8 @@ function showAuroraAtClickedLocation(lat, lon) {
 
   let nearest = null, minDist = Infinity;
   currentData.coordinates.forEach(p => {
-    let pointLon = p[0] < 0 ? p[0] + 360 : p[0];
+    let pointLon = convertLonNOAAtoLeaflet(p[0]);
+
     let pointLat = p[1];
     let intensity = p[2];
     const latDiff = pointLat - lat;
