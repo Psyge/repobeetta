@@ -7,8 +7,14 @@ let notificationPermissionRequested = false;
 //  ✓ Lon-muunnos NOAA 0–360 → Leaflet -180–180
 // --------------------------------------------------
 function convertLonNOAAtoLeaflet(lon) {
+    // Siirretään NOAA:n wrap-point 180° kohtaan (Beringin salmi)
+    lon = (lon + 180) % 360;      // käännetään NOAA-dataa 180° oikealle
+    if (lon < 0) lon += 360;
+
+    // Muunnetaan takaisin Leafletin -180...180 asteisiin
     return lon > 180 ? lon - 360 : lon;
 }
+
 
 // --- Kartta ---
 const map = L.map('map', {
