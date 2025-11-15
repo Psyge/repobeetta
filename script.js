@@ -4,10 +4,9 @@ let currentData = null;
 let notificationPermissionRequested = false;
 
 // --------------------------------------------------
-//  Lon conversion: NOAA 0–360 → Leaflet -180–180
+//  Simple lon conversion: NOAA 0–360 → Leaflet -180–180
 // --------------------------------------------------
 function convertLonNOAAtoLeaflet(lon) {
-    // Simple conversion: values > 180 become negative
     if (lon > 180) {
         lon = lon - 360;
     }
@@ -27,7 +26,6 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
   subdomains: 'abcd'
 }).addTo(map);
 
-// Rajoitetaan näkymä yhteen maapallon levyiseen alueeseen
 map.setMaxBounds([[-90, -180], [90, 180]]);
 map.on('drag', () => map.panInsideBounds([[-90, -180],[90,180]], {animate:false}));
 
@@ -54,7 +52,7 @@ function formatTime(timeStr) {
 }
 
 // --------------------------------------------------
-//  Aurora overlay - draw in two parts to avoid wrap artifacts
+//  NEW METHOD: Draw aurora points twice near edges to prevent wrap artifacts
 // --------------------------------------------------
 function drawAuroraOverlay(points) {
 
@@ -68,60 +66,48 @@ function drawAuroraOverlay(points) {
   const canvasWidth = canvas.width;
   const canvasHeight = canvas.height;
   
-  // Draw each point TWICE if it's near the wrap boundary
-  // This creates smooth transitions at the edges
   points.forEach(p => {
     let lon = p[0]; // NOAA 0–360
     const lat = p[1];
     const intensity = Math.min(p[2], 100);
     if (intensity < 1) return;
 
-    // Convert to -180 to 180
+    // Convert NOAA to standard -180 to 180
     if (lon > 180) {
       lon = lon - 360;
     }
     
     const radius = 30 + intensity * 0.5;
-    const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, radius);
     const alpha = Math.min(0.2, intensity / 200);
-    grad.addColorStop(0, `rgba(50,255,100,${alpha})`);
-    grad.addColorStop(0.5, `rgba(0,200,100,${alpha/2})`);
-    grad.addColorStop(1, 'rgba(0,0,0,0)');
 
-    // Draw at normal position
+    // Function to draw a single aurora blob
+    function drawBlob(xPos, yPos) {
+      const grad = ctx.createRadialGradient(xPos, yPos, 0, xPos, yPos, radius);
+      grad.addColorStop(0, `rgba(50,255,100,${alpha})`);
+      grad.addColorStop(0.5, `rgba(0,200,100,${alpha/2})`);
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(xPos, yPos, radius, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    // Primary position
     const x = ((lon + 180) / 360) * canvasWidth;
     const y = ((90 - lat) / 50) * canvasHeight;
-    
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(0, 0, radius, 0, Math.PI*2);
-    ctx.fill();
-    ctx.restore();
+    drawBlob(x, y);
 
-    // If point is near left edge (western dateline), also draw it on right edge
-    if (lon < -180 + 30) {
-      const x2 = ((lon + 360 + 180) / 360) * canvasWidth;
-      ctx.save();
-      ctx.translate(x2, y);
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(0, 0, radius, 0, Math.PI*2);
-      ctx.fill();
-      ctx.restore();
+    // If near left edge (-180°), also draw on right edge
+    if (lon < -150) {
+      const xRight = ((lon + 360 + 180) / 360) * canvasWidth;
+      drawBlob(xRight, y);
     }
     
-    // If point is near right edge (eastern dateline), also draw it on left edge
-    if (lon > 180 - 30) {
-      const x2 = ((lon - 360 + 180) / 360) * canvasWidth;
-      ctx.save();
-      ctx.translate(x2, y);
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(0, 0, radius, 0, Math.PI*2);
-      ctx.fill();
-      ctx.restore();
+    // If near right edge (+180°), also draw on left edge
+    if (lon > 150) {
+      const xLeft = ((lon - 360 + 180) / 360) * canvasWidth;
+      drawBlob(xLeft, y);
     }
   });
 
@@ -136,9 +122,6 @@ function hideInfoAfterDelay() {
   }, 5000);
 }
 
-// --------------------------------------------------
-//  Check aurora at user location
-// --------------------------------------------------
 function checkAuroraAtLocation(userLat, userLon) {
   if (!currentData || !currentData.coordinates) return;
 
@@ -152,7 +135,6 @@ function checkAuroraAtLocation(userLat, userLon) {
     const latDiff = pointLat - userLat;
     const lonDiff = pointLon - userLon;
     
-    // Handle longitude wrap-around for distance calculation
     let adjustedLonDiff = lonDiff;
     if (Math.abs(lonDiff) > 180) {
       adjustedLonDiff = lonDiff > 0 ? lonDiff - 360 : lonDiff + 360;
@@ -189,7 +171,6 @@ function checkAuroraAtLocation(userLat, userLon) {
   }
 }
 
-// --- Käyttäjän sijainti ---
 if (navigator.geolocation) {
   navigator.geolocation.getCurrentPosition(pos => {
     const lat = pos.coords.latitude;
@@ -200,7 +181,6 @@ if (navigator.geolocation) {
   });
 }
 
-// --- Nappi oman sijainnin näyttämiseen ---
 document.getElementById("locate-btn").addEventListener("click", () => {
   if (!navigator.geolocation) return alert("Your browser does not support location detection.");
 
@@ -217,9 +197,6 @@ document.getElementById("locate-btn").addEventListener("click", () => {
   });
 });
 
-// --------------------------------------------------
-// Map click handler
-// --------------------------------------------------
 map.on('click', (e) => {
   const lat = e.latlng.lat;
   const lon = e.latlng.lng;
@@ -227,7 +204,6 @@ map.on('click', (e) => {
 });
 
 function showAuroraAtClickedLocation(lat, lon) {
-
   if (!currentData||!currentData.coordinates) return;
 
   let nearest = null, minDist = Infinity;
@@ -239,7 +215,6 @@ function showAuroraAtClickedLocation(lat, lon) {
     const latDiff = pointLat - lat;
     const lonDiff = pointLon - lon;
     
-    // Handle longitude wrap-around for distance calculation
     let adjustedLonDiff = lonDiff;
     if (Math.abs(lonDiff) > 180) {
       adjustedLonDiff = lonDiff > 0 ? lonDiff - 360 : lonDiff + 360;
@@ -265,9 +240,6 @@ function showAuroraAtClickedLocation(lat, lon) {
   L.popup().setLatLng([lat, lon]).setContent(message).openOn(map);
 }
 
-// --------------------------------------------------
-// POPUP HELP
-// --------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
   const helpPopup = document.getElementById('help-popup');
   const closePopupBtn = document.getElementById('close-popup');
@@ -285,26 +257,20 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// --- "Näytä ohjeet" linkki ---
 document.getElementById('show-help').addEventListener('click', (e) => {
   e.preventDefault();
   document.getElementById('help-popup').style.display = 'flex';
 });
 
-// --------------------------------------------------
-// Kp-ennusteen nouto
-// --------------------------------------------------
 const chartScript = document.createElement('script');
 chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js';
 document.head.appendChild(chartScript);
 
-// Näytä popup
 document.getElementById('forecast-btn').addEventListener('click', () => {
   document.getElementById('forecast-popup').style.display = 'flex';
   fetchAuroraForecast();
 });
 
-// Sulje popup
 document.getElementById('close-forecast').addEventListener('click', () => {
   document.getElementById('forecast-popup').style.display = 'none';
 });
@@ -314,9 +280,7 @@ async function fetchAuroraForecast() {
     const response = await fetch('https://services.swpc.noaa.gov/text/3-day-forecast.txt');
     if (!response.ok) throw new Error(`Verkkovirhe: ${response.status}`);
     const text = await response.text();
-    console.log("Raaka data NOAA:lta:", text);
 
-    // Luo päivämäärät alkaen tänään
     const today = new Date();
     const dayLabels = [];
     for (let i = 0; i < 3; i++) {
@@ -325,19 +289,16 @@ async function fetchAuroraForecast() {
       dayLabels.push(d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }));
     }
 
-    // --- Parsitaan NOAA:n data ---
     const kpRegex = /[ \t]*(\d{2}-\d{2}UT)[ \t]+([\d\.\(\)G \t]+)/g;
     const times = [];
     const day1 = [], day2 = [], day3 = [];
     let match;
-    let lineCount = 0;
 
     while ((match = kpRegex.exec(text)) !== null) {
-      lineCount++;
       const time = match[1].trim();
       const clean = match[2]
-        .replace(/\(G\d\)/g, '')   // poista (G1),(G2),(G3)
-        .replace(/[ \t]+/g, ' ')   // tasoita välit
+        .replace(/\(G\d\)/g, '')
+        .replace(/[ \t]+/g, ' ')
         .trim();
 
       const values = clean.split(' ').map(Number);
@@ -347,21 +308,12 @@ async function fetchAuroraForecast() {
         day1.push(values[0]);
         day2.push(values[1]);
         day3.push(values[2]);
-      } else {
-        console.log("Ohitettiin rivi:", match[0], " -> tulkittiin:", values);
       }
     }
 
-    console.log(`Löydettiin ${lineCount} riviä, joista ${times.length} kelvollista.`);
-
     if (times.length === 0) {
-      throw new Error("Kp-arvoja ei löytynyt datasta – tarkista regex tai datan muoto.");
+      throw new Error("Kp-arvoja ei löytynyt datasta");
     }
-
-    console.log("Aikavälit:", times);
-    console.log("Päivä 1:", day1);
-    console.log("Päivä 2:", day2);
-    console.log("Päivä 3:", day3);
 
     const ctx = document.getElementById('kpChart').getContext('2d');
     new Chart(ctx, {
@@ -419,7 +371,7 @@ async function fetchAuroraForecast() {
     });
 
   } catch (error) {
-    console.error("Virhe haettaessa tai käsiteltäessä dataa:", error);
+    console.error("Virhe:", error);
     const container = document.getElementById('errorMessage');
     if (container) {
       container.textContent = "⚠️ Virhe ladattaessa NOAA:n dataa: " + error.message;
