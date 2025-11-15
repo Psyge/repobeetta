@@ -286,6 +286,7 @@ header.banner::after {
 .custom-popup .leaflet-popup-content {
   width: auto !important;
   padding: 0;
+  text-align: center;
 }
 
 .popup-stream iframe {
