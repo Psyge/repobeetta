@@ -3,9 +3,6 @@ let userMarker = null;
 let currentData = null;
 let notificationPermissionRequested = false;
 
-// --------------------------------------------------
-//  Simple lon conversion: NOAA 0–360 → Leaflet -180–180
-// --------------------------------------------------
 function convertLonNOAAtoLeaflet(lon) {
     if (lon > 180) {
         lon = lon - 360;
@@ -13,7 +10,6 @@ function convertLonNOAAtoLeaflet(lon) {
     return lon;
 }
 
-// --- Kartta ---
 const map = L.map('map', {
   center: [65, 25],
   zoom: 4,
@@ -31,7 +27,6 @@ map.on('drag', () => map.panInsideBounds([[-90, -180],[90,180]], {animate:false}
 
 const info = document.getElementById("info");
 
-// --- Hae NOAA data ---
 async function fetchAuroraData() {
   try {
     const res = await fetch('https://services.swpc.noaa.gov/json/ovation_aurora_latest.json');
@@ -52,27 +47,29 @@ function formatTime(timeStr) {
 }
 
 // --------------------------------------------------
-//  NEW METHOD: Draw aurora points twice near edges to prevent wrap artifacts
+//  NEW APPROACH: Create wider canvas and use overflow
 // --------------------------------------------------
 function drawAuroraOverlay(points) {
-
   if (auroraLayer) map.removeLayer(auroraLayer);
 
+  // Create a canvas that's WIDER than needed (450° instead of 360°)
+  // This allows us to draw the aurora continuously without wrap issues
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
 
-  canvas.width = 800;
+  canvas.width = 1000;  // 450° worth of width
   canvas.height = 500;
   const canvasWidth = canvas.width;
   const canvasHeight = canvas.height;
   
+  // Draw each point, and also draw it shifted by ±360° for continuity
   points.forEach(p => {
     let lon = p[0]; // NOAA 0–360
     const lat = p[1];
     const intensity = Math.min(p[2], 100);
     if (intensity < 1) return;
 
-    // Convert NOAA to standard -180 to 180
+    // Convert to -180 to 180
     if (lon > 180) {
       lon = lon - 360;
     }
@@ -80,39 +77,42 @@ function drawAuroraOverlay(points) {
     const radius = 30 + intensity * 0.5;
     const alpha = Math.min(0.2, intensity / 200);
 
-    // Function to draw a single aurora blob
-    function drawBlob(xPos, yPos) {
-      const grad = ctx.createRadialGradient(xPos, yPos, 0, xPos, yPos, radius);
+    function drawBlob(longitude) {
+      // Map -225 to 225 degrees onto canvas (450° total)
+      const x = ((longitude + 225) / 450) * canvasWidth;
+      const y = ((90 - lat) / 50) * canvasHeight;
+      
+      const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
       grad.addColorStop(0, `rgba(50,255,100,${alpha})`);
       grad.addColorStop(0.5, `rgba(0,200,100,${alpha/2})`);
       grad.addColorStop(1, 'rgba(0,0,0,0)');
       
       ctx.fillStyle = grad;
       ctx.beginPath();
-      ctx.arc(xPos, yPos, radius, 0, Math.PI*2);
+      ctx.arc(x, y, radius, 0, Math.PI*2);
       ctx.fill();
     }
 
-    // Primary position
-    const x = ((lon + 180) / 360) * canvasWidth;
-    const y = ((90 - lat) / 50) * canvasHeight;
-    drawBlob(x, y);
-
-    // If near left edge (-180°), also draw on right edge
-    if (lon < -150) {
-      const xRight = ((lon + 360 + 180) / 360) * canvasWidth;
-      drawBlob(xRight, y);
-    }
-    
-    // If near right edge (+180°), also draw on left edge
-    if (lon > 150) {
-      const xLeft = ((lon - 360 + 180) / 360) * canvasWidth;
-      drawBlob(xLeft, y);
-    }
+    // Draw at three positions for seamless wrapping
+    drawBlob(lon);           // Main position
+    drawBlob(lon - 360);     // Left wrap
+    drawBlob(lon + 360);     // Right wrap
   });
 
+  // Crop the center 360° section (from -180 to +180)
+  const croppedCanvas = document.createElement('canvas');
+  croppedCanvas.width = 800;
+  croppedCanvas.height = 500;
+  const croppedCtx = croppedCanvas.getContext('2d');
+  
+  // Copy only the middle section
+  const sourceX = ((45) / 450) * canvasWidth; // Start at -135°, but we want -180°
+  const sourceWidth = (360 / 450) * canvasWidth;
+  
+  croppedCtx.drawImage(canvas, sourceX, 0, sourceWidth, canvas.height, 0, 0, 800, 500);
+
   const bounds = [[40, -180], [90, 180]];
-  auroraLayer = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.7 });
+  auroraLayer = L.imageOverlay(croppedCanvas.toDataURL(), bounds, { opacity: 0.7 });
   auroraLayer.addTo(map);
 }
 
