@@ -84,10 +84,10 @@ function addMarkers() {
               <img src="https://openweathermap.org/img/wn/${weather.icon}.png">
               <span>${weather.temp}°C — ${weather.desc}</span>
             </div>
-            <small>Tuntuu kuin ${weather.feels}°C | Tuuli ${weather.wind} m/s</small>
+            <small>Feels like ${weather.feels}°C | Wind ${weather.wind} m/s</small>
           `;
         } else {
-          weatherBox.innerHTML = "Sää ei saatavilla";
+          weatherBox.innerHTML = "Weather not available";
         }
 
         weatherBox.dataset.loaded = "true";
