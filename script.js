@@ -54,7 +54,7 @@ function formatTime(timeStr) {
 }
 
 // --------------------------------------------------
-//  Aurora overlay with wrap at Bering Strait
+//  Aurora overlay - draw in two parts to avoid wrap artifacts
 // --------------------------------------------------
 function drawAuroraOverlay(points) {
 
@@ -68,36 +68,63 @@ function drawAuroraOverlay(points) {
   const canvasWidth = canvas.width;
   const canvasHeight = canvas.height;
   
+  // Draw each point TWICE if it's near the wrap boundary
+  // This creates smooth transitions at the edges
   points.forEach(p => {
     let lon = p[0]; // NOAA 0–360
     const lat = p[1];
     const intensity = Math.min(p[2], 100);
     if (intensity < 1) return;
 
-    // Rotate the entire world by 180° so wrap point moves to Bering Strait
-    // This means: Alaska/Russia border becomes the left/right edge
-    // and Greenwich becomes the center
-    lon = (lon + 180) % 360;
+    // Convert to -180 to 180
+    if (lon > 180) {
+      lon = lon - 360;
+    }
     
-    // Map to canvas coordinates (0-360 range)
-    const x = (lon / 360) * canvasWidth;
-    const y = ((90 - lat) / 50) * canvasHeight;
-
     const radius = 30 + intensity * 0.5;
-
-    const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
+    const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, radius);
     const alpha = Math.min(0.2, intensity / 200);
     grad.addColorStop(0, `rgba(50,255,100,${alpha})`);
     grad.addColorStop(0.5, `rgba(0,200,100,${alpha/2})`);
     grad.addColorStop(1, 'rgba(0,0,0,0)');
 
+    // Draw at normal position
+    const x = ((lon + 180) / 360) * canvasWidth;
+    const y = ((90 - lat) / 50) * canvasHeight;
+    
+    ctx.save();
+    ctx.translate(x, y);
     ctx.fillStyle = grad;
     ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI*2);
+    ctx.arc(0, 0, radius, 0, Math.PI*2);
     ctx.fill();
+    ctx.restore();
+
+    // If point is near left edge (western dateline), also draw it on right edge
+    if (lon < -180 + 30) {
+      const x2 = ((lon + 360 + 180) / 360) * canvasWidth;
+      ctx.save();
+      ctx.translate(x2, y);
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(0, 0, radius, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+    
+    // If point is near right edge (eastern dateline), also draw it on left edge
+    if (lon > 180 - 30) {
+      const x2 = ((lon - 360 + 180) / 360) * canvasWidth;
+      ctx.save();
+      ctx.translate(x2, y);
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(0, 0, radius, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
   });
 
-  // The canvas now represents: left edge = -180° (Bering west), right edge = 180° (Bering east)
   const bounds = [[40, -180], [90, 180]];
   auroraLayer = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.7 });
   auroraLayer.addTo(map);
