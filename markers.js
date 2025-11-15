@@ -33,6 +33,7 @@ const markersLayer = L.layerGroup().addTo(map);
 function addMarkers() {
   places.forEach(place => {
 
+    const popupOffset = place.stream ? -52 : -70;
     const customIcon = L.divIcon({
       className: 'custom-marker',
       html: `
@@ -43,7 +44,7 @@ function addMarkers() {
       `,
       iconSize: [32, 48],
       iconAnchor: [16, 48],
-      popupAnchor: [0, -52]
+      popupAnchor: [0, popupOffset]
     });
 
     // Popupin perussisältö
