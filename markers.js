@@ -32,6 +32,7 @@ const markersLayer = L.layerGroup().addTo(map);
 
 function addMarkers() {
   places.forEach(place => {
+
     const customIcon = L.divIcon({
       className: 'custom-marker',
       html: `
@@ -47,69 +48,73 @@ function addMarkers() {
 
     // Popupin perussisältö
     const popupContent = `
-  <strong>${place.name}</strong><br>
-  <img src="${place.icon}" alt="${place.name}" style="width:50px;height:50px;border-radius:50%;"><br>
-  <a href="${place.url}" target="_blank">More info</a>
+      <strong>${place.name}</strong><br>
+      <img src="${place.icon}" alt="${place.name}" style="width:50px;height:50px;border-radius:50%;"><br>
+      <a href="${place.url}" target="_blank">More info</a>
 
-  <div class="weather-box" style="margin-top:10px;">
-    <em>Haetaan säätietoja…</em>
-  </div>
+      <div class="weather-box" style="margin-top:10px;">
+        <em>Haetaan säätietoja…</em>
+      </div>
 
-  ${place.stream ? `<div class="popup-stream" 
-    data-stream="${place.stream}" 
-    data-width="${place.streamWidth || 320}" 
-    data-height="${place.streamHeight || 180}" 
-    style="margin-top:10px;"></div>` : ''}
-`;
+      ${place.stream ? `<div class="popup-stream" 
+        data-stream="${place.stream}" 
+        data-width="${place.streamWidth || 320}" 
+        data-height="${place.streamHeight || 180}" 
+        style="margin-top:10px;"></div>` : ''}
+    `;
 
+    // ❗️Tämä puuttui: marker pitää luoda ENNEN marker.on(...)
+    const marker = L.marker([place.lat, place.lon], { icon: customIcon })
+      .bindPopup(popupContent, { className: 'custom-popup' })
+      .addTo(markersLayer);
 
-    // Lazy load iframe kun popup avataan
-    
-marker.on('popupopen', async (e) => {
-  const popup = e.popup;
+    // Popup avautuessa: hae sää + luo iframe
+    marker.on('popupopen', async (e) => {
+      const popup = e.popup;
 
-  // 1) Lataa sää
-  const weatherBox = popup.getElement().querySelector('.weather-box');
-  if (weatherBox && !weatherBox.dataset.loaded) {
+      // 1) Lataa sää
+      const weatherBox = popup.getElement().querySelector('.weather-box');
+      if (weatherBox && !weatherBox.dataset.loaded) {
 
-    const weather = await getWeather(place.lat, place.lon);
+        const weather = await getWeather(place.lat, place.lon);
 
-    if (weather) {
-      weatherBox.innerHTML = `
-        <div class="weather-row">
-          <img src="https://openweathermap.org/img/wn/${weather.icon}.png">
-          <span>${weather.temp}°C — ${weather.desc}</span>
-        </div>
-        <small>Tuntuu kuin ${weather.feels}°C | Tuuli ${weather.wind} m/s</small>
-      `;
-    } else {
-      weatherBox.innerHTML = "Sää ei saatavilla";
-    }
+        if (weather) {
+          weatherBox.innerHTML = `
+            <div class="weather-row">
+              <img src="https://openweathermap.org/img/wn/${weather.icon}.png">
+              <span>${weather.temp}°C — ${weather.desc}</span>
+            </div>
+            <small>Tuntuu kuin ${weather.feels}°C | Tuuli ${weather.wind} m/s</small>
+          `;
+        } else {
+          weatherBox.innerHTML = "Sää ei saatavilla";
+        }
 
-    weatherBox.dataset.loaded = "true";
-  }
+        weatherBox.dataset.loaded = "true";
+      }
 
-  // 2) Your existing iframe lazy load
-  const container = popup.getElement().querySelector('.popup-stream');
-  if (container && !container.querySelector('iframe')) {
-    const iframe = document.createElement('iframe');
-    iframe.src = container.dataset.stream;
-    iframe.width = container.dataset.width;
-    iframe.height = container.dataset.height;
-    iframe.style.border = 'none';
-    iframe.style.display = 'block';
+      // 2) Lataa YouTube-iframe (lazy load)
+      const container = popup.getElement().querySelector('.popup-stream');
+      if (container && !container.querySelector('iframe')) {
+        const iframe = document.createElement('iframe');
+        iframe.src = container.dataset.stream;
+        iframe.width = container.dataset.width;
+        iframe.height = container.dataset.height;
+        iframe.style.border = 'none';
+        iframe.style.display = 'block';
 
-    container.appendChild(iframe);
-  }
-});
+        container.appendChild(iframe);
+      }
+    });
 
-});
+  });
 
   // Satunnainen animaatioviive markereille
   document.querySelectorAll('.marker-wrapper').forEach(el => {
     el.style.animationDelay = `${Math.random() * 2}s`;
   });
 }
+
 
 addMarkers();
 
