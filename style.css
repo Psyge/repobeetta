@@ -293,6 +293,11 @@ header.banner::after {
   display: block;
   max-width: none; /* varmistaa ettei popupin ulkopuolelle */
 }
+.custom-popup .popup-stream iframe {
+    width: 100% !important;
+    height: auto;
+}
+
 .leaflet-popup-pane {
   z-index: 9000; 
 }
