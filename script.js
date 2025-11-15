@@ -120,6 +120,10 @@ function checkAuroraAtLocation(userLat,userLon) {
     else{emoji='😕';message=`${emoji} <strong>Not much northern lights</strong><br>Intensiteetti: ${nearest.intensity.toFixed(1)}`;}
     message+=`<br><small>Distance to data point: ~${(nearest.distance*111).toFixed(0)} km</small>`;
     L.popup().setLatLng([userLat,userLon]).setContent(message).openOn(map);
+    if (!notificationPermissionRequested) {
+    Notification.requestPermission();
+    notificationPermissionRequested = true;
+}
     if(Notification.permission==="granted"&&nearest.intensity>5){
       new Notification("🌌 Northern Lights alert",{body:message.replace(/<[^>]*>/g,'')});
     }
