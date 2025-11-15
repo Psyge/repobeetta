@@ -47,7 +47,7 @@ function formatTime(timeStr) {
 }
 
 // --------------------------------------------------
-//  Apply gradient mask to fade edges near Greenwich
+//  Filter out problematic points near 0°/360° boundary
 // --------------------------------------------------
 function drawAuroraOverlay(points) {
   if (auroraLayer) map.removeLayer(auroraLayer);
@@ -60,13 +60,25 @@ function drawAuroraOverlay(points) {
   const canvasWidth = canvas.width;
   const canvasHeight = canvas.height;
   
-  // First pass: draw all aurora
-  points.forEach(p => {
+  // FILTER: Remove points within 15° of the 0°/360° boundary
+  // These are the problematic points causing the "blob"
+  const BOUNDARY_THRESHOLD = 15; // degrees
+  
+  const filteredPoints = points.filter(p => {
+    const lon = p[0]; // NOAA 0–360
+    // Keep only points that are NOT near 0° or 360°
+    return lon > BOUNDARY_THRESHOLD && lon < (360 - BOUNDARY_THRESHOLD);
+  });
+  
+  console.log(`Filtered ${points.length - filteredPoints.length} boundary points. Drawing ${filteredPoints.length} points.`);
+  
+  filteredPoints.forEach(p => {
     let lon = p[0]; // NOAA 0–360
     const lat = p[1];
     const intensity = Math.min(p[2], 100);
     if (intensity < 1) return;
 
+    // Convert to -180 to 180
     if (lon > 180) {
       lon = lon - 360;
     }
@@ -86,27 +98,6 @@ function drawAuroraOverlay(points) {
     ctx.arc(x, y, radius, 0, Math.PI*2);
     ctx.fill();
   });
-
-  // Second pass: apply edge fade to hide discontinuities
-  // Create gradient masks on left and right edges (near Greenwich area)
-  const fadeWidth = 80; // pixels to fade
-  
-  // Left edge fade (western edge, around 180°W area in display)
-  const leftGrad = ctx.createLinearGradient(0, 0, fadeWidth, 0);
-  leftGrad.addColorStop(0, 'rgba(0,0,0,1)');
-  leftGrad.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.globalCompositeOperation = 'destination-out';
-  ctx.fillStyle = leftGrad;
-  ctx.fillRect(0, 0, fadeWidth, canvasHeight);
-  
-  // Right edge fade (eastern edge, around 180°E area in display)
-  const rightGrad = ctx.createLinearGradient(canvasWidth - fadeWidth, 0, canvasWidth, 0);
-  rightGrad.addColorStop(0, 'rgba(0,0,0,0)');
-  rightGrad.addColorStop(1, 'rgba(0,0,0,1)');
-  ctx.fillStyle = rightGrad;
-  ctx.fillRect(canvasWidth - fadeWidth, 0, fadeWidth, canvasHeight);
-  
-  ctx.globalCompositeOperation = 'source-over';
 
   const bounds = [[40, -180], [90, 180]];
   auroraLayer = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.7 });
