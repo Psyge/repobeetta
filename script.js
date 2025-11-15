@@ -47,6 +47,9 @@ async function fetchAuroraData() {
     console.error("Aurora data error:", err);
   }
 }
+function lonTo360(lon) {
+    return (lon + 360) % 360;
+}
 function lonDiffWrapped(lon1, lon2) {
     let diff = Math.abs(lon1 - lon2);
     return Math.min(diff, 360 - diff);
@@ -75,34 +78,35 @@ function drawAuroraOverlay(points) {
   const canvasHeight = canvas.height;
   
   points.forEach(p => {
+    let lon = p[0]; // suoraan NOAA 0–360
+    const lat = p[1];
+    const intensity = Math.min(p[2], 100);
+    if (intensity < 1) return;
 
-      let lon = convertLonNOAAtoLeaflet(p[0]);   // ✓ lisätty
-      const lat = p[1];
-      const intensity = Math.min(p[2], 100);
-      if (intensity < 1) return;
+    // Siirrä wrap point Beringin salmelle (n. 180°)
+    let x = lon - 180; 
+    if (x < 0) x += 360;        // siirrä negatiiviset +360
+    x = (x / 360) * canvasWidth;
 
-      const wrapLon = 180;
-      let x = lon - wrapLon;
-if (x < -180) x += 360;
-if (x > 180) x -= 360;
-x = ((x + 180) / 360) * canvasWidth;
-      const y = ((90 - lat) / 50) * canvasHeight;
+    const y = ((90 - lat) / 50) * canvasHeight;
 
-      const radius = 30 + intensity * 0.5;
+    const radius = 30 + intensity * 0.5;
 
-      const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
-      const alpha = Math.min(0.2, intensity / 200);
-      grad.addColorStop(0, `rgba(50,255,100,${alpha})`);
-      grad.addColorStop(0.5, `rgba(0,200,100,${alpha/2})`);
-      grad.addColorStop(1, 'rgba(0,0,0,0)');
+    const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
+    const alpha = Math.min(0.2, intensity / 200);
+    grad.addColorStop(0, `rgba(50,255,100,${alpha})`);
+    grad.addColorStop(0.5, `rgba(0,200,100,${alpha/2})`);
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
 
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI*2);
-      ctx.fill();
-  });
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI*2);
+    ctx.fill();
+});
 
-  const bounds = [[40, wrapLon - 180], [90, wrapLon + 180]];
+
+
+  const bounds = [[40, -180], [90, 180]];
 auroraLayer = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.7 });
   auroraLayer.addTo(map);
 }
@@ -117,42 +121,45 @@ function hideInfoAfterDelay() {
 // --------------------------------------------------
 //  ✓ Käyttäjän sijaintiin lisätty lon-muunnos
 // --------------------------------------------------
-function checkAuroraAtLocation(userLat,userLon) {
-  if(!currentData||!currentData.coordinates) return;
-  let nearest=null,minDist=Infinity;
+function checkAuroraAtLocation(userLat, userLon) {
+  if (!currentData || !currentData.coordinates) return;
 
-  currentData.coordinates.forEach(p=>{
-    let lon = convertLonNOAAtoLeaflet(p[0]);    // ✓ korjaus
-    let lat=p[1];
-    let intensity=p[2];
+  let nearest = null, minDist = Infinity;
+  const userLon360 = lonTo360(userLon);
 
-    const latDiff = lat-userLat;
-    const dist = Math.hypot(latDiff, lonDiffWrapped(lon, userLon) * Math.cos(userLat * Math.PI/180));
+  currentData.coordinates.forEach(p => {
+    const lat = p[1];
+    const lon = lonTo360(p[0]);
+    const intensity = p[2];
 
+    const latDiff = lat - userLat;
+    const dist = Math.hypot(latDiff, lonDiffWrapped(lon, userLon360) * Math.cos(userLat * Math.PI / 180));
 
-    if(dist<minDist){
-        minDist=dist;
-        nearest={lat,lon,intensity,distance:dist};
+    if (dist < minDist) {
+      minDist = dist;
+      nearest = { lat, lon, intensity, distance: dist };
     }
   });
 
-  if(nearest){
-    let message='',emoji='';
-    if(nearest.intensity>80){emoji='🌟';message=`${emoji} <strong>Strong aurora activity!</strong><br>Intensiteetti: ${nearest.intensity.toFixed(1)}`;}
-    else if(nearest.intensity>60){emoji='🌌';message=`${emoji} <strong>Northern lights very likely to be visible</strong><br>Intensiteetti: ${nearest.intensity.toFixed(1)}`;}
-    else if(nearest.intensity>40){emoji='✨';message=`${emoji} <strong>Moderate activity</strong><br>Intensiteetti: ${nearest.intensity.toFixed(1)}`;}
-    else if(nearest.intensity>20){emoji='🌙';message=`${emoji} <strong>Low activity</strong><br>Intensiteetti: ${nearest.intensity.toFixed(1)}`;}
-    else{emoji='😕';message=`${emoji} <strong>Not much northern lights</strong><br>Intensiteetti: ${nearest.intensity.toFixed(1)}`;}
+  if (nearest) {
+    let message = '', emoji = '';
+    const i = nearest.intensity;
+    if (i > 80) { emoji = '🌟'; message = `${emoji} <strong>Strong aurora activity!</strong><br>Intensity: ${i.toFixed(1)}`; }
+    else if (i > 60) { emoji = '🌌'; message = `${emoji} <strong>Very likely visible</strong><br>Intensity: ${i.toFixed(1)}`; }
+    else if (i > 40) { emoji = '✨'; message = `${emoji} <strong>Moderate activity</strong><br>Intensity: ${i.toFixed(1)}`; }
+    else if (i > 20) { emoji = '🌙'; message = `${emoji} <strong>Low activity</strong><br>Intensity: ${i.toFixed(1)}`; }
+    else { emoji = '😕'; message = `${emoji} <strong>Not much northern lights</strong><br>Intensity: ${i.toFixed(1)}`; }
 
-    message+=`<br><small>Distance to data point: ~${(nearest.distance*111).toFixed(0)} km</small>`;
-    L.popup().setLatLng([userLat,userLon]).setContent(message).openOn(map);
+    message += `<br><small>Distance to data point: ~${(nearest.distance*111).toFixed(0)} km</small>`;
+
+    L.popup().setLatLng([userLat, userLon]).setContent(message).openOn(map);
 
     if (!notificationPermissionRequested) {
-        Notification.requestPermission();
-        notificationPermissionRequested = true;
+      Notification.requestPermission();
+      notificationPermissionRequested = true;
     }
-    if(Notification.permission==="granted"&&nearest.intensity>5){
-      new Notification("🌌 Northern Lights alert",{body:message.replace(/<[^>]*>/g,'')});
+    if (Notification.permission === "granted" && nearest.intensity > 5) {
+      new Notification("🌌 Northern Lights alert", { body: message.replace(/<[^>]*>/g,'') });
     }
   }
 }
@@ -170,26 +177,22 @@ if (navigator.geolocation) {
 
 // --- Nappi oman sijainnin näyttämiseen ---
 document.getElementById("locate-btn").addEventListener("click", () => {
-  if (!navigator.geolocation) {
-    alert("Your browser does not support location detection.");
-    return;
-  }
+  if (!navigator.geolocation) return alert("Your browser does not support location detection.");
 
   navigator.geolocation.getCurrentPosition(pos => {
     const lat = pos.coords.latitude;
     const lon = pos.coords.longitude;
     map.setView([lat, lon], 6);
 
-    if (userMarker) {
-      userMarker.setLatLng([lat, lon]);
-    } else {
-      userMarker = L.marker([lat, lon]).addTo(map).bindPopup('Your location');
-    }
+    if (userMarker) userMarker.setLatLng([lat, lon]);
+    else userMarker = L.marker([lat, lon]).addTo(map).bindPopup('Your location');
 
     userMarker.openPopup();
     checkAuroraAtLocation(lat, lon);
   });
 });
+
+
 
 // --------------------------------------------------
 // ✓ Karttaklikkaus: lon-muunnos lisätty
