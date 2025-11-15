@@ -1,5 +1,5 @@
 async function getWeather(lat, lon) {
-  const apiKey = "a47a0bead08bf387f1a629376bb96319";
+  const apiKey = "";
 
   const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=en`;
 
