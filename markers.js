@@ -115,5 +115,8 @@ function addMarkers(layer) {
   });
 }
 
-// Käynnistä markerit
-initMarkers();
+// Käynnistä markerit vasta kun kartta on valmis
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initMarkers, 500); // pieni viive varmistaa että map on valmis
+});
+
