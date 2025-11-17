@@ -188,7 +188,11 @@ function showAuroraAtClickedLocation(lat, lon) {
 
   L.popup().setLatLng([lat, lon]).setContent(message).openOn(map);
 }
-
+function hideInfoAfterDelay() {
+  setTimeout(() => {
+    document.getElementById("info").style.display = "none";
+  }, 5000); // 5 sekuntia
+}
 // --- Geolocation nappi ---
 const locateBtn = document.getElementById("locate-btn");
 if (locateBtn && navigator.geolocation && map) {
