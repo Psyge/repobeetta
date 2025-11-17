@@ -368,6 +368,15 @@ header.banner::after {
 .faq-item li {
   margin-bottom: 4px;
 }
+
+.faq-img {
+  width: 100%;
+  max-width: 600px;
+  border-radius: 8px;
+  margin: 10px 0;
+  display: block;
+}
+
 /* Mobiili */
 @media (max-width: 768px) {
   header.banner {
