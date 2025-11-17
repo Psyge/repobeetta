@@ -103,7 +103,15 @@ function addMarkers(layer) {
         setTimeout(() => {
           e.popup._updateLayout();
           e.popup._updatePosition();
-          e.popup._andom() * 2}s`;
+          e.popup._adjustPan();
+        }, 50);
+      }
+    });
+  });
+
+  // Animaatioviive
+  document.querySelectorAll('.marker-wrapper').forEach(el => {
+    el.style.animationDelay = `${Math.random() * 2}s`;
   });
 }
 
