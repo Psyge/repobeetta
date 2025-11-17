@@ -118,7 +118,7 @@ if (typeof L !== 'undefined') {
     ${statusEmoji} ${statusText}<br>
     Aurora intensity: ${auroraIntensity.toFixed(1)}<br>
     Clouds: ${clouds}%<br>
-    Temp: ${weather ? weather.temp + '°C' : 'N/A'}
+    Temp: ${weather ? weather.temp + '°C' : 'N/A'}<br>
     <strong>Coordinates:</strong> ${lat.toFixed(4)}, ${lon.toFixed(4)}<br>
     <a href="https://www.google.com/maps?q=${lat},${lon}" target="_blank" style="color:#1e88e5;">Open in Google Maps</a>
   `;
