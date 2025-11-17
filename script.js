@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // --- Menu ---
   const menuBtn = document.getElementById('menu-btn');
   const menu = document.getElementById('menu');
   if (menuBtn && menu) {
@@ -42,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// --- Kartta vain jos Leaflet ladattu ---
 if (typeof L !== 'undefined') {
   map = L.map('map', {
     center: [65, 25],
@@ -70,8 +68,6 @@ if (typeof L !== 'undefined') {
 const info = document.getElementById("info");
 if (info) info.textContent = "Klikkaa karttaa nähdäksesi revontulien ennusteen.";
 
-
-// --- Hae NOAA data ---
 function fetchAuroraData() {
   if (!info) return;
  
@@ -155,7 +151,6 @@ function hideInfoAfterDelay() {
   }, 5000); // 5 sekuntia
 }
 
-// --- Tarkista käyttäjän sijainti ja revontulet ---
 function checkAuroraAtLocation(userLat,userLon) {
   if(!currentData||!currentData.coordinates) return;
   let nearest=null,minDist=Infinity;
@@ -183,7 +178,6 @@ function checkAuroraAtLocation(userLat,userLon) {
   }
 }
 // --- Käyttäjän sijainti ---
-
 if (navigator.geolocation && map) {
   navigator.geolocation.getCurrentPosition(pos => {
     const lat = pos.coords.latitude;
@@ -194,7 +188,6 @@ if (navigator.geolocation && map) {
   });
 }
 
-// --- Nappi oman sijainnin näyttämiseen ---
 const locateBtn = document.getElementById("locate-btn");
 if (locateBtn && navigator.geolocation && map) {
   locateBtn.addEventListener("click", () => {
@@ -209,21 +202,8 @@ if (locateBtn && navigator.geolocation && map) {
   });
 }
 
-// --- Säännöllinen päivitys ---
 fetchAuroraData();
 setInterval(fetchAuroraData, 5*60*1000);
-
-// --- Valikon toiminta ---
-document.addEventListener('DOMContentLoaded', () => {
-  // --- Menu Logic ---
-  const menuBtn = document.getElementById('menu-btn');
-  const menu = document.getElementById('menu');
-  if (menuBtn && menu) {
-    menuBtn.addEventListener('click', () => {
-      menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
-    });
-  }
-
 
 hideInfoAfterDelay();
  // --- Klikkaus kartalla: näytä revontulitilanne ---
@@ -255,11 +235,6 @@ function showAuroraAtClickedLocation(lat, lon) {
   L.popup().setLatLng([lat, lon]).setContent(message).openOn(map);
 }
 
-
-
-
-// Chart.js CDN
-// Lisää Chart.js
 const chartScript = document.createElement('script');
 chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js';
 document.head.appendChild(chartScript);
@@ -275,8 +250,6 @@ document.getElementById('close-forecast').addEventListener('click', () => {
   document.getElementById('forecast-popup').style.display = 'none';
 });
 
-// Hae NOAA-data ja piirrä graafi
-
 async function fetchAuroraForecast() {
   try {
     const response = await fetch('https://services.swpc.noaa.gov/text/3-day-forecast.txt');
@@ -284,7 +257,6 @@ async function fetchAuroraForecast() {
     const text = await response.text();
     console.log("Raaka data NOAA:lta:", text);
 
-    // Luo päivämäärät alkaen tänään
     const today = new Date();
     const dayLabels = [];
     for (let i = 0; i < 3; i++) {
@@ -293,8 +265,6 @@ async function fetchAuroraForecast() {
       dayLabels.push(d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }));
     }
 
-    // --- Parsitaan NOAA:n data ---
-    // sallitaan sekä välilyönnit että tabit ja mahdolliset (G1) tms.
     const kpRegex = /[ \t]*(\d{2}-\d{2}UT)[ \t]+([\d\.\(\)G \t]+)/g;
     const times = [];
     const day1 = [], day2 = [], day3 = [];
@@ -398,8 +368,7 @@ async function fetchAuroraForecast() {
   }
 }
 
-fetchAuroraForecast();
-setInterval(fetchAuroraData, 5 * 60 * 1000);
+
 
 
 
