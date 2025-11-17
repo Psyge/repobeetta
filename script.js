@@ -246,6 +246,7 @@ if (locateBtn && navigator.geolocation && map) {
 
       // Popup sisältö
       const popupContent = `
+        <strong>Your Northern Lights chance is now:</strong><br>      
         <strong>${statusEmoji} ${statusText}</strong><br>
         Aurora intensity: ${auroraIntensity.toFixed(1)}<br>
         Clouds: ${clouds}%<br>
