@@ -211,6 +211,55 @@ if (locateBtn && navigator.geolocation && map) {
 // --- Päivitys ---
 fetchAuroraData();
 setInterval(fetchAuroraData, 5 * 60 * 1000);
+
+// --- Aurora Chance Button ---
+const auroraCheckBtn = document.getElementById('aurora-check-btn');
+const auroraStatus = document.getElementById('aurora-status');
+
+if (auroraCheckBtn && navigator.geolocation) {
+  auroraCheckBtn.addEventListener('click', async () => {
+    auroraStatus.textContent = 'Checking...';
+
+    navigator.geolocation.getCurrentPosition(async pos => {
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+
+      let score = 0;
+
+      // 1. Aurora intensiteetti NOAA:n datasta
+      if (currentData && currentData.coordinates) {
+        let nearest = null, minDist = Infinity;
+        currentData.coordinates.forEach(p => {
+          let pointLon = p[0] < 0 ? p[0] + 360 : p[0];
+          const pointLat = p[1], intensity = p[2];
+          const dist = Math.hypot(pointLat - lat, Math.abs(pointLon - lon));
+          if (dist < minDist) { minDist = dist; nearest = intensity; }
+        });
+        if (nearest > 60) score += 2;
+        else if (nearest > 30) score += 1;
+      }
+
+      // 2. Säädata markers.js:n funktiosta
+      const weather = await getWeather(lat, lon);
+      if (weather) {
+        if (weather.clouds < 30) score += 2;
+        else if (weather.clouds < 60) score += 1;
+      }
+
+      // 3. Näytä liikennevalo
+      if (score >= 3) {
+        auroraStatus.innerHTML = '🟢 High chance!<br><small>Aurora intensity & clouds considered.</small>';
+      } else if (score === 2) {
+        auroraStatus.innerHTML = '🟡 Moderate chance<br><small>Conditions are mixed.</small>';
+      } else {
+        auroraStatus.innerHTML = '🔴 Low chance<br><small>Too cloudy or weak aurora.</small>';
+      }
+    }, err => {
+      auroraStatus.textContent = 'Location error: ' + err.message;
+    });
+  });
+}
+
 document.addEventListener('DOMContentLoaded', hideInfoAfterDelay);
 // --- Chart.js ---
 const chartScript = document.createElement('script');
