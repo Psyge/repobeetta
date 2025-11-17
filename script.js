@@ -191,7 +191,7 @@ function showAuroraAtClickedLocation(lat, lon) {
 function hideInfoAfterDelay() {
   setTimeout(() => {
     document.getElementById("info").style.display = "none";
-  }, 5000); // 5 sekuntia
+  }, 3000); // 5 sekuntia
 }
 // --- Geolocation nappi ---
 const locateBtn = document.getElementById("locate-btn");
