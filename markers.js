@@ -10,7 +10,8 @@ async function getWeather(lat, lon) {
       feels: Math.round(data.main.feels_like),
       wind: data.wind.speed,
       desc: data.weather[0].description,
-      icon: data.weather[0].icon
+      icon: data.weather[0].icon,
+      clouds: data.clouds.all
     };
 
   } catch (err) {
