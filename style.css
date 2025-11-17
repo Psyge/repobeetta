@@ -54,7 +54,13 @@ header.banner::after {
 .banner-right .icon:hover {
   transform: scale(1.1);
 }
-
+.banner-right {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* väli nappeihin */
+  position: relative;
+  right: 40px; /* jos haluat siirtää */
+}
 .banner-right img {
   height: 40px;
 }
