@@ -211,7 +211,7 @@ if (locateBtn && navigator.geolocation && map) {
 // --- Päivitys ---
 fetchAuroraData();
 setInterval(fetchAuroraData, 5 * 60 * 1000);
-
+document.addEventListener('DOMContentLoaded', hideInfoAfterDelay);
 // --- Chart.js ---
 const chartScript = document.createElement('script');
 chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js';
