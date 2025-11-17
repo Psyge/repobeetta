@@ -1,1 +1,97 @@
 
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact & Feedback - RepoTracker</title>
+<link rel="stylesheet" href="style.css"> <!-- Käytä samaa CSS-tiedostoa -->
+</head>
+<body>
+
+<header class="banner">
+  <div id="menu-btn">☰</div>
+
+  <div class="banner-left">
+    <img src="repo-neon.png" alt="RepoTracker Logo" class="logo">
+  </div>
+
+  <div class="banner-right">
+    <a href="https://instagram.com/repotracker_" target="_blank" class="social-btn instagram">
+      <img src="ig-icon.png" alt="Instagram" class="icon">
+    </a>
+    <a href="https://www.buymeacoffee.com/repotracker" target="_blank">
+    <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" style="height: 50px; width: auto;">
+
+  </div>
+  
+<nav id="menu">
+  <a href="index.html">Front page</a>
+  <a href="contact.html">Contact / Feedback</a>
+  <a href="#" id="show-help">Help</a>
+</nav>
+
+</header>
+
+<!-- Sama menu -->
+<nav id="menu">
+  <a href="index.html">Front page</a>
+  <a href="contact.html">Contact / Feedback</a>
+</nav>
+
+<section id="revontuli-faq">
+  <h2>Usein kysytyt kysymykset revontulista</h2>
+
+  <div class="faq-item">
+    <h3>Milloin revontulia näkyy parhaiten?</h3>
+    <p>Revontulet näkyvät parhaiten pimeinä, kirkkaina öinä syksyllä ja keväällä. Paras aika on yleensä klo 21–02. Suomessa pohjoisessa riittää Kp-indeksi 3–4, etelässä tarvitaan Kp 5–6 tai enemmän.</p>
+  </div>
+
+  <div class="faq-item">
+    <h3>Mitä kartan arvot tarkoittavat?</h3>
+    <p>Kartassa näkyvä <strong>Kp-indeksi</strong> kertoo geomagneettisen aktiivisuuden. Mitä suurempi arvo, sitä todennäköisemmin revontulia näkyy. Esimerkiksi:
+      <ul>
+        <li>Kp 0–2: Ei todennäköisyyttä</li>
+        <li>Kp 3–4: Pohjois-Suomi</li>
+        <li>Kp 5+: Etelä-Suomi mahdollinen</li>
+      </ul>
+    </p>
+  </div>
+
+  <div class="faq-item">
+    <h3>Miten pilvisyys vaikuttaa?</h3>
+    <p>Pilvet estävät revontulien näkymisen. Tarkista pilvisyyskartta ennen lähtöä – kirkas taivas on välttämätön.</p>
+  </div>
+
+  <div class="faq-item">
+    <h3>Tarvitaanko pimeä paikka?</h3>
+    <p>Kyllä. Valosaaste kaupungeissa heikentää näkyvyyttä. Siirry pois katuvaloista ja valitse avoin paikka.</p>
+  </div>
+
+  <div class="faq-item">
+    <h3>Voiko revontulia nähdä Etelä-Suomessa?</h3>
+    <p>Kyllä, mutta harvemmin. Tarvitaan korkea Kp-indeksi (≥ 5–6) ja kirkas taivas.</p>
+  </div>
+
+  <div class="faq-item">
+    <h3>Mistä tiedän, milloin revontulia tulee?</h3>
+    <p>Käytä reaaliaikaista karttaa ja ennusteita. Voit seurata myös NOAA:n ja Ilmatieteen laitoksen tietoja.</p>
+  </div>
+
+  <div class="faq-item">
+    <h3>Mikä on aurinkotuuli ja IMF Bz?</h3>
+    <p>Aurinkotuuli on Auringosta tuleva hiukkasvirta, joka tuo energiaa maapallon magneettikenttään. IMF Bz-arvo kertoo magneettikentän suunnan – negatiivinen Bz lisää revontulien todennäköisyyttä.</p>
+  </div>
+</section>
+
+<script>
+const menuBtn = document.getElementById("menu-btn");
+const menu = document.getElementById("menu");
+menuBtn.addEventListener("click", () => {
+  menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+});
+</script>
+
+</body>
+</html>
+
