@@ -1,21 +1,21 @@
+// --- Globaalit muuttujat ---
 let auroraLayer = null;
 let userMarker = null;
 let currentData = null;
 let notificationPermissionRequested = false;
-let map;
+let map; // määritellään heti alussa
 
 document.addEventListener('DOMContentLoaded', () => {
+  // --- Help Popup ---
   const helpPopup = document.getElementById('help-popup');
   const closePopupBtn = document.getElementById('close-popup');
   const dontShowAgainCheckbox = document.getElementById('dont-show-again');
   const showHelpLink = document.getElementById('show-help');
 
-  // Näytä popup vain jos käyttäjä ei ole estänyt sitä
   if (helpPopup && !localStorage.getItem('hideHelpPopup')) {
     helpPopup.style.display = 'flex';
   }
 
-  // Sulkemisnappi
   if (closePopupBtn) {
     closePopupBtn.addEventListener('click', () => {
       if (dontShowAgainCheckbox && dontShowAgainCheckbox.checked) {
@@ -25,65 +25,72 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Help-linkki
   if (showHelpLink) {
     showHelpLink.addEventListener('click', (e) => {
       e.preventDefault();
-      if (helpPopup) {
-        helpPopup.style.display = 'flex';
-      }
+      if (helpPopup) helpPopup.style.display = 'flex';
+    });
+  }
+
+  // --- Menu ---
+  const menuBtn = document.getElementById('menu-btn');
+  const menu = document.getElementById('menu');
+  if (menuBtn && menu) {
+    menuBtn.addEventListener('click', () => {
+      menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
     });
   }
 });
 
-// --- Kartta ---
+// --- Kartta vain jos Leaflet ladattu ---
+if (typeof L !== 'undefined') {
+  map = L.map('map', {
+    center: [65, 25],
+    zoom: 4,
+    minZoom: 2,
+    maxZoom: 15,
+    worldCopyJump: false
+  });
 
- if (typeof L !== 'undefined') {
-    map = L.map('map', {
-      center: [65, 25],
-      zoom: 4,
-      minZoom: 2,
-      maxZoom: 15,
-      worldCopyJump: false
-    });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(map);
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
-      subdomains: 'abcd',
-      maxZoom: 19
-    }).addTo(map);
+  map.setMaxBounds([[-90, -180], [90, 180]]);
+  map.on('drag', () => map.panInsideBounds([[-90, -180], [90, 180]], { animate: false }));
 
-    map.setMaxBounds([[-90, -180], [90, 180]]);
-    map.on('drag', () => map.panInsideBounds([[-90, -180], [90, 180]], { animate: false }));
-  }
-
-  
-const info = document.getElementById("info");
-if (info) {
-  info.textContent = "Klikkaa karttaa nähdäksesi revontulien ennusteen.";
+  // Klikkaus kartalla
+  map.on('click', (e) => {
+    showAuroraAtClickedLocation(e.latlng.lat, e.latlng.lng);
+  });
 }
 
-
+const info = document.getElementById("info");
+if (info) info.textContent = "Klikkaa karttaa nähdäksesi revontulien ennusteen.";
 
 
 // --- Hae NOAA data ---
 function fetchAuroraData() {
-  info.className = 'loading';
+  if (!info) return;
+ 
   info.innerHTML = '⏳ Loading northern lights forecast...';
+
   const directUrl = 'https://services.swpc.noaa.gov/json/ovation_aurora_latest.json';
   const proxyUrl = 'https://corsproxy.io/?' + directUrl;
 
   fetch(directUrl).catch(() => fetch(proxyUrl))
-    .then(res => { if(!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
+    .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
     .then(data => {
-      if (!data.coordinates || !Array.isArray(data.coordinates)) throw new Error("The data does not contain a 'coordinates' table.");
+      if (!data.coordinates || !Array.isArray(data.coordinates)) throw new Error("Invalid data format.");
       currentData = data;
       const obsTime = formatTime(data["Observation Time"]);
       const forecastTime = formatTime(data["Forecast Time"]);
       info.className = '';
       info.innerHTML = `<strong>📡 Northern Lights forecast</strong><br>
         <small>Observation: ${obsTime}<br>Forecast: ${forecastTime}<br>Points: ${data.coordinates.length}</small>`;
-      drawAuroraOverlay(data.coordinates);
+      if (map) drawAuroraOverlay(data.coordinates);
     })
     .catch(err => {
       console.error('Error retrieving northern light data', err);
@@ -95,39 +102,30 @@ function fetchAuroraData() {
 function formatTime(timeStr) {
   try {
     const date = new Date(timeStr);
-    return date.toLocaleString('fi-FI',{day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'});
+    return date.toLocaleString('fi-FI', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' });
   } catch { return timeStr; }
 }
 
-// --- Piirrä revontulet gradienttina ---
-// --- Piirrä revontulet gradienttina ympäri palloa ---
-// --- Piirrä revontulet samalla tyylillä kuin liittämässäsi ---
 function drawAuroraOverlay(points) {
-  if (auroraLayer) {
-    auroraLayer.forEach(l => map.removeLayer(l));
-  }
+  if (!map) return;
+  if (auroraLayer) auroraLayer.forEach(l => map.removeLayer(l));
   auroraLayer = [];
 
-  const canvasWidth = 3600;
-  const canvasHeight = 500;
+  const canvasWidth = 3600, canvasHeight = 500;
 
-  const createCanvasOverlay = (xOffset = 0, clipStart = -Infinity, clipEnd = Infinity) => {
+  const createCanvasOverlay = (xOffset = 0) => {
     const canvas = document.createElement('canvas');
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
     const ctx = canvas.getContext('2d');
 
     points.forEach(p => {
-      let lon = p[0]; 
-      if (lon < 0) lon += 360; // normalize 0-360
-      if (lon < clipStart || lon > clipEnd) return; // piirrä vain sallitulle alueelle
-      const lat = p[1];
-      const intensity = p[2];
+      let lon = p[0]; if (lon < 0) lon += 360;
+      const lat = p[1], intensity = p[2];
       if (intensity < 1) return;
 
       const x = ((lon + 180) / 360) * canvasWidth + xOffset;
       const y = ((90 - lat) / 50) * canvasHeight;
-
       const radius = Math.min(60, Math.max(10, intensity * 3));
 
       const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
@@ -137,30 +135,25 @@ function drawAuroraOverlay(points) {
       ctx.fillStyle = grad;
 
       ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI*2);
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
       ctx.fill();
     });
 
     const bounds = [[40, -180], [90, 180]];
-    const overlay = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.75, interactive: false }).addTo(map);
+    const overlay = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.75 }).addTo(map);
     auroraLayer.push(overlay);
   };
 
-  // piirretään kolme overlayta, mutta rajoitetaan missä alueella pisteitä piirretään
-  createCanvasOverlay(0);       // alkuperäinen
-  createCanvasOverlay(-canvasWidth); // vasen kopio
-  createCanvasOverlay(canvasWidth);   // oikea kopio
-
+  createCanvasOverlay(0);
+  createCanvasOverlay(-canvasWidth);
+  createCanvasOverlay(canvasWidth);
 }
-
 
 function hideInfoAfterDelay() {
   setTimeout(() => {
     document.getElementById("info").style.display = "none";
   }, 5000); // 5 sekuntia
 }
-
-
 
 // --- Tarkista käyttäjän sijainti ja revontulet ---
 function checkAuroraAtLocation(userLat,userLon) {
@@ -189,10 +182,9 @@ function checkAuroraAtLocation(userLat,userLon) {
     }
   }
 }
-
-
 // --- Käyttäjän sijainti ---
-if (navigator.geolocation) {
+
+if (navigator.geolocation && map) {
   navigator.geolocation.getCurrentPosition(pos => {
     const lat = pos.coords.latitude;
     const lon = pos.coords.longitude;
@@ -200,36 +192,22 @@ if (navigator.geolocation) {
     userMarker = L.marker([lat, lon]).addTo(map).bindPopup('Your location');
     checkAuroraAtLocation(lat, lon);
   });
-} else {
-  alert("Your browser does not support location detection.");
 }
 
 // --- Nappi oman sijainnin näyttämiseen ---
-document.getElementById("locate-btn").addEventListener("click", () => {
-  if (!navigator.geolocation) {
-    alert("Your browser does not support location detection.");
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(pos => {
-    const lat = pos.coords.latitude;
-    const lon = pos.coords.longitude;
-    map.setView([lat, lon], 6);
-
-    if (userMarker) {
-      userMarker.setLatLng([lat, lon]);
-    } else {
-      userMarker = L.marker([lat, lon]).addTo(map).bindPopup('Your location');
-    }
-
-    userMarker.openPopup();
-    checkAuroraAtLocation(lat, lon);
-  }, err => {
-    alert("Location determination failed: " + err.message);
+const locateBtn = document.getElementById("locate-btn");
+if (locateBtn && navigator.geolocation && map) {
+  locateBtn.addEventListener("click", () => {
+    navigator.geolocation.getCurrentPosition(pos => {
+      const lat = pos.coords.latitude, lon = pos.coords.longitude;
+      map.setView([lat, lon], 6);
+      if (userMarker) userMarker.setLatLng([lat, lon]);
+      else userMarker = L.marker([lat, lon]).addTo(map).bindPopup('Your location');
+      userMarker.openPopup();
+      checkAuroraAtLocation(lat, lon);
+    }, err => alert("Location failed: " + err.message));
   });
-});
-
-
+}
 
 // --- Säännöllinen päivitys ---
 fetchAuroraData();
@@ -256,43 +234,26 @@ map.on('click', (e) => {
 });
 
 function showAuroraAtClickedLocation(lat, lon) {
-  if (!currentData || !currentData.coordinates) {
-    L.popup()
-      .setLatLng([lat, lon])
-      .setContent("❌ No aurora data available.")
-      .openOn(map);
-    return;
-  }
-
+  if (!map || !currentData || !currentData.coordinates) return;
   let nearest = null, minDist = Infinity;
+
   currentData.coordinates.forEach(p => {
     let pointLon = p[0] < 0 ? p[0] + 360 : p[0];
-    let pointLat = p[1];
-    let intensity = p[2];
+    const pointLat = p[1], intensity = p[2];
     const latDiff = pointLat - lat;
     const lonDiff = Math.abs(pointLon - lon);
     const lonDiffNormalized = Math.min(lonDiff, 360 - lonDiff);
     const dist = Math.hypot(latDiff, lonDiffNormalized * Math.cos(lat * Math.PI / 180));
-    if (dist < minDist) {
-      minDist = dist;
-      nearest = { lat: pointLat, lon: pointLon, intensity, distance: dist };
-    }
+    if (dist < minDist) { minDist = dist; nearest = { lat: pointLat, lon: pointLon, intensity, distance: dist }; }
   });
 
-  let message = '', emoji = '';
-  if (nearest.intensity > 80) { emoji = '🌟'; message = `${emoji} <strong>Strong aurora activity!</strong>`; }
-  else if (nearest.intensity > 60) { emoji = '🌌'; message = `${emoji} <strong>Very likely visible</strong>`; }
-  else if (nearest.intensity > 40) { emoji = '✨'; message = `${emoji} <strong>Moderate activity</strong>`; }
-  else if (nearest.intensity > 20) { emoji = '🌙'; message = `${emoji} <strong>Low activity</strong>`; }
-  else { emoji = '😕'; message = `${emoji} <strong>Not much northern lights</strong>`; }
+  if (!nearest) return;
+  let emoji = nearest.intensity > 80 ? '🌟' : nearest.intensity > 60 ? '🌌' : nearest.intensity > 40 ? '✨' : nearest.intensity > 20 ? '🌙' : '😕';
+  let message = `${emoji} <strong>${nearest.intensity > 60 ? 'High chance!' : 'Aurora info'}</strong><br>
+    Intensity: ${nearest.intensity.toFixed(1)}<br><small>Distance: ~${(nearest.distance * 111).toFixed(0)} km</small>`;
 
-  message += `<br>Intensity: ${nearest.intensity.toFixed(1)}<br><small>Distance to data point: ~${(nearest.distance * 111).toFixed(0)} km</small>`;
-
-  L.popup()
-    .setLatLng([lat, lon])
-    .setContent(message)
-    .openOn(map);
-} 
+  L.popup().setLatLng([lat, lon]).setContent(message).openOn(map);
+}
 
 
 
@@ -438,7 +399,7 @@ async function fetchAuroraForecast() {
 }
 
 fetchAuroraForecast();
-
+setInterval(fetchAuroraData, 5 * 60 * 1000);
 
 
 
