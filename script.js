@@ -167,27 +167,51 @@ function drawAuroraOverlay(points) {
 }
 
 // --- Klikkaus kartalla ---
-function showAuroraAtClickedLocation(lat, lon) {
-  if (!map || !currentData || !currentData.coordinates) return;
-  let nearest = null, minDist = Infinity;
+map.on('click', async (e) => {
+  const lat = e.latlng.lat;
+  const lon = e.latlng.lng;
 
-  currentData.coordinates.forEach(p => {
-    let pointLon = p[0] < 0 ? p[0] + 360 : p[0];
-    const pointLat = p[1], intensity = p[2];
-    const latDiff = pointLat - lat;
-    const lonDiff = Math.abs(pointLon - lon);
-    const lonDiffNormalized = Math.min(lonDiff, 360 - lonDiff);
-    const dist = Math.hypot(latDiff, lonDiffNormalized * Math.cos(lat * Math.PI / 180));
-    if (dist < minDist) { minDist = dist; nearest = { lat: pointLat, lon: pointLon, intensity, distance: dist }; }
-  });
+  let score = 0;
+  let auroraIntensity = 0;
 
-  if (!nearest) return;
-  let emoji = nearest.intensity > 80 ? '🌟' : nearest.intensity > 60 ? '🌌' : nearest.intensity > 40 ? '✨' : nearest.intensity > 20 ? '🌙' : '😕';
-  let message = `${emoji} <strong>${nearest.intensity > 60 ? 'High chance!' : 'Aurora info'}</strong><br>
-    Intensity: ${nearest.intensity.toFixed(1)}<br><small>Distance: ~${(nearest.distance * 111).toFixed(0)} km</small>`;
+  // 1. Aurora-intensiteetti NOAA:n datasta
+  if (currentData && currentData.coordinates) {
+    let nearest = null, minDist = Infinity;
+    currentData.coordinates.forEach(p => {
+      let pointLon = p[0] < 0 ? p[0] + 360 : p[0];
+      const pointLat = p[1], intensity = p[2];
+      const dist = Math.hypot(pointLat - lat, Math.abs(pointLon - lon));
+      if (dist < minDist) { minDist = dist; nearest = intensity; }
+    });
+    auroraIntensity = nearest || 0;
+    if (auroraIntensity > 60) score += 2;
+    else if (auroraIntensity > 30) score += 1;
+  }
 
-  L.popup().setLatLng([lat, lon]).setContent(message).openOn(map);
-}
+  // 2. Säädata markers.js:n funktiosta
+  const weather = await getWeather(lat, lon);
+  let clouds = weather ? weather.clouds : 100;
+  if (clouds < 30) score += 2;
+  else if (clouds < 60) score += 1;
+
+  // 3. Liikennevalo
+  let statusEmoji = '🔴';
+  let statusText = 'Low chance';
+  if (score >= 3) { statusEmoji = '🟢'; statusText = 'High chance!'; }
+  else if (score === 2) { statusEmoji = '🟡'; statusText = 'Moderate chance'; }
+
+  // 4. Popup sisältö
+  const popupContent = `
+    <strong>Your Northern Lights chance is now:</strong><br>
+    ${statusEmoji} ${statusText}<br>
+    Aurora intensity: ${auroraIntensity.toFixed(1)}<br>
+    Clouds: ${clouds}%<br>
+    Temp: ${weather ? weather.temp + '°C' : 'N/A'}
+  `;
+
+  L.popup().setLatLng([lat, lon]).setContent(popupContent).openOn(map);
+});
+
 function hideInfoAfterDelay() {
   setTimeout(() => {
     document.getElementById("info").style.display = "none";
