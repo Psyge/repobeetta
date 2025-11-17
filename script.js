@@ -193,40 +193,32 @@ function hideInfoAfterDelay() {
     document.getElementById("info").style.display = "none";
   }, 3000); // 5 sekuntia
 }
-// --- Geolocation nappi ---
-const locateBtn = document.getElementById("locate-btn");
-if (locateBtn && navigator.geolocation && map) {
-  locateBtn.addEventListener("click", () => {
-    navigator.geolocation.getCurrentPosition(pos => {
-      const lat = pos.coords.latitude, lon = pos.coords.longitude;
-      map.setView([lat, lon], 6);
-      if (userMarker) userMarker.setLatLng([lat, lon]);
-      else userMarker = L.marker([lat, lon]).addTo(map).bindPopup('Your location');
-      userMarker.openPopup();
-      checkAuroraAtLocation(lat, lon);
-    }, err => alert("Location failed: " + err.message));
-  });
-}
+
 
 // --- Päivitys ---
 fetchAuroraData();
 setInterval(fetchAuroraData, 5 * 60 * 1000);
 
 // --- Aurora Chance Button ---
-const auroraCheckBtn = document.getElementById('aurora-check-btn');
-const auroraStatus = document.getElementById('aurora-status');
-
-if (auroraCheckBtn && navigator.geolocation) {
-  auroraCheckBtn.addEventListener('click', async () => {
-    auroraStatus.textContent = 'Checking...';
-
+const locateBtn = document.getElementById("locate-btn");
+if (locateBtn && navigator.geolocation && map) {
+  locateBtn.addEventListener("click", () => {
     navigator.geolocation.getCurrentPosition(async pos => {
       const lat = pos.coords.latitude;
       const lon = pos.coords.longitude;
 
-      let score = 0;
+      // Keskitetään kartta
+      map.setView([lat, lon], 6);
 
-      // 1. Aurora intensiteetti NOAA:n datasta
+      if (userMarker) {
+        userMarker.setLatLng([lat, lon]);
+      } else {
+        userMarker = L.marker([lat, lon]).addTo(map);
+      }
+
+      // Haetaan aurora-intensiteetti
+      let auroraScore = 0;
+      let auroraIntensity = 0;
       if (currentData && currentData.coordinates) {
         let nearest = null, minDist = Infinity;
         currentData.coordinates.forEach(p => {
@@ -235,27 +227,34 @@ if (auroraCheckBtn && navigator.geolocation) {
           const dist = Math.hypot(pointLat - lat, Math.abs(pointLon - lon));
           if (dist < minDist) { minDist = dist; nearest = intensity; }
         });
-        if (nearest > 60) score += 2;
-        else if (nearest > 30) score += 1;
+        auroraIntensity = nearest || 0;
+        if (auroraIntensity > 60) auroraScore += 2;
+        else if (auroraIntensity > 30) auroraScore += 1;
       }
 
-      // 2. Säädata markers.js:n funktiosta
+      // Haetaan säädata
       const weather = await getWeather(lat, lon);
-      if (weather) {
-        if (weather.clouds < 30) score += 2;
-        else if (weather.clouds < 60) score += 1;
-      }
+      let clouds = weather ? weather.clouds : 100;
+      if (clouds < 30) auroraScore += 2;
+      else if (clouds < 60) auroraScore += 1;
 
-      // 3. Näytä liikennevalo
-      if (score >= 3) {
-        auroraStatus.innerHTML = '🟢 High chance!<br><small>Aurora intensity & clouds considered.</small>';
-      } else if (score === 2) {
-        auroraStatus.innerHTML = '🟡 Moderate chance<br><small>Conditions are mixed.</small>';
-      } else {
-        auroraStatus.innerHTML = '🔴 Low chance<br><small>Too cloudy or weak aurora.</small>';
-      }
+      // Liikennevalo
+      let statusEmoji = '🔴';
+      let statusText = 'Low chance';
+      if (auroraScore >= 3) { statusEmoji = '🟢'; statusText = 'High chance!'; }
+      else if (auroraScore === 2) { statusEmoji = '🟡'; statusText = 'Moderate chance'; }
+
+      // Popup sisältö
+      const popupContent = `
+        <strong>${statusEmoji} ${statusText}</strong><br>
+        Aurora intensity: ${auroraIntensity.toFixed(1)}<br>
+        Clouds: ${clouds}%<br>
+        Temp: ${weather ? weather.temp + '°C' : 'N/A'}
+      `;
+
+      userMarker.bindPopup(popupContent).openPopup();
     }, err => {
-      auroraStatus.textContent = 'Location error: ' + err.message;
+      alert("Location failed: " + err.message);
     });
   });
 }
