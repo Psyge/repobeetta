@@ -378,7 +378,7 @@ header.banner::after {
 }
 
 #northern-lights-faq {
-  margin-top: 140px; /* bannerin korkeus + vähän tilaa */
+  margin-top: 100px; /* bannerin korkeus + vähän tilaa */
  padding: 20px;
   background: rgba(0, 0, 0, 0.8); /* tumma läpikuultava tausta */
   color: #fff; /* valkoinen teksti */
