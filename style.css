@@ -377,6 +377,10 @@ header.banner::after {
   display: block;
 }
 
+#northern-lights-faq {
+  margin-top: 140px; /* bannerin korkeus + vähän tilaa */
+}
+
 /* Mobiili */
 @media (max-width: 768px) {
   header.banner {
