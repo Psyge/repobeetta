@@ -1,138 +1,98 @@
-
 <!DOCTYPE html>
 <html lang="fi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Northern Lights FAQ – Frequently asked questions about the northern lights</title>
- <meta name="description" content="Northern Lights FAQ: When can you see the Northern Lights, what does the Kp index mean, clothing tips, and safety instructions for Northern Lights hunting.">
-  <meta name="keywords" content="revontulet, aurora borealis, Kp-indeksi, revontulien katselu, revontuli ennuste, pukeutuminen, turvallisuus, northern lights, aurora borealis, Kp index, viewing the northern lights, northern lights forecast, clothing, safety">
-  
-<link rel="stylesheet" href="style.css"> <!-- Käytä samaa CSS-tiedostoa -->
+<title id="faq-page-title">Northern Lights FAQ – Frequently asked questions about the northern lights</title>
+<meta name="description" content="Northern Lights FAQ: When can you see the Northern Lights, what does the Kp index mean, clothing tips, and safety instructions for Northern Lights hunting.">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header class="banner">
   <div id="menu-btn">☰</div>
-
+  <div class="language-switch">
+    <button onclick="setLanguage('fi')">Suomi</button>
+    <button onclick="setLanguage('en')">English</button>
+  </div>
   <div class="banner-left">
     <img src="repo-neon.png" alt="RepoTracker Logo" class="logo">
   </div>
-
-  <div class="banner-right">
-    <a href="https://instagram.com/repotracker_" target="_blank" class="social-btn instagram">
-      <img src="ig-icon.png" alt="Instagram" class="icon">
-    </a>
-    <a href="https://www.buymeacoffee.com/repotracker" target="_blank">
-    <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" style="height: 50px; width: auto;"></a>
-
-  </div>
-  
-<nav id="menu">
-  <a href="index.html">Front page</a>
-  <a href="contact.html">Contact / Feedback</a>
-  <a href="#" id="show-help">Help</a>
-</nav>
-
+  <nav id="menu">
+    <a href="index.html" id="menu-home">Front page</a>
+    <a href="contact.html" id="menu-contact">Contact / Feedback</a>
+    <a href="#" id="show-help">Help</a>
+  </nav>
 </header>
 
-
 <section id="northern-lights-faq">
-  <h2>Frequently asked questions about the northern lights</h2>
+  <h2 id="faq-title">Frequently asked questions about the northern lights</h2>
 
   <div class="faq-item">
-    <h3>When is the best time to see the Northern Lights?</h3>
-    <img src="repolappi.jpg" alt="Revontulet Lapissa" class="faq-img">
-    <p>The Northern Lights are best seen on dark, clear nights in autumn and spring. The best time is usually between 9 p.m. and 2 a.m. In northern Finland, a Kp index of 3–4 is sufficient, while in the south, a Kp index of 5–6 or higher is required. </p>
+    <h3 id="faq-q1">When is the best time to see the Northern Lights?</h3>
+    <p id="faq-a1">The Northern Lights are best seen on dark, clear nights in autumn and spring...</p>
   </div>
 
   <div class="faq-item">
-    <h3>What do the values on the map mean?</h3>
-    <p>The <strong>Kp index</strong> shown on the map indicates geomagnetic activity. The higher the value, the more likely it is that the Northern Lights will be visible. For example:
-      <ul>
-        <li>Kp 0–2: No probability</li>
-        <li>Kp 3–4: Northern Finland</li>
-        <li>Kp 5+: Southern Finland possible</li>
-      </ul>
-    </p>
+    <h3 id="faq-q2">What do the values on the map mean?</h3>
+    <p id="faq-a2">The Kp index shown on the map indicates geomagnetic activity...</p>
   </div>
 
   <div class="faq-item">
-    <h3>How does cloud cover affect visibility?</h3>
-    <p>Clouds prevent the northern lights from being seen. Check the cloud cover map before you leave – a clear sky is essential. </p>
-</div>
-
-<div class="faq-item">
-<h3>Do I need a dark place?</h3>
-<p>Yes. Light pollution in cities reduces visibility. Move away from street lights and choose an open place. </p>
-</div>
-
-<div class="faq-item">
-<h3>Can the Northern Lights be seen in southern Finland?</h3>
-<p>Yes, but less frequently. A high Kp index (≥ 5–6) and clear skies are required. </p>
-</div>
-
- 
-<div class="faq-item">
-  <h3>How do I know when the Northern Lights will appear?</h3>
-  <p>Use real-time maps like <a href="https://repotracker.fi" target="_blank" rel="noopener">RepoTracker.fi</a> for forecasts. You can also follow information from NOAA and the Finnish Meteorological Institute.</p>
-</div>
-
+    <h3 id="faq-q3">How does cloud cover affect visibility?</h3>
+    <p id="faq-a3">Clouds prevent the northern lights from being seen...</p>
+  </div>
 
   <div class="faq-item">
-    <h3>What are solar wind and IMF Bz?</h3>
-    <p>Solar wind is a stream of particles from the Sun that brings energy to the Earth's magnetic field. The IMF Bz value indicates the direction of the magnetic field – a negative Bz increases the likelihood of auroras. </p>
-</div>
+    <h3 id="faq-q4">Do I need a dark place?</h3>
+    <p id="faq-a4">Yes. Light pollution in cities reduces visibility...</p>
+  </div>
 
-  
-<div class="faq-item">
-  <h3>What should you keep in mind when going hunting for the Northern Lights?</h3>
-  <p>Dress warmly – one thick coat is not the best option; it is better to wear several thin layers under your coat. Layering keeps you warmer and gives you flexibility. Finally, add a proper winter coat. </p>
-  <p>Wear warm shoes and gloves, and bring extra clothes if you plan to be outside for a long time. </p>
-<p>If you are moving with a rental car, stay on plowed public roads. Do not drive on poorly maintained or unplowed forest roads, so you don't get stuck in the snow. It can take a long time for help to arrive in winter</p>
-</div>
+  <div class="faq-item">
+    <h3 id="faq-q5">Can the Northern Lights be seen in southern Finland?</h3>
+    <p id="faq-a5">Yes, but less frequently. A high Kp index and clear skies are required...</p>
+  </div>
+
+  <div class="faq-item">
+    <h3 id="faq-q6">How do I know when the Northern Lights will appear?</h3>
+    <p id="faq-a6">Use real-time maps like RepoTracker.fi for forecasts...</p>
+  </div>
+
+  <div class="faq-item">
+    <h3 id="faq-q7">What are solar wind and IMF Bz?</h3>
+    <p id="faq-a7">Solar wind is a stream of particles from the Sun...</p>
+  </div>
+
+  <div class="faq-item">
+    <h3 id="faq-q8">What should you keep in mind when going hunting for the Northern Lights?</h3>
+    <p id="faq-a8">Dress warmly – one thick coat is not the best option...</p>
+  </div>
 </section>
 
-<div id="help-popup" class="popup" style="display:none;">
-  <div class="popup-content">
-    <h2>How to use RepoTracker</h2>
-    <p>Click anywhere on the map to see the aurora forecast for that location.<br>
-       Use the 📍 button to check your current position.<br><br>
-    <strong>Note:</strong> Cloud cover can affect visibility even if aurora activity is strong.
-    </p>
-    <label>
-      <input type="checkbox" id="dont-show-again"> Don’t show again
-    </label>
-    <br>
-    <button id="close-popup">Close</button>
-  </div>
-</div>
+<script src="language.js"></script>
+<script>
+async function loadLanguage(lang) {
+  const response = await fetch('lang.json');
+  translations = await response.json();
+  currentLang = lang;
 
-<script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "Milloin revontulia näkyy parhaiten?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Revontulet näkyvät parhaiten pimeinä, kirkkaina öinä syksyllä ja keväällä. Paras aika on klo 21–02."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Mitä kartan arvot tarkoittavat?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Kp-indeksi kertoo geomagneettisen aktiivisuuden. Mitä suurempi arvo, sitä todennäköisemmin revontulia näkyy."
-        }
-      }
-    ]
+  // Päivitä otsikko ja navigaatio
+  updateText('faq-page-title', translations[lang].faq.pageTitle);
+  updateText('faq-title', translations[lang].faq.title);
+  updateText('menu-home', translations[lang].menu.home);
+  updateText('menu-contact', translations[lang].menu.contact);
+  updateText('show-help', translations[lang].menu.help);
+
+  // Päivitä FAQ-kysymykset ja vastaukset
+  for (let i = 0; i < translations[lang].faq.questions.length; i++) {
+    updateText(`faq-q${i+1}`, translations[lang].faq.questions[i].q);
+    updateText(`faq-a${i+1}`, translations[lang].faq.questions[i].a);
   }
-  </script>
-<script src="script.js"></script>
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadLanguage(currentLang);
+});
+</script>
 </body>
 </html>
-
