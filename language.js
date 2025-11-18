@@ -1,19 +1,17 @@
 let translations = {};
 let currentLang = 'fi';
 
-// Turvallinen päivitysfunktio
 function updateText(id, text) {
   const el = document.getElementById(id);
   if (el) el.textContent = text;
 }
 
-
 async function loadLanguage(lang) {
   const response = await fetch('lang.json');
-  translations = await response.json(); // nyt globaali
+  translations = await response.json();
   currentLang = lang;
 
-  // Päivitä tekstit turvallisesti
+  // Päivitä tekstit
   updateText('page-title', translations[lang].h1);
   updateText('menu-home', translations[lang].menu.home);
   updateText('menu-faq', translations[lang].menu.faq);
@@ -35,17 +33,16 @@ async function loadLanguage(lang) {
   updateText('kp-high', translations[lang].forecastPopup.kpHigh);
   updateText('close-forecast', translations[lang].forecastPopup.close);
 
-  updateText('info', translations[lang].loading);
+  updateText('info', translations[lang].map.clickInfo);
+
+  // Ilmoita että kieli on valmis
+  document.dispatchEvent(new Event('languageReady'));
 }
 
 function setLanguage(lang) {
   loadLanguage(lang);
 }
 
-// Lataa oletuskieli DOM:n latauksen jälkeen
 document.addEventListener('DOMContentLoaded', () => {
   loadLanguage(currentLang);
-document.dispatchEvent(new Event('languageReady'));  
 });
-
-
