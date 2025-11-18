@@ -58,70 +58,99 @@ document.addEventListener('DOMContentLoaded', () => {
       forecastPopup.style.display = 'none';
     });
   }
+});
 
-  // --- Kartta ---
-  if (typeof L !== 'undefined') {
-    map = L.map('map', {
-      center: [65, 25],
-      zoom: 4,
-      minZoom: 2,
-      maxZoom: 15,
-      worldCopyJump: false
-    });
+// --- Kartta ---
+if (typeof L !== 'undefined') {
+  map = L.map('map', {
+    center: [65, 25],
+    zoom: 4,
+    minZoom: 2,
+    maxZoom: 15,
+    worldCopyJump: false
+  });
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap &copy; CARTO',
-      subdomains: 'abcd',
-      maxZoom: 19
-    }).addTo(map);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap &copy; CARTO',
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(map);
 
-    map.setMaxBounds([[-90, -180], [90, 180]]);
-    map.on('drag', () => map.panInsideBounds([[-90, -180], [90, 180]], { animate: false }));
+  map.setMaxBounds([[-90, -180], [90, 180]]);
+  map.on('drag', () => map.panInsideBounds([[-90, -180], [90, 180]], { animate: false }));
 
-    document.dispatchEvent(new Event('mapReady'));
+  document.dispatchEvent(new Event('mapReady'));
 
-    // Klikkaus kartalla
-    map.on('click', async (e) => {
-      const lat = e.latlng.lat;
-      const lon = e.latlng.lng;
+  // Klikkaus kartalla
+  map.on('click', async (e) => {
+    const lat = e.latlng.lat;
+    const lon = e.latlng.lng;
 
-      let auroraScore = 0;
-      let auroraIntensity = 0;
+    let auroraScore = 0;
+    let auroraIntensity = 0;
 
-      if (currentData && currentData.coordinates) {
-        let nearest = null, minDist = Infinity;
-        currentData.coordinates.forEach(p => {
-          let pointLon = p[0] < 0 ? p[0] + 360 : p[0];
-          const pointLat = p[1], intensity = p[2];
-          const dist = Math.hypot(pointLat - lat, Math.abs(pointLon - lon));
-          if (dist < minDist) { minDist = dist; nearest = intensity; }
-        });
-        auroraIntensity = nearest || 0;
-        if (auroraIntensity > 60) auroraScore += 2;
-        else if (auroraIntensity > 30) auroraScore += 1;
-      }
+    if (currentData && currentData.coordinates) {
+      let nearest = null, minDist = Infinity;
+      currentData.coordinates.forEach(p => {
+        let pointLon = p[0] < 0 ? p[0] + 360 : p[0];
+        const pointLat = p[1], intensity = p[2];
+        const dist = Math.hypot(pointLat - lat, Math.abs(pointLon - lon));
+        if (dist < minDist) { minDist = dist; nearest = intensity; }
+      });
+      auroraIntensity = nearest || 0;
+      if (auroraIntensity > 60) auroraScore += 2;
+      else if (auroraIntensity > 30) auroraScore += 1;
+    }
 
-      const weather = await getWeather(lat, lon);
-      let clouds = weather ? weather.clouds : 100;
-      if (clouds < 30) auroraScore += 2;
-      else if (clouds < 60) auroraScore += 1;
+    const weather = await getWeather(lat, lon);
+    let clouds = weather ? weather.clouds : 100;
+    if (clouds < 30) auroraScore += 2;
+    else if (clouds < 60) auroraScore += 1;
 
-      let statusEmoji = '🔴';
-      let statusText = translations[currentLang].map.chanceLow;
-      if (auroraScore >= 3) { statusEmoji = '🟢'; statusText = translations[currentLang].map.chanceHigh; }
-      else if (auroraScore === 2) { statusEmoji = '🟡'; statusText = translations[currentLang].map.chanceModerate; }
+    let statusEmoji = '🔴';
+    let statusText = translations[currentLang].map.chanceLow;
+    if (auroraScore >= 3) { statusEmoji = '🟢'; statusText = translations[currentLang].map.chanceHigh; }
+    else if (auroraScore === 2) { statusEmoji = '🟡'; statusText = translations[currentLang].map.chanceModerate; }
 
-      const popupContent = `
-        <strong>${translations[currentLang].map.popupTitle}</strong><br>
-        ${statusEmoji} ${statusText}<br>
-        ${translations[currentLang].map.auroraIntensity}: ${auroraIntensity.toFixed(1)}<br>
-        ${translations[currentLang].map.clouds}: ${clouds}%<br>
-        ${translations[currentLang].map.temp}: ${weather ? weather.temp + '°C' : 'N/A'}<br>
-        <strong>${translations[currentLang].map.coordinates}:</strong> ${lat.toFixed(4)}, ${lon.toFixed(4)}<br>
-        <a href="https://www.google.com/maps?q=${lat},${lon}" target="_blank" style="color:#1e88e5;">${translations[currentLang].map.openMaps}</a>
-      `;
+    const popupContent = `
+      <strong>${translations[currentLang].map.popupTitle}</strong><br>
+      ${statusEmoji} ${statusText}<br>
+      ${translations[currentLang].map.auroraIntensity}: ${auroraIntensity.toFixed(1)}<br>
+      ${translations[currentLang].map.clouds}: ${clouds}%<br>
+      ${translations[currentLang].map.temp}: ${weather ? weather.temp + '°C' : 'N/A'}<br>
+      <strong>${translations[currentLang].map.coordinates}:</strong> ${lat.toFixed(4)}, ${lon.toFixed(4)}<br>
+      https://www.google.com/maps?q=${lat},${lon}${translations[currentLang].map.openMaps}</a>
+    `;
 
-      L.popup().setLatLng([lat, lon]).setContent(popupContent).openOn(map);
+    L.popup().setLatLng([lat, lon]).setContent(popupContent).openOn(map);
+  });
+}
+
+// --- Näenkö revontulet nyt -nappi ---
+document.addEventListener('mapReady', () => {
+  const locateBtn = document.getElementById("locate-btn");
+  if (locateBtn && navigator.geolocation) {
+    locateBtn.addEventListener("click", () => {
+      navigator.geolocation.getCurrentPosition(async pos => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+
+        map.setView([lat, lon], 6);
+
+        if (userMarker) {
+          userMarker.setLatLng([lat, lon]);
+        } else {
+          userMarker = L.marker([lat, lon]).addTo(map);
+        }
+
+        const popupContent = `
+          <strong>${translations[currentLang].map.popupTitle}</strong><br>
+          ${translations[currentLang].map.coordinates}: ${lat.toFixed(4)}, ${lon.toFixed(4)}
+        `;
+        userMarker.bindPopup(popupContent).openPopup();
+      }, err => {
+        alert("Location failed: " + err.message);
+      });
     });
   }
 });
@@ -209,20 +238,12 @@ function drawAuroraOverlay(points) {
   createCanvasOverlay(canvasWidth);
 }
 
-// --- Piilota info viiveellä ---
-function hideInfoAfterDelay() {
-  setTimeout(() => {
-    const infoBox = document.getElementById("info");
-    if (infoBox) infoBox.style.display = "none";
-  }, 5000);
-}
-document.addEventListener('DOMContentLoaded', hideInfoAfterDelay);
+// --- Chart.js ---
+const chartScript = document.createElement('script');
+chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+document.head.appendChild(chartScript);
 
-// --- Päivitys ---
-document.addEventListener('languageReady', fetchAuroraData);
-setInterval(fetchAuroraData, 5 * 60 * 1000);
-
-// --- Chart.js Forecast ---
+// --- Forecast ---
 async function fetchAuroraForecast() {
   try {
     const response = await fetch('https://services.swpc.noaa.gov/text/3-day-forecast.txt');
@@ -244,6 +265,14 @@ async function fetchAuroraForecast() {
       }
     }
 
+    const today = new Date();
+    const dayLabels = [];
+    for (let i = 0; i < 3; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      dayLabels.push(d.toLocaleDateString(currentLang === 'fi' ? 'fi-FI' : 'en-GB', { day: 'numeric', month: 'short' }));
+    }
+
     const ctxElement = document.getElementById('kpChart');
     if (!ctxElement) return;
     const ctx = ctxElement.getContext('2d');
@@ -253,9 +282,9 @@ async function fetchAuroraForecast() {
       data: {
         labels: times,
         datasets: [
-          { label: 'Day 1', data: day1, borderColor: '#007bff', pointBackgroundColor: day1.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'), pointRadius: 6, tension: 0.3 },
-          { label: 'Day 2', data: day2, borderColor: '#6f42c1', pointBackgroundColor: day2.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'), pointRadius: 6, tension: 0.3 },
-          { label: 'Day 3', data: day3, borderColor: '#20c997', pointBackgroundColor: day3.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'), pointRadius: 6, tension: 0.3 }
+          { label: dayLabels[0], data: day1, borderColor: '#007bff', pointBackgroundColor: day1.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'), pointRadius: 6, tension: 0.3 },
+          { label: dayLabels[1], data: day2, borderColor: '#6f42c1', pointBackgroundColor: day2.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'), pointRadius: 6, tension: 0.3 },
+          { label: dayLabels[2], data: day3, borderColor: '#20c997', pointBackgroundColor: day3.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'), pointRadius: 6, tension: 0.3 }
         ]
       },
       options: {
@@ -272,6 +301,10 @@ async function fetchAuroraForecast() {
               }
             }
           }
+        },
+        scales: {
+          y: { min: 0, max: 9, title: { display: true, text: 'Kp Index' } },
+          x: { title: { display: true, text: 'UT Time (3h intervals)' } }
         }
       }
     });
@@ -279,3 +312,7 @@ async function fetchAuroraForecast() {
     console.error("Error fetching forecast:", error);
   }
 }
+
+// --- Päivitys ---
+document.addEventListener('languageReady', fetchAuroraData);
+setInterval(fetchAuroraData, 5 * 60 * 1000);
