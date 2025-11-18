@@ -53,6 +53,28 @@
       "kpHigh": "Kp 5 or more: Widely visible",
       "close": "Close"
     },
+    
+"map": {
+  "clickInfo": "Klikkaa karttaa nähdäksesi revontulien ennusteen.",
+  "loading": "⏳ Ladataan revontuliennustetta...",
+  "error": "❌ Virhe – Ei revontuliennustetta saatavilla.",
+  "popupTitle": "Revontulien mahdollisuus nyt:",
+  "chanceHigh": "Korkea mahdollisuus!",
+  "chanceModerate": "Kohtalainen mahdollisuus",
+  "chanceLow": "Heikko mahdollisuus",
+  "auroraIntensity": "Revontulien intensiteetti",
+  "clouds": "Pilvisyys",
+  "temp": "Lämpötila",
+  "coordinates": "Koordinaatit",
+  "openMaps": "Avaa Google Mapsissa"
+},
+"chart": {
+  "title": "Revontuliennuste (NOAA)",
+  "tooltipHigh": "Kp {kp} - Korkea mahdollisuus",
+  "tooltipModerate": "Kp {kp} - Kohtalainen mahdollisuus",
+  "tooltipLow": "Kp {kp} - Heikko mahdollisuus"
+}
     "loading": "⏳ Loading northern lights forecast..."
   }
+
 }
