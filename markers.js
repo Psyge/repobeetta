@@ -53,9 +53,9 @@ function addMarkers(layer) {
     const popupContent = `
       <strong>${place.name}</strong><br>
       <img src="${place.icon}" alt="${place.name}" style="width:50px;height:50px;border-radius:50%;"><br>
-      <a href="${place.url}" target="_blank">More info</a>
+      <a href="${place.url}" target="_blank">${translations[currentLang].weather.moreInfo}</a>
       <div class="weather-box" style="margin-top:10px;">
-        <em>Retrieving weather data...</em>
+        <em>${translations[currentLang].weather.loading}</em>
       </div>
       ${place.stream ? `<div class="popup-stream" 
         data-stream="${place.stream}" 
@@ -81,10 +81,10 @@ function addMarkers(layer) {
               <img src="https://openweathermap.org/img/wn/${weather.icon}.png">
               <span>${weather.temp}°C — ${weather.desc}</span>
             </div>
-            <small>Feels like ${weather.feels}°C | Wind ${weather.wind} m/s</small>
+            <small>${translations[currentLang].weather.feels} ${weather.feels}°C | ${translations[currentLang].weather.wind} ${weather.wind} m/s</small>
           `;
         } else {
-          weatherBox.innerHTML = "Weather not available";
+          weatherBox.innerHTML = translations[currentLang].weather.error;
         }
         weatherBox.dataset.loaded = "true";
       }
@@ -117,6 +117,5 @@ function addMarkers(layer) {
 
 // Käynnistä markerit vasta kun kartta on valmis
 document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(initMarkers, 500); // pieni viive varmistaa että map on valmis
+  setTimeout(initMarkers, 500);
 });
-
