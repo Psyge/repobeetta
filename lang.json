@@ -48,6 +48,13 @@
       "tooltipHigh": "Kp {kp} - Korkea mahdollisuus",
       "tooltipModerate": "Kp {kp} - Kohtalainen mahdollisuus",
       "tooltipLow": "Kp {kp} - Heikko mahdollisuus"
+    },
+    "weather": {
+      "loading": "Haetaan säätietoja...",
+      "error": "Säätietoja ei saatavilla",
+      "feels": "Tuntuu kuin",
+      "wind": "Tuuli",
+      "moreInfo": "Lisätietoja"
     }
   },
   "en": {
@@ -99,6 +106,13 @@
       "tooltipHigh": "Kp {kp} - High chance",
       "tooltipModerate": "Kp {kp} - Moderate chance",
       "tooltipLow": "Kp {kp} - Low chance"
+    },
+    "weather": {
+      "loading": "Retrieving weather data...",
+      "error": "Weather not available",
+      "feels": "Feels like",
+      "wind": "Wind",
+      "moreInfo": "More info"
     }
   }
 }
