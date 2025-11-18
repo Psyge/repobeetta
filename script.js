@@ -154,8 +154,16 @@ function fetchAuroraData() {
       const obsTime = formatTime(data["Observation Time"]);
       const forecastTime = formatTime(data["Forecast Time"]);
       info.className = '';
-      info.innerHTML = translations[currentLang].map.loading;
-        <small>Observation: ${obsTime}<br>Forecast: ${forecastTime}<br>Points: ${data.coordinates.length}</small>`;
+      
+info.innerHTML = `
+  <strong>${translations[currentLang].map.forecastTitle}</strong><br>
+  <small>
+    ${translations[currentLang].map.observation}: ${obsTime}<br>
+    ${translations[currentLang].map.forecast}: ${forecastTime}<br>
+    ${translations[currentLang].map.points}: ${data.coordinates.length}
+  </small>
+`;
+
       if (map) drawAuroraOverlay(data.coordinates);
     })
     .catch(err => {
