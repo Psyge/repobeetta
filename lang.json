@@ -25,7 +25,30 @@
       "kpHigh": "Kp 5 tai enemmän: Laajasti näkyvissä",
       "close": "Sulje"
     },
-    "loading": "⏳ Ladataan revontuliennustetta..."
+    "map": {
+      "clickInfo": "Klikkaa karttaa nähdäksesi revontulien ennusteen.",
+      "loading": "⏳ Ladataan revontuliennustetta...",
+      "error": "❌ Virhe – Ei revontuliennustetta saatavilla.",
+      "popupTitle": "Revontulien mahdollisuus nyt:",
+      "chanceHigh": "Korkea mahdollisuus!",
+      "chanceModerate": "Kohtalainen mahdollisuus",
+      "chanceLow": "Heikko mahdollisuus",
+      "auroraIntensity": "Revontulien intensiteetti",
+      "clouds": "Pilvisyys",
+      "temp": "Lämpötila",
+      "coordinates": "Koordinaatit",
+      "openMaps": "Avaa Google Mapsissa",
+      "forecastTitle": "Revontuliennuste",
+      "observation": "Havainto",
+      "forecast": "Ennuste",
+      "points": "Pisteitä"
+    },
+    "chart": {
+      "title": "Revontuliennuste (NOAA)",
+      "tooltipHigh": "Kp {kp} - Korkea mahdollisuus",
+      "tooltipModerate": "Kp {kp} - Kohtalainen mahdollisuus",
+      "tooltipLow": "Kp {kp} - Heikko mahdollisuus"
+    }
   },
   "en": {
     "h1": "RepoTracker – Track Northern Lights in Real Time",
@@ -53,35 +76,29 @@
       "kpHigh": "Kp 5 or more: Widely visible",
       "close": "Close"
     },
-    
-"map": {
-  "clickInfo": "Klikkaa karttaa nähdäksesi revontulien ennusteen.",
-  "loading": "⏳ Ladataan revontuliennustetta...",
-  "error": "❌ Virhe – Ei revontuliennustetta saatavilla.",
-  "popupTitle": "Revontulien mahdollisuus nyt:",
-  "chanceHigh": "Korkea mahdollisuus!",
-  "chanceModerate": "Kohtalainen mahdollisuus",
-  "chanceLow": "Heikko mahdollisuus",
-  "auroraIntensity": "Revontulien intensiteetti",
-  "clouds": "Pilvisyys",
-  "temp": "Lämpötila",
-  "coordinates": "Koordinaatit",
-  "openMaps": "Avaa Google Mapsissa"
-},
-"chart": {
-  "title": "Revontuliennuste (NOAA)",
-  "tooltipHigh": "Kp {kp} - Korkea mahdollisuus",
-  "tooltipModerate": "Kp {kp} - Kohtalainen mahdollisuus",
-  "tooltipLow": "Kp {kp} - Heikko mahdollisuus"
-}
-    "loading": "⏳ Loading northern lights forecast...",
-    
-"chanceHigh": "Korkea mahdollisuus!",
-"chanceModerate": "Kohtalainen mahdollisuus",
-"chanceLow": "Heikko mahdollisuus"
-
+    "map": {
+      "clickInfo": "Click anywhere on the map to see the aurora forecast.",
+      "loading": "⏳ Loading northern lights forecast...",
+      "error": "❌ Error – No aurora forecast available.",
+      "popupTitle": "Your Northern Lights chance is now:",
+      "chanceHigh": "High chance!",
+      "chanceModerate": "Moderate chance",
+      "chanceLow": "Low chance",
+      "auroraIntensity": "Aurora intensity",
+      "clouds": "Clouds",
+      "temp": "Temperature",
+      "coordinates": "Coordinates",
+      "openMaps": "Open in Google Maps",
+      "forecastTitle": "Aurora Forecast",
+      "observation": "Observation",
+      "forecast": "Forecast",
+      "points": "Points"
+    },
+    "chart": {
+      "title": "Northern Lights forecast (NOAA)",
+      "tooltipHigh": "Kp {kp} - High chance",
+      "tooltipModerate": "Kp {kp} - Moderate chance",
+      "tooltipLow": "Kp {kp} - Low chance"
+    }
   }
-
 }
-
-
