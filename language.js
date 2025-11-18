@@ -1,3 +1,4 @@
+let translations = {};
 let currentLang = 'fi';
 
 // Turvallinen päivitysfunktio
@@ -6,9 +7,10 @@ function updateText(id, text) {
   if (el) el.textContent = text;
 }
 
+
 async function loadLanguage(lang) {
   const response = await fetch('lang.json');
-  const translations = await response.json();
+  translations = await response.json(); // nyt globaali
   currentLang = lang;
 
   // Päivitä tekstit turvallisesti
@@ -44,3 +46,4 @@ function setLanguage(lang) {
 document.addEventListener('DOMContentLoaded', () => {
   loadLanguage(currentLang);
 });
+
