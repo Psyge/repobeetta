@@ -1,0 +1,58 @@
+{
+  "fi": {
+    "h1": "RepoTracker – Seuraa revontulia reaaliajassa",
+    "menu": {
+      "home": "Etusivu",
+      "faq": "Usein kysytyt kysymykset",
+      "contact": "Yhteystiedot",
+      "help": "Ohje"
+    },
+    "helpPopup": {
+      "title": "Näin käytät RepoTrackeria",
+      "text": "Klikkaa karttaa nähdäksesi revontuliennusteen valitulle alueelle.\nKäytä 📍-painiketta tarkistaaksesi sijaintisi.\n\nHuom: Pilvisyys voi estää näkyvyyden, vaikka aktiivisuus olisi korkea.",
+      "dontShow": "Älä näytä uudelleen",
+      "close": "Sulje"
+    },
+    "buttons": {
+      "locate": "Näenkö revontulet nyt?",
+      "markers": "Näytä markerit",
+      "forecast": "3 päivän ennuste"
+    },
+    "forecastPopup": {
+      "title": "Revontuliennuste (NOAA)",
+      "kpLow": "Kp 0–2: Ei revontulia",
+      "kpMid": "Kp 3–4: Mahdollisuus Lapissa",
+      "kpHigh": "Kp 5 tai enemmän: Laajasti näkyvissä",
+      "close": "Sulje"
+    },
+    "loading": "⏳ Ladataan revontuliennustetta..."
+  },
+  "en": {
+    "h1": "RepoTracker – Track Northern Lights in Real Time",
+    "menu": {
+      "home": "Front page",
+      "faq": "FAQ",
+      "contact": "Contact / Feedback",
+      "help": "Help"
+    },
+    "helpPopup": {
+      "title": "How to use RepoTracker",
+      "text": "Click anywhere on the map to see the aurora forecast for that location.\nUse the 📍 button to check your current position.\n\nNote: Cloud cover can affect visibility even if aurora activity is strong.",
+      "dontShow": "Don’t show again",
+      "close": "Close"
+    },
+    "buttons": {
+      "locate": "Can I See Northern Lights now?",
+      "markers": "Show markers",
+      "forecast": "3 Day Forecast"
+    },
+    "forecastPopup": {
+      "title": "Northern Lights forecast (NOAA)",
+      "kpLow": "Kp 0–2: No northern lights",
+      "kpMid": "Kp 3–4: Opportunity to see Lapland",
+      "kpHigh": "Kp 5 or more: Widely visible",
+      "close": "Close"
+    },
+    "loading": "⏳ Loading northern lights forecast..."
+  }
+}
