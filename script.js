@@ -221,3 +221,4 @@ async function fetchAuroraForecast() {
     console.error("Error fetching forecast:", error);
   }
 }
+document.dispatchEvent(new Event('mapReady'));
