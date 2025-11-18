@@ -45,5 +45,7 @@ function setLanguage(lang) {
 // Lataa oletuskieli DOM:n latauksen jälkeen
 document.addEventListener('DOMContentLoaded', () => {
   loadLanguage(currentLang);
+document.dispatchEvent(new Event('languageReady'));  
 });
+
 
