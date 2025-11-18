@@ -4,6 +4,9 @@ let userMarker = null;
 let currentData = null;
 let map;
 
+if (info) info.textContent = translations[currentLang].map.clickInfo;
+info.innerHTML = translations[currentLang].map.loading;
+info.innerHTML = `<strong>${translations[currentLang].map.error}</strong>`;
 // --- DOMContentLoaded ---
 document.addEventListener('DOMContentLoaded', () => {
   // --- Help Popup ---
@@ -113,15 +116,17 @@ if (typeof L !== 'undefined') {
   else if (score === 2) { statusEmoji = '🟡'; statusText = 'Moderate chance'; }
 
   // 4. Popup sisältö
-  const popupContent = `
-    <strong>Your Northern Lights chance is now:</strong><br>
-    ${statusEmoji} ${statusText}<br>
-    Aurora intensity: ${auroraIntensity.toFixed(1)}<br>
-    Clouds: ${clouds}%<br>
-    Temp: ${weather ? weather.temp + '°C' : 'N/A'}<br>
-    <strong>Coordinates:</strong> ${lat.toFixed(4)}, ${lon.toFixed(4)}<br>
-    <a href="https://www.google.com/maps?q=${lat},${lon}" target="_blank" style="color:#1e88e5;">Open in Google Maps</a>
-  `;
+  
+const popupContent = `
+  <strong>${translations[currentLang].map.popupTitle}</strong><br>
+  ${statusEmoji} ${statusText}<br>
+  ${translations[currentLang].map.auroraIntensity}: ${auroraIntensity.toFixed(1)}<br>
+  ${translations[currentLang].map.clouds}: ${clouds}%<br>
+  ${translations[currentLang].map.temp}: ${weather ? weather.temp + '°C' : 'N/A'}<br>
+  <strong>${translations[currentLang].map.coordinates}:</strong> ${lat.toFixed(4)}, ${lon.toFixed(4)}<br>
+  <a href="https://www.google.com/maps?q=${lat},${lon}" target="_blank">${translations[currentLang].map.openMaps}</a>
+`;
+
 
   L.popup().setLatLng([lat, lon]).setContent(popupContent).openOn(map);
 });
@@ -130,7 +135,7 @@ if (typeof L !== 'undefined') {
 }
 
 const info = document.getElementById("info");
-if (info) info.textContent = "Klikkaa karttaa nähdäksesi revontulien ennusteen.";
+if (info) info.textContent = translations[currentLang].map.clickInfo;
 
 // --- NOAA Data ---
 function fetchAuroraData() {
@@ -149,14 +154,14 @@ function fetchAuroraData() {
       const obsTime = formatTime(data["Observation Time"]);
       const forecastTime = formatTime(data["Forecast Time"]);
       info.className = '';
-      info.innerHTML = `<strong>📡 Northern Lights forecast</strong><br>
+      info.innerHTML = translations[currentLang].map.loading;
         <small>Observation: ${obsTime}<br>Forecast: ${forecastTime}<br>Points: ${data.coordinates.length}</small>`;
       if (map) drawAuroraOverlay(data.coordinates);
     })
     .catch(err => {
       console.error('Error retrieving northern light data', err);
       info.className = 'error';
-      info.innerHTML = `<strong>❌ Error</strong><br><small>No northern lights forecast available.<br>${err.message}</small>`;
+      info.innerHTML = `<strong>${translations[currentLang].map.error}</strong>`;
     });
 }
 
@@ -265,17 +270,22 @@ if (locateBtn && navigator.geolocation && map) {
 
       // Liikennevalo
       let statusEmoji = '🔴';
-      let statusText = 'Low chance';
-      if (auroraScore >= 3) { statusEmoji = '🟢'; statusText = 'High chance!'; }
-      else if (auroraScore === 2) { statusEmoji = '🟡'; statusText = 'Moderate chance'; }
+      
+let statusText = translations[currentLang].map.chanceLow;
+if (score >= 3) statusText = translations[currentLang].map.chanceHigh;
+else if (score === 2) statusText = translations[currentLang].map.chanceModerate;
+
 
       // Popup sisältö
-      const popupContent = `
-        <strong>Your Northern Lights chance is now:</strong><br>      
-        <strong>${statusEmoji} ${statusText}</strong><br>
-        Aurora intensity: ${auroraIntensity.toFixed(1)}<br>
-        Clouds: ${clouds}%<br>
-        Temp: ${weather ? weather.temp + '°C' : 'N/A'}
+      
+const popupContent = `
+  <strong>${translations[currentLang].map.popupTitle}</strong><br>
+  ${statusEmoji} ${statusText}<br>
+  ${translations[currentLang].map.auroraIntensity}: ${auroraIntensity.toFixed(1)}<br>
+  ${translations[currentLang].map.clouds}: ${clouds}%<br>
+  ${translations[currentLang].map.temp}: ${weather ? weather.temp + '°C' : 'N/A'}<br>
+  <strong>${translations[currentLang].map.coordinates}:</strong> ${lat.toFixed(4)}, ${lon.toFixed(4)}<br>
+
       `;
 
       userMarker.bindPopup(popupContent).openPopup();
@@ -341,17 +351,19 @@ async function fetchAuroraForecast() {
       options: {
         responsive: true,
         plugins: {
-          title: { display: true, text: 'Northern Lights forecast (NOAA)' },
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                const kp = context.parsed.y;
-                if (kp >= 5) return `Kp ${kp} - High chance`;
-                if (kp >= 3) return `Kp ${kp} - Moderate chance`;
-                return `Kp ${kp} - Low chance`;
-              }
-            }
-          }
+         
+title: { display: true, text: translations[currentLang].chart.title },
+tooltip: {
+  callbacks: {
+    label: function(context) {
+      const kp = context.parsed.y;
+      if (kp >= 5) return translations[currentLang].chart.tooltipHigh.replace('{kp}', kp);
+      if (kp >= 3) return translations[currentLang].chart.tooltipModerate.replace('{kp}', kp);
+      return translations[currentLang].chart.tooltipLow.replace('{kp}', kp);
+    }
+  }
+}
+
         },
         scales: {
           y: { min: 0, max: 9, title: { display: true, text: 'Kp Index' } },
