@@ -401,12 +401,7 @@ header.banner::after {
     padding: 0;
   }
 /* FAQ-osio */
-  .banner-right {
-  display: flex;
-  align-items: center;
-  gap: 3px; /* väli nappeihin */
-  position: relative;
-  right: 25px; /* jos haluat siirtää */
+ 
 
   .banner-left .logo {
     height: 60px;
