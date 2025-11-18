@@ -30,6 +30,11 @@ function initMarkers() {
   if (typeof map !== 'undefined' && map) {
     markersLayer = L.layerGroup().addTo(map);
     addMarkers(markersLayer);
+
+    // ✅ Animaatioviive markkereille
+    document.querySelectorAll('.marker-wrapper').forEach(el => {
+      el.style.animationDelay = `${Math.random() * 2}s`;
+    });
   } else {
     console.warn("Map is not ready yet. Markers not initialized.");
   }
@@ -71,7 +76,7 @@ function addMarkers(layer) {
     marker.on('popupopen', async (e) => {
       const popup = e.popup;
 
-      // Säädata
+      // ✅ Säädata
       const weatherBox = popup.getElement().querySelector('.weather-box');
       if (weatherBox && !weatherBox.dataset.loaded) {
         const weather = await getWeather(place.lat, place.lon);
@@ -89,7 +94,7 @@ function addMarkers(layer) {
         weatherBox.dataset.loaded = "true";
       }
 
-      // Stream iframe
+      // ✅ Stream iframe
       const container = popup.getElement().querySelector('.popup-stream');
       if (container && !container.querySelector('iframe')) {
         const iframe = document.createElement('iframe');
@@ -108,14 +113,7 @@ function addMarkers(layer) {
       }
     });
   });
-
-  // Animaatioviive
-  document.querySelectorAll('.marker-wrapper').forEach(el => {
-    el.style.animationDelay = `${Math.random() * 2}s`;
-  });
 }
 
-// Käynnistä markerit vasta kun kartta on valmis
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(initMarkers, 500);
-});
+// ✅ Käynnistä markerit vasta kun kartta on valmis
+document.addEventListener('mapReady', initMarkers);
