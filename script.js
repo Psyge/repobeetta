@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ${translations[currentLang].map.clouds}: ${clouds}%<br>
         ${translations[currentLang].map.temp}: ${weather ? weather.temp + '°C' : 'N/A'}<br>
         <strong>${translations[currentLang].map.coordinates}:</strong> ${lat.toFixed(4)}, ${lon.toFixed(4)}<br>
-        https://www.google.com/maps?q=${lat},${lon}${translations[currentLang].map.openMaps}</a>
+        <a href="https://www.google.com/maps?q=${lat},${lon}" target="_blank" style="color:#1e88e5;">${translations[currentLang].map.openMaps}</a>
       `;
 
       L.popup().setLatLng([lat, lon]).setContent(popupContent).openOn(map);
