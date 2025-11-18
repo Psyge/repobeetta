@@ -1,3 +1,10 @@
+
+if (!translations[currentLang]) {
+  console.warn("Translations not loaded yet. Waiting...");
+  document.addEventListener('languageReady', initMarkers);
+  return;
+}
+
 async function getWeather(lat, lon) {
   const url = `https://repotracker.masto84.workers.dev/?lat=${lat}&lon=${lon}`;
   try {
