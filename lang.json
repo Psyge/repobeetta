@@ -114,5 +114,88 @@
       "wind": "Wind",
       "moreInfo": "More info"
     }
+    
+  "fi": {
+    "faq": {
+      "pageTitle": "Revontulet – Usein kysytyt kysymykset",
+      "title": "Usein kysytyt kysymykset revontulista",
+      "questions": [
+        {
+          "q": "Milloin revontulia näkyy parhaiten?",
+          "a": "Revontulet näkyvät parhaiten pimeinä, kirkkaina öinä syksyllä ja keväällä. Paras aika on klo 21–02."
+        },
+        {
+          "q": "Mitä kartan arvot tarkoittavat?",
+          "a": "Kp-indeksi kertoo geomagneettisen aktiivisuuden. Mitä suurempi arvo, sitä todennäköisemmin revontulia näkyy."
+        },
+        {
+          "q": "Miten pilvisyys vaikuttaa näkyvyyteen?",
+          "a": "Pilvet estävät revontulien näkymisen. Tarkista pilvisyyskartta ennen lähtöä – kirkas taivas on välttämätön."
+        },
+        {
+          "q": "Tarvitaanko pimeä paikka?",
+          "a": "Kyllä. Valosaaste kaupungeissa heikentää näkyvyyttä. Siirry pois katuvaloista ja valitse avoin paikka."
+        },
+        {
+          "q": "Voiko revontulia nähdä Etelä-Suomessa?",
+          "a": "Kyllä, mutta harvemmin. Tarvitaan korkea Kp-indeksi (≥ 5–6) ja kirkas taivas."
+        },
+        {
+          "q": "Mistä tiedän, milloin revontulia näkyy?",
+          "a": "Käytä reaaliaikaisia karttoja, kuten RepoTracker.fi, ja seuraa NOAA:n sekä Ilmatieteen laitoksen tietoja."
+        },
+        {
+          "q": "Mitä ovat aurinkotuuli ja IMF Bz?",
+          "a": "Aurinkotuuli tuo energiaa Maan magneettikenttään. IMF Bz-arvo kertoo kentän suunnan – negatiivinen Bz lisää revontulien todennäköisyyttä."
+        },
+        {
+          "q": "Mitä pitää muistaa revontulijahtiin lähtiessä?",
+          "a": "Pukeudu lämpimästi kerroksittain. Käytä talvitakkia, lämpimiä kenkiä ja varavaatteita. Älä aja huonosti auratuilla teillä."
+        }
+      ]
+    }
+  },
+  "en": {
+    "faq": {
+      "pageTitle": "Northern Lights FAQ – Frequently asked questions",
+      "title": "Frequently asked questions about the northern lights",
+      "questions": [
+        {
+          "q": "When is the best time to see the Northern Lights?",
+          "a": "The Northern Lights are best seen on dark, clear nights in autumn and spring. The best time is between 9 p.m. and 2 a.m."
+        },
+        {
+          "q": "What do the values on the map mean?",
+          "a": "The Kp index indicates geomagnetic activity. The higher the value, the more likely auroras will be visible."
+        },
+        {
+          "q": "How does cloud cover affect visibility?",
+          "a": "Clouds block the Northern Lights. Check the cloud cover map before you go – clear skies are essential."
+        },
+        {
+          "q": "Do I need a dark place?",
+          "a": "Yes. Light pollution reduces visibility. Move away from street lights and choose an open area."
+        },
+        {
+          "q": "Can the Northern Lights be seen in southern Finland?",
+          "a": "Yes, but less frequently. A high Kp index (≥ 5–6) and clear skies are required."
+        },
+        {
+          "q": "How do I know when the Northern Lights will appear?",
+          "a": "Use real-time maps like RepoTracker.fi and follow NOAA and Finnish Meteorological Institute updates."
+        },
+        {
+          "q": "What are solar wind and IMF Bz?",
+          "a": "Solar wind brings energy to Earth's magnetic field. A negative IMF Bz increases aurora chances."
+        },
+        {
+          "q": "What should you keep in mind when going hunting for the Northern Lights?",
+          "a": "Dress warmly in layers. Wear winter boots and gloves, and avoid poorly maintained roads."
+        }
+      ]
+    }
+  }
+
   }
 }
+
