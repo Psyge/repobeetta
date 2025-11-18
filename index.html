@@ -5,12 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RepoTracker - Follow the northern lights</title>
 <link rel="icon" href="iconi.png">
-<!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="style.css">
-
-<!-- Google Analytics -->
-
 </head>
 <body>
 
@@ -18,30 +14,21 @@
   <h1 id="page-title" style="position:absolute; left:-9999px;">RepoTracker – Seuraa revontulia reaaliajassa</h1>
   <div id="menu-btn">☰</div>
 
-<div class="language-switch">
-  <button onclick="setLanguage('fi')">Suomi</button>
-  <button onclick="setLanguage('en')">English</button>
-</div>
+  <div class="language-switch">
+    <button onclick="setLanguage('fi')">Suomi</button>
+    <button onclick="setLanguage('en')">English</button>
+  </div>
 
   <div class="banner-left">
     <img src="repo-neon.png" alt="RepoTracker Logo" class="logo">
   </div>
 
   <div class="banner-right">
-    <a href="https://instagram.com/repotracker_" target="_blank" class="social-btn instagram">
-      <img src="ig-icon.png" alt="Instagram" class="icon">
-    </a>
-    <a href="https://www.tiktok.com/@repotracker" target="_blank">
-    <img src="tiktok.png" alt="Seuraa TikTokissa" class="icon">
-  </a>
- <a href="https://www.buymeacoffee.com/repotracker" target="_blank">
-    <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" style="height: 40px; width: auto;"></a>
-
- 
-</div>
-
+    <a href="https://instagram.com/repotracker_" target="_blank"><img src="ig-icon.png" alt="Instagram" class="icon"></a>
+    <a href="https://www.tiktok.com/@repotracker" target="_blank"><img src="tiktok.png" alt="TikTok" class="icon"></a>
+    <a href="https://www.buymeacoffee.com/repotracker" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" style="height:40px;width:auto;"></a>
   </div>
-  
+</header>
 
 <nav id="menu">
   <a href="index.html" id="menu-home">Front page</a>
@@ -50,91 +37,42 @@
   <a href="#" id="show-help">Help</a>
 </nav>
 
-
-
-
-</header>
-
-<!-- Pop-up Help -->
-<!-- Pop-up Help -->
+<!-- Help Popup -->
 <div id="help-popup" class="popup" style="display:none;">
   <div class="popup-content">
     <h2 id="help-title">How to use RepoTracker</h2>
-    <p id="help-text">Click anywhere on the map to see the aurora forecast for that location.<br>
-       Use the 📍 button to check your current position.<br><br>
-    <strong>Note:</strong> Cloud cover can affect visibility even if aurora activity is strong.
-    </p>
-    <label>
-      <input type="checkbox" id="dont-show-again"> <span id="dont-show-text">Don’t show again</span>
-    </label>
-    <br>
+    <p id="help-text">Click anywhere on the map...</p>
+    <label><input type="checkbox" id="dont-show-again"> <span id="dont-show-text">Don’t show again</span></label>
     <button id="close-popup">Close</button>
   </div>
 </div>
 
-
-
 <div id="container">
   <div id="map">
-  
-<button id="locate-btn">Can I See Northern Lights now?</button>
-<button id="markers-btn">Show markers</button>
-<button id="forecast-btn">3 Day Forecast</button>
-
+    <button id="locate-btn">Can I See Northern Lights now?</button>
+    <button id="markers-btn">Show markers</button>
+    <button id="forecast-btn">3 Day Forecast</button>
   </div>
 </div>
-
 
 <div id="forecast-popup" class="popup" style="display:none;">
   <div class="popup-content">
     <h2 id="forecast-title">Northern Lights forecast (NOAA)</h2>
     <canvas id="kpChart" width="280" height="180"></canvas>
-    
-
-<div class="kp-legend">
-  <p id="kp-low"><span class="kp-dot" style="color:green;">●</span> Kp 0–2: No northern lights</p>
-  <p id="kp-mid"><span class="kp-dot" style="color:orange;">●</span> Kp 3–4: Opportunity to see Lapland</p>
-  <p id="kp-high"><span class="kp-dot" style="color:red;">●</span> Kp 5 or more: Widely visible</p>
-</div>
-<button id="close-forecast">Close</button>
-
+    <div class="kp-legend">
+      <p id="kp-low"><span class="kp-dot" style="color:green;">●</span> Kp 0–2: No northern lights</p>
+      <p id="kp-mid"><span class="kp-dot" style="color:orange;">●</span> Kp 3–4: Opportunity to see Lapland</p>
+      <p id="kp-high"><span class="kp-dot" style="color:red;">●</span> Kp 5 or more: Widely visible</p>
+    </div>
+    <button id="close-forecast">Close</button>
   </div>
 </div>
 
-  
 <div id="info" class="loading">⏳ Loading northern lights forecast...</div>
-<script src="language.js"></script>
-<!-- Leaflet JS -->
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="markers.js"></script>
-<!-- Kartta ja NOAA-data -->
+<script src="language.js"></script>
 <script src="script.js"></script>
-
-<!-- Markerit -->
-
-<script>
-  // Lisää markerit kartalle
-  addMarkers();
-
-  // Napin toiminta
-  document.getElementById('markers-btn').addEventListener('click', () => {
-    if (!map.hasLayer(markersLayer)) {
-      markersLayer.addTo(map);
-    } else {
-      map.removeLayer(markersLayer);
-    }
-  });
-
-  // Näkyvyys zoomin mukaan
-  map.on('zoomend', () => {
-    const zoom = map.getZoom();
-    if (zoom >= 6) {
-      if (!map.hasLayer(markersLayer)) markersLayer.addTo(map);
-    } else {
-      if (map.hasLayer(markersLayer)) map.removeLayer(markersLayer);
-    }
-  });
-</script>
-
+<script src="markers.js"></script>
 </body>
 </html>
