@@ -50,7 +50,19 @@
 <div id="container" style="margin-top:120px; text-align:center;">
   <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdnjjYcD008LAMcvo0g2riXAtQ80_Xtfy-2vQ2vrEo6xbSuXQ/viewform?embedded=true" width="640" height="800" frameborder="0" marginheight="0" marginwidth="0">Ladataan…</iframe>
 </div>
+<script src="language.js"></script>
+<script>
+async function loadLanguage(lang) {
+  const response = await fetch('lang.json');
+  translations = await response.json();
+  currentLang = lang;
 
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadLanguage(currentLang);
+});
+</script>
 <script src="script.js"></script>
 
 </body>
