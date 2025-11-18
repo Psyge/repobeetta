@@ -74,7 +74,7 @@
   "tooltipModerate": "Kp {kp} - Kohtalainen mahdollisuus",
   "tooltipLow": "Kp {kp} - Heikko mahdollisuus"
 }
-    "loading": "⏳ Loading northern lights forecast..."
+    "loading": "⏳ Loading northern lights forecast...",
     
 "chanceHigh": "Korkea mahdollisuus!",
 "chanceModerate": "Kohtalainen mahdollisuus",
@@ -83,4 +83,5 @@
   }
 
 }
+
 
