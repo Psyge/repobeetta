@@ -1,10 +1,3 @@
-
-if (!translations[currentLang]) {
-  console.warn("Translations not loaded yet. Waiting...");
-  document.addEventListener('languageReady', initMarkers);
-  return;
-}
-
 async function getWeather(lat, lon) {
   const url = `https://repotracker.masto84.workers.dev/?lat=${lat}&lon=${lon}`;
   try {
@@ -18,8 +11,7 @@ async function getWeather(lat, lon) {
       icon: data.weather[0].icon,
       clouds: data.clouds.all
     };
-  } catch (err) {
-    console.error("Weather fetch failed:", err);
+  } catch {
     return null;
   }
 }
@@ -34,17 +26,21 @@ const places = [
 let markersLayer;
 
 function initMarkers() {
-  if (typeof map !== 'undefined' && map) {
-    markersLayer = L.layerGroup().addTo(map);
-    addMarkers(markersLayer);
-
-    // ✅ Animaatioviive markkereille
-    document.querySelectorAll('.marker-wrapper').forEach(el => {
-      el.style.animationDelay = `${Math.random() * 2}s`;
-    });
-  } else {
-    console.warn("Map is not ready yet. Markers not initialized.");
+  if (!translations[currentLang]) {
+    document.addEventListener('languageReady', initMarkers);
+    return;
   }
+  if (!map) {
+    document.addEventListener('mapReady', initMarkers);
+    return;
+  }
+
+  markersLayer = L.layerGroup().addTo(map);
+  addMarkers(markersLayer);
+
+  document.querySelectorAll('.marker-wrapper').forEach(el => {
+    el.style.animationDelay = `${Math.random() * 2}s`;
+  });
 }
 
 function addMarkers(layer) {
@@ -69,11 +65,7 @@ function addMarkers(layer) {
       <div class="weather-box" style="margin-top:10px;">
         <em>${translations[currentLang].weather.loading}</em>
       </div>
-      ${place.stream ? `<div class="popup-stream" 
-        data-stream="${place.stream}" 
-        data-width="${place.streamWidth || 320}" 
-        data-height="${place.streamHeight || 180}" 
-        style="margin-top:10px;"></div>` : ''}
+      ${place.stream ? `<div class="popup-stream" data-stream="${place.stream}" data-width="${place.streamWidth}" data-height="${place.streamHeight}" style="margin-top:10px;"></div>` : ''}
     `;
 
     const marker = L.marker([place.lat, place.lon], { icon: customIcon })
@@ -82,8 +74,6 @@ function addMarkers(layer) {
 
     marker.on('popupopen', async (e) => {
       const popup = e.popup;
-
-      // ✅ Säädata
       const weatherBox = popup.getElement().querySelector('.weather-box');
       if (weatherBox && !weatherBox.dataset.loaded) {
         const weather = await getWeather(place.lat, place.lon);
@@ -101,7 +91,6 @@ function addMarkers(layer) {
         weatherBox.dataset.loaded = "true";
       }
 
-      // ✅ Stream iframe
       const container = popup.getElement().querySelector('.popup-stream');
       if (container && !container.querySelector('iframe')) {
         const iframe = document.createElement('iframe');
@@ -111,16 +100,9 @@ function addMarkers(layer) {
         iframe.style.border = 'none';
         iframe.style.display = 'block';
         container.appendChild(iframe);
-
-        setTimeout(() => {
-          e.popup._updateLayout();
-          e.popup._updatePosition();
-          e.popup._adjustPan();
-        }, 50);
       }
     });
   });
 }
 
-// ✅ Käynnistä markerit vasta kun kartta on valmis
 document.addEventListener('mapReady', initMarkers);
