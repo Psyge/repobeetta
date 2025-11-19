@@ -27,10 +27,12 @@ let markersLayer;
 
 function initMarkers() {
   if (!translations[currentLang]) {
+    console.warn("Translations not ready, waiting...");
     document.addEventListener('languageReady', initMarkers);
     return;
   }
   if (!map) {
+    console.warn("Map not ready, waiting...");
     document.addEventListener('mapReady', initMarkers);
     return;
   }
@@ -38,6 +40,7 @@ function initMarkers() {
   markersLayer = L.layerGroup().addTo(map);
   addMarkers(markersLayer);
 
+  // Animaatioviive markkereille
   document.querySelectorAll('.marker-wrapper').forEach(el => {
     el.style.animationDelay = `${Math.random() * 2}s`;
   });
@@ -88,11 +91,7 @@ function addMarkers(layer) {
         } else {
           weatherBox.innerHTML = translations[currentLang].weather.error;
         }
-        weatherBox.dataset.loaded = "true";
-      }
-
-      const container = popup.getElement().querySelector('.popup-stream');
-      if (container && !container.querySelector('iframe')) {
+       me')) {
         const iframe = document.createElement('iframe');
         iframe.src = container.dataset.stream;
         iframe.width = container.dataset.width;
