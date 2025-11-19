@@ -91,7 +91,7 @@ function addMarkers(layer) {
         } else {
           weatherBox.innerHTML = translations[currentLang].weather.error;
         }
-       me')) {
+        {
         const iframe = document.createElement('iframe');
         iframe.src = container.dataset.stream;
         iframe.width = container.dataset.width;
