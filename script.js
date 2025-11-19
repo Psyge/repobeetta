@@ -332,10 +332,12 @@ async function fetchAuroraForecast() {
             }
           }
         },
-        scales: {
-          y: { min: 0, max: 9, title: { display: true, text: 'Kp Index' } },
-          x: { title: { display: true, text: 'UT Time (3h intervals)' } }
-        }
+       
+scales: {
+  y: { min: 0, max: 9, title: { display: true, text: translations[currentLang].chart.yAxis } },
+  x: { title: { display: true, text: translations[currentLang].chart.xAxis } }
+}
+
       }
     });
   } catch (error) {
