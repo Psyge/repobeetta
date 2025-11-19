@@ -85,39 +85,7 @@
   </div>
 </div>
 <script src="language.js"></script>
-<script>
-async function loadLanguage(lang) {
-  const response = await fetch('lang.json');
-  translations = await response.json();
-  currentLang = lang;
 
-  // Navigaatio
-  updateText('menu-home', translations[lang].menu.home);
-  updateText('menu-contact', translations[lang].menu.contact);
-  updateText('show-help', translations[lang].menu.help);
-
-  // FAQ-sivun otsikko ja title
-  const faqData = translations[lang].faq;
-  if (faqData) {
-    document.title = faqData.pageTitle; // Päivittää selaimen otsikon
-    updateText('faq-title', faqData.title);
-
-    for (let i = 0; i < faqData.questions.length; i++) {
-      updateText(`faq-q${i + 1}`, faqData.questions[i].q);
-      updateText(`faq-a${i + 1}`, faqData.questions[i].a);
-    }
-  }
-
-  // Etusivun napit (jos olemassa)
-  updateText('locate-btn', translations[lang].buttons.locate);
-  updateText('markers-btn', translations[lang].buttons.markers);
-  updateText('forecast-btn', translations[lang].buttons.forecast);
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  loadLanguage(currentLang);
-});
-</script>
 <script src="script.js"></script>  
 </body>
 </html>
