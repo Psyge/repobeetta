@@ -91,18 +91,27 @@ async function loadLanguage(lang) {
   translations = await response.json();
   currentLang = lang;
 
-  // Päivitä otsikko ja navigaatio
-  updateText('faq-page-title', translations[lang].faq.pageTitle);
-  updateText('faq-title', translations[lang].faq.title);
+  // Päivitä navigaatio ja otsikot
   updateText('menu-home', translations[lang].menu.home);
   updateText('menu-contact', translations[lang].menu.contact);
   updateText('show-help', translations[lang].menu.help);
 
-  // Päivitä FAQ-kysymykset ja vastaukset
-  for (let i = 0; i < translations[lang].faq.questions.length; i++) {
-    updateText(`faq-q${i+1}`, translations[lang].faq.questions[i].q);
-    updateText(`faq-a${i+1}`, translations[lang].faq.questions[i].a);
+  // Päivitä FAQ-sivun otsikko ja meta-title
+  const faqData = translations[lang].faq;
+  if (faqData) {
+    updateText('faq-page-title', faqData.pageTitle);
+    updateText('faq-title', faqData.title);
+
+    for (let i = 0; i < faqData.questions.length; i++) {
+      updateText(`faq-q${i + 1}`, faqData.questions[i].q);
+      updateText(`faq-a${i + 1}`, faqData.questions[i].a);
+    }
   }
+
+  // Päivitä muut elementit (etusivun napit, popupit jne.)
+  updateText('locate-btn', translations[lang].buttons.locate);
+  updateText('markers-btn', translations[lang].buttons.markers);
+  updateText('forecast-btn', translations[lang].buttons.forecast);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
