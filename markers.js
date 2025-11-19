@@ -1,4 +1,5 @@
-async function getWeather(lat, lon) {
+// Tee getWeather globaaliksi
+window.getWeather = async function(lat, lon) {
   const url = `https://repotracker.masto84.workers.dev/?lat=${lat}&lon=${lon}`;
   try {
     const res = await fetch(url);
@@ -14,7 +15,7 @@ async function getWeather(lat, lon) {
   } catch {
     return null;
   }
-}
+};
 
 const places = [
   { name: 'Rovaniemi', lat: 66.5, lon: 25.7, url: 'https://visitrovaniemi.fi', icon: 'roic.png' },
@@ -91,7 +92,11 @@ function addMarkers(layer) {
         } else {
           weatherBox.innerHTML = translations[currentLang].weather.error;
         }
-        {
+        weatherBox.dataset.loaded = "true";
+      }
+
+      const container = popup.getElement().querySelector('.popup-stream');
+      if (container && !container.querySelector('iframe')) {
         const iframe = document.createElement('iframe');
         iframe.src = container.dataset.stream;
         iframe.width = container.dataset.width;
