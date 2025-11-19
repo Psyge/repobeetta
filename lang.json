@@ -55,6 +55,44 @@
       "feels": "Tuntuu kuin",
       "wind": "Tuuli",
       "moreInfo": "Lisätietoja"
+    },
+    "faq": {
+      "pageTitle": "Revontulet – Usein kysytyt kysymykset",
+      "title": "Usein kysytyt kysymykset revontulista",
+      "questions": [
+        {
+          "q": "Milloin revontulia näkyy parhaiten?",
+          "a": "Revontulet näkyvät parhaiten pimeinä, kirkkaina öinä syksyllä ja keväällä. Paras aika on klo 21–02."
+        },
+        {
+          "q": "Mitä kartan arvot tarkoittavat?",
+          "a": "Kp-indeksi kertoo geomagneettisen aktiivisuuden. Mitä suurempi arvo, sitä todennäköisemmin revontulia näkyy."
+        },
+        {
+          "q": "Miten pilvisyys vaikuttaa näkyvyyteen?",
+          "a": "Pilvet estävät revontulien näkymisen. Tarkista pilvisyyskartta ennen lähtöä – kirkas taivas on välttämätön."
+        },
+        {
+          "q": "Tarvitaanko pimeä paikka?",
+          "a": "Kyllä. Valosaaste kaupungeissa heikentää näkyvyyttä. Siirry pois katuvaloista ja valitse avoin paikka."
+        },
+        {
+          "q": "Voiko revontulia nähdä Etelä-Suomessa?",
+          "a": "Kyllä, mutta harvemmin. Tarvitaan korkea Kp-indeksi (≥ 5–6) ja kirkas taivas."
+        },
+        {
+          "q": "Mistä tiedän, milloin revontulia näkyy?",
+          "a": "Käytä reaaliaikaisia karttoja, kuten RepoTracker.fi, ja seuraa NOAA:n sekä Ilmatieteen laitoksen tietoja."
+        },
+        {
+          "q": "Mitä ovat aurinkotuuli ja IMF Bz?",
+          "a": "Aurinkotuuli tuo energiaa Maan magneettikenttään. IMF Bz-arvo kertoo kentän suunnan – negatiivinen Bz lisää revontulien todennäköisyyttä."
+        },
+        {
+          "q": "Mitä pitää muistaa revontulijahtiin lähtiessä?",
+          "a": "Pukeudu lämpimästi kerroksittain. Käytä talvitakkia, lämpimiä kenkiä ja varavaatteita. Älä aja huonosti auratuilla teillä."
+        }
+      ]
     }
   },
   "en": {
@@ -113,49 +151,7 @@
       "feels": "Feels like",
       "wind": "Wind",
       "moreInfo": "More info"
-    }
-    
-  "fi": {
-    "faq": {
-      "pageTitle": "Revontulet – Usein kysytyt kysymykset",
-      "title": "Usein kysytyt kysymykset revontulista",
-      "questions": [
-        {
-          "q": "Milloin revontulia näkyy parhaiten?",
-          "a": "Revontulet näkyvät parhaiten pimeinä, kirkkaina öinä syksyllä ja keväällä. Paras aika on klo 21–02."
-        },
-        {
-          "q": "Mitä kartan arvot tarkoittavat?",
-          "a": "Kp-indeksi kertoo geomagneettisen aktiivisuuden. Mitä suurempi arvo, sitä todennäköisemmin revontulia näkyy."
-        },
-        {
-          "q": "Miten pilvisyys vaikuttaa näkyvyyteen?",
-          "a": "Pilvet estävät revontulien näkymisen. Tarkista pilvisyyskartta ennen lähtöä – kirkas taivas on välttämätön."
-        },
-        {
-          "q": "Tarvitaanko pimeä paikka?",
-          "a": "Kyllä. Valosaaste kaupungeissa heikentää näkyvyyttä. Siirry pois katuvaloista ja valitse avoin paikka."
-        },
-        {
-          "q": "Voiko revontulia nähdä Etelä-Suomessa?",
-          "a": "Kyllä, mutta harvemmin. Tarvitaan korkea Kp-indeksi (≥ 5–6) ja kirkas taivas."
-        },
-        {
-          "q": "Mistä tiedän, milloin revontulia näkyy?",
-          "a": "Käytä reaaliaikaisia karttoja, kuten RepoTracker.fi, ja seuraa NOAA:n sekä Ilmatieteen laitoksen tietoja."
-        },
-        {
-          "q": "Mitä ovat aurinkotuuli ja IMF Bz?",
-          "a": "Aurinkotuuli tuo energiaa Maan magneettikenttään. IMF Bz-arvo kertoo kentän suunnan – negatiivinen Bz lisää revontulien todennäköisyyttä."
-        },
-        {
-          "q": "Mitä pitää muistaa revontulijahtiin lähtiessä?",
-          "a": "Pukeudu lämpimästi kerroksittain. Käytä talvitakkia, lämpimiä kenkiä ja varavaatteita. Älä aja huonosti auratuilla teillä."
-        }
-      ]
-    }
-  },
-  "en": {
+    },
     "faq": {
       "pageTitle": "Northern Lights FAQ – Frequently asked questions",
       "title": "Frequently asked questions about the northern lights",
@@ -195,7 +191,4 @@
       ]
     }
   }
-
-  }
 }
-
