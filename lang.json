@@ -47,7 +47,9 @@
       "title": "Revontuliennuste (NOAA)",
       "tooltipHigh": "Kp {kp} - Korkea mahdollisuus",
       "tooltipModerate": "Kp {kp} - Kohtalainen mahdollisuus",
-      "tooltipLow": "Kp {kp} - Heikko mahdollisuus"
+      "tooltipLow": "Kp {kp} - Heikko mahdollisuus",
+      "xAxis": "UT-aika (3h välein)",
+      "yAxis": "Kp-indeksi"
     },
     "weather": {
       "loading": "Haetaan säätietoja...",
@@ -143,7 +145,9 @@
       "title": "Northern Lights forecast (NOAA)",
       "tooltipHigh": "Kp {kp} - High chance",
       "tooltipModerate": "Kp {kp} - Moderate chance",
-      "tooltipLow": "Kp {kp} - Low chance"
+      "tooltipLow": "Kp {kp} - Low chance",
+      "xAxis": "UT Time (3h intervals)",
+      "yAxis": "Kp Index"
     },
     "weather": {
       "loading": "Retrieving weather data...",
@@ -192,3 +196,4 @@
     }
   }
 }
+
