@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (closePopupBtn) {
     closePopupBtn.addEventListener('click', () => {
-      if (dontShowAgainCheckbox && dontShowAgainCheckbox.checked) {
+      if (dontShowAgainCheckbox && dontShowAgainCheckbox.checked) { 
         localStorage.setItem('hideHelpPopup', 'true');
       }
       helpPopup.style.display = 'none';
