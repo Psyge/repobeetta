@@ -131,56 +131,53 @@ document.addEventListener('mapReady', () => {
   const locateBtn = document.getElementById("locate-btn");
   if (locateBtn && navigator.geolocation) {
     locateBtn.addEventListener("click", () => {
-      navigator.geolocation.getCurrentPosition(async pos => {
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
+   navigator.geolocation.getCurrentPosition(async pos => {
+  const lat = pos.coords.latitude;
+  const lon = pos.coords.longitude;
 
-        map.setView([lat, lon], 6);
+  map.setView([lat, lon], 6);
 
-        if (userMarker) {
-          userMarker.setLatLng([lat, lon]);
-        } else {
-          userMarker = L.marker([lat, lon]).addTo(map);
-        }
+  if (userMarker) {
+    userMarker.setLatLng([lat, lon]);
+  } else {
+    userMarker = L.marker([lat, lon]).addTo(map);
+  }
 
-        // Laske auroraScore ja hae säädata
-let auroraScore = 0;
-let auroraIntensity = 0;
-if (currentData && currentData.coordinates) {
-  let nearest = null, minDist = Infinity;
-  currentData.coordinates.forEach(p => {
-    let pointLon = p[0] < 0 ? p[0] + 360 : p[0];
-    const pointLat = p[1], intensity = p[2];
-    const dist = Math.hypot(pointLat - lat, Math.abs(pointLon - lon));
-    if (dist < minDist) { minDist = dist; nearest = intensity; }
-  });
-  auroraIntensity = nearest || 0;
-  if (auroraIntensity > 60) auroraScore += 2;
-  else if (auroraIntensity > 30) auroraScore += 1;
-}
+  let auroraScore = 0;
+  let auroraIntensity = 0;
+  if (currentData && currentData.coordinates) {
+    let nearest = null, minDist = Infinity;
+    currentData.coordinates.forEach(p => {
+      let pointLon = p[0] < 0 ? p[0] + 360 : p[0];
+      const pointLat = p[1], intensity = p[2];
+      const dist = Math.hypot(pointLat - lat, Math.abs(pointLon - lon));
+      if (dist < minDist) { minDist = dist; nearest = intensity; }
+    });
+    auroraIntensity = nearest || 0;
+    if (auroraIntensity > 60) auroraScore += 2;
+    else if (auroraIntensity > 30) auroraScore += 1;
+  }
 
-const weather = await getWeather(lat, lon);
-let clouds = weather ? weather.clouds : 100;
-if (clouds < 30) auroraScore += 2;
-else if (clouds < 60) auroraScore += 1;
+  const weather = await getWeather(lat, lon);
+  let clouds = weather ? weather.clouds : 100;
+  if (clouds < 30) auroraScore += 2;
+  else if (clouds < 60) auroraScore += 1;
 
-let statusEmoji = '🔴';
-let statusText = translations[currentLang].map.chanceLow;
-if (auroraScore >= 3) { statusEmoji = '🟢'; statusText = translations[currentLang].map.chanceHigh; }
-else if (auroraScore === 2) { statusEmoji = '🟡'; statusText = translations[currentLang].map.chanceModerate; }
+  let statusEmoji = '🔴';
+  let statusText = translations[currentLang].map.chanceLow;
+  if (auroraScore >= 3) { statusEmoji = '🟢'; statusText = translations[currentLang].map.chanceHigh; }
+  else if (auroraScore === 2) { statusEmoji = '🟡'; statusText = translations[currentLang].map.chanceModerate; }
 
-const popupContent = `
-  <strong>${translations[currentLang].map.popupTitle}</strong><br>
-  ${statusEmoji} ${statusText}<br>
-  ${translations[currentLang].map.auroraIntensity}: ${auroraIntensity.toFixed(1)}<br>
-  ${translations[currentLang].map.clouds}: ${clouds}%<br>
-  ${translations[currentLang].map.temp}: ${weather ? weather.temp + '°C' : 'N/A'}<br>
-  <strong>${translations[currentLang].map.coordinates}:</strong> ${lat.toFixed(4)}, ${lon.toFixed(4)}
-`;
-userMarker.bindPopup(popupContent).openPopup();
-      }, err => {
-        alert("Location failed: " + err.message);
-      });
+  const popupContent = `
+    <strong>${translations[currentLang].map.popupTitle}</strong><br>
+    ${statusEmoji} ${statusText}<br>
+    ${translations[currentLang].map.auroraIntensity}: ${auroraIntensity.toFixed(1)}<br>
+    ${translations[currentLang].map.clouds}: ${clouds}%<br>
+    ${translations[currentLang].map.temp}: ${weather ? weather.temp + '°C' : 'N/A'}<br>
+    <strong>${translations[currentLang].map.coordinates}:</strong> ${lat.toFixed(4)}, ${lon.toFixed(4)}
+  `;
+  userMarker.bindPopup(popupContent).openPopup();
+});
     });
   }
 });
