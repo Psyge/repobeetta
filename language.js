@@ -36,7 +36,7 @@ async function loadLanguage(lang) {
   updateText('info', translations[lang].map.clickInfo);
 
   
-  updateText('faq-title', translations.faq.title[lang]);
+  updateText('faq-title', translations[lang].faq.title);
   updateText('faq-q1', translations.faq.questions[0][lang].q);
   updateText('faq-a1', translations.faq.questions[0][lang].a);
   updateText('faq-q2', translations.faq.questions[1][lang].q);
@@ -53,4 +53,5 @@ function setLanguage(lang) {
 document.addEventListener('DOMContentLoaded', () => {
   loadLanguage(currentLang);
 });
+
 
