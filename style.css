@@ -1,4 +1,16 @@
 /* Perusasetukset */
+.popup-header {
+    display: flex;
+    align-items: center; /* Keskittää tekstin pystysuunnassa ikonikuvaan */
+    gap: 8px;            /* Kuvan ja tekstin väli */
+}
+
+.popup-header img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    flex-shrink: 0;      /* Estää kuvan pienentymisen */
+}
 body, html {
     margin: 0;
     padding: 0;
