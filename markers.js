@@ -64,8 +64,8 @@ function addMarkers(layer) {
 
         const popupContent = `
       <strong>${place.name}</strong><br>
-      <img src="${place.icon}" alt="${place.name}" style="width:30px;height:30px;border-radius:50%;"><br>
-        <div style="font-size: 0.9em; margin: 6px 0; max-width:250px;">
+      <div><img src="${place.icon}" alt="${place.name}" style="width:30px;height:30px;border-radius:50%;"><br>
+        <style="font-size: 0.9em; margin: 6px 0; max-width:250px;">
         ${place.description || ''}
     </div>
       <a href="${place.url}" target="_blank">${translations[currentLang].weather.moreInfo}</a>
