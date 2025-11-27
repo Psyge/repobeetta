@@ -231,7 +231,7 @@ header.banner::after {
   position: relative;
   width: 32px;
   height: 48px;
-  animation: float 3s ease-in-out infinite;
+  animation: float 2s infinite;
   
 }
 
@@ -254,9 +254,9 @@ header.banner::after {
   box-shadow: 0 0 2px rgba(0,0,0,0.3);
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+@keyframes float  {
+    0% { transform: scale(0.9); }
+    50% { transform: scale(1.2); }
 }
 
 
