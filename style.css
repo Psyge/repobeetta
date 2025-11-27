@@ -11,6 +11,10 @@
     border-radius: 50%;
     flex-shrink: 0;      /* Estää kuvan pienentymisen */
 }
+.popup-title {
+    font-size: 1.1em;
+    display: inline-block;
+}
 body, html {
     margin: 0;
     padding: 0;
