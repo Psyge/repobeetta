@@ -18,7 +18,7 @@ window.getWeather = async function(lat, lon) {
 };
 
 const places = [
-    { name: 'Rovaniemi', lat: 66.5, lon: 25.7, url: 'https://visitrovaniemi.fi', icon: 'roic.png' },
+    { name: 'Rovaniemi', lat: 66.5, lon: 25.7, url: 'https://visitrovaniemi.fi', icon: 'roic.png', description: 'Rovaniemi on Lapin pääkaupunki ja tunnettu Joulupukin virallisena kotikaupunkina.' },
     { name: 'Joulupukin Pajakylä', lat: 66.54, lon: 25.84, url: 'https://santaclausvillage.info/', icon: 'pukki.png', stream: 'https://www.youtube.com/embed/Cp4RRAEgpeU', streamWidth: 320, streamHeight: 180 },
     { name: 'Levi', lat: 67.80, lon: 24.80, url: 'https://www.levi.fi/', icon: 'levi.png' },
     { name: 'Ylläs', lat: 67.57, lon: 24.20, url: 'https://yllas.fi/', icon: 'yllas.png' }
@@ -64,7 +64,10 @@ function addMarkers(layer) {
 
         const popupContent = `
       <strong>${place.name}</strong><br>
-      <img src="${place.icon}" alt="${place.name}" style="width:50px;height:50px;border-radius:50%;"><br>
+      <img src="${place.icon}" alt="${place.name}" style="width:30px;height:30px;border-radius:50%;"><br>
+        <div style="font-size: 0.9em; margin: 6px 0; max-width:200px;">
+        ${place.description || ''}
+    </div>
       <a href="${place.url}" target="_blank">${translations[currentLang].weather.moreInfo}</a>
       <div class="weather-box" style="margin-top:10px;">
         <em>${translations[currentLang].weather.loading}</em>
