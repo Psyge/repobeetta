@@ -64,7 +64,7 @@ function addMarkers(layer) {
 
         const popupContent = `
       <strong>${place.name}</strong><br>
-      <div><img src="${place.icon}" alt="${place.name}" style="width:30px;height:30px;border-radius:50%;"><br>
+      <div><img src="${place.icon}" alt="${place.name}" style="width:30px;height:30px;border-radius:50%;">
         <style="font-size: 0.9em; margin: 6px 0; max-width:250px;">
         ${place.description || ''}
     </div>
