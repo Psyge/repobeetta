@@ -63,7 +63,7 @@ function addMarkers(layer) {
         });
 
         const popupContent = `
-      <div style="display:flex; align-items:center; gap:8px;">
+      <div style="display:flex; align-items:center; gap:50px; padding-bottom: 5px;">
         <img src="${place.icon}" alt="${place.name}" 
              style="width:30px;height:30px;border-radius:50%; flex-shrink:0;">
         <strong style="font-size:1.1em;">${place.name}</strong>
