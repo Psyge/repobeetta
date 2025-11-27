@@ -1,15 +1,18 @@
 /* Perusasetukset */
 .popup-header {
-    display: flex;
-    align-items: center; /* Keskittää tekstin pystysuunnassa ikonikuvaan */
-    gap: 8px;            /* Kuvan ja tekstin väli */
+      position: relative;
+    text-align: center;      /* Keskittää tekstin */
+    margin-bottom: 8px;
+    min-height: 32px;       /* Kuvan ja tekstin väli */
 }
 
 .popup-header img {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 30px;
     height: 30px;
-    border-radius: 50%;
-    flex-shrink: 0;      /* Estää kuvan pienentymisen */
+    border-radius: 50%;    /* Estää kuvan pienentymisen */
 }
 .popup-title {
     font-size: 1.1em;
