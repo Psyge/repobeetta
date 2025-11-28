@@ -436,3 +436,11 @@ async function fetchAuroraForecast() {
         }
     }
 }
+document.addEventListener("click", function (e) {
+    if (e.target.classList.contains("read-more")) {
+        e.preventDefault();
+        const placeName = e.target.dataset.place;
+        const place = places.find(p => p.name === placeName);
+        if (place) showPlaceInfo(place);
+    }
+});
