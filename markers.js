@@ -21,14 +21,14 @@ window.getWeather = async function (lat, lon) {
 const places = [
     { name: 'Rovaniemi', lat: 66.5, lon: 25.7, url: 'https://visitrovaniemi.fi', icon: 'roic.png',  short: 'Rovaniemi on Lapin pääkaupunki ja Joulupukin virallinen kotikaupunki.', 
      description: `
-        Rovaniemi on Lapin pääkaupunki ja tunnettu Joulupukin virallisena kotikaupunkina. <br><br>
-    
-        Rovaniemen alkutalvi tuo mukanaan ensilumen, huurteiset metsät ja hiljaisen luonnon rauhan. <br><br>
-    
-    Marraskuussa voi nauttia varhaisista talviaktiviteeteista: SantaPark avaa ovensa ja ensimmäiset lumiaktiviteetit ovat saatavilla ja tarjoavat hauskoja elämyksiä koko perheelle. <br><br>
-    
-    Joulunaika herättää Napapiirin eloon, vaikka Joulupukin Pajakylässä joulun tunnelma on koettavissa ympärivuotisesti. Talven pimenevissä illoissa jouluvalot koristavat kaupunkia tuovat iloista joulutunnelmaa. <br><br>
-    Suosituimmat elämykset, kuten husky- ja porosafarit sekä lumiaktiviteetit, kannattaa varata ajoissa.` 
+        <p><strong>Rovaniemi</strong> on Lapin pääkaupunki ja tunnettu Joulupukin 
+            virallisena kotikaupunkina. Kaupunki houkuttelee matkailijoita ympäri vuoden ja  
+            erityisesti talvella, joka on varsinaista sesonki aikaa lapin matkailulle.</p>
+
+            <p>Rovaniemi tarjoaa arktisia elämyksiä, jäljittelemätöntä luontoa ja 
+            Pohjoisen kulttuuria sekä revontuli- ja lumiaktiviteetteja. Alueelta löytyy myös Joulupukin Pajakylä, 
+            napapiiri sekä monipuolisia ulkoilureittejä.</p>
+            ` 
     },
     { name: 'Joulupukin Pajakylä', lat: 66.54, lon: 25.84, url: 'https://santaclausvillage.info/', icon: 'pukki.png', stream: 'https://www.youtube.com/embed/Cp4RRAEgpeU', streamWidth: 320, streamHeight: 180, description: 'Joulupukin Pajakylä on maailman kuuluisin joulukohde, jossa voi tavata Joulupukin ympäri vuoden.' },
     { name: 'Levi', lat: 67.80, lon: 24.80, url: 'https://www.levi.fi/', icon: 'levi.png' },
