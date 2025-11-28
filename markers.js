@@ -1,5 +1,5 @@
 // Tee getWeather globaaliksi
-window.getWeather = async function(lat, lon) {
+window.getWeather = async function (lat, lon) {
     const url = `https://repotracker.masto84.workers.dev/?lat=${lat}&lon=${lon}`;
     try {
         const res = await fetch(url);
@@ -17,6 +17,7 @@ window.getWeather = async function(lat, lon) {
     }
 };
 
+
 const places = [
     { name: 'Rovaniemi', lat: 66.5, lon: 25.7, url: 'https://visitrovaniemi.fi', icon: 'roic.png', description: 'Rovaniemi on Lapin pääkaupunki ja tunnettu Joulupukin virallisena kotikaupunkina.' },
     { name: 'Joulupukin Pajakylä', lat: 66.54, lon: 25.84, url: 'https://santaclausvillage.info/', icon: 'pukki.png', stream: 'https://www.youtube.com/embed/Cp4RRAEgpeU', streamWidth: 320, streamHeight: 180, description: 'Joulupukin Pajakylä on maailman kuuluisin joulukohde, jossa voi tavata Joulupukin ympäri vuoden.' },
@@ -26,14 +27,15 @@ const places = [
 
 let markersLayer;
 
+
 function initMarkers() {
     if (!translations[currentLang]) {
         console.warn("Translations not ready, waiting...");
-        return; // odotetaan languageReady-eventtiä
+        return;
     }
     if (!map) {
         console.warn("Map not ready, waiting...");
-        return; // odotetaan mapReady-eventtiä
+        return;
     }
 
     // Jos markersLayer on jo luotu, tyhjennä se
@@ -47,61 +49,87 @@ function initMarkers() {
     });
 }
 
+
 function addMarkers(layer) {
     places.forEach(place => {
+
         const customIcon = L.divIcon({
             className: 'custom-marker',
             html: `
-        <div class="marker-wrapper">
-          <img src="pinni.png" class="pin">
-          <img src="${place.icon}" class="pin-icon">
-        </div>
-      `,
+                <div class="marker-wrapper">
+                    <img src="pinni.png" class="pin">
+                    <img src="${place.icon}" class="pin-icon">
+                </div>
+            `,
             iconSize: [32, 48],
             iconAnchor: [16, 48],
             popupAnchor: [0, -52]
         });
 
         const popupContent = `
-     <div class="popup-header">
-    <img src="${place.icon}" alt="${place.name}">
-    <strong class="popup-title">${place.name}</strong>
-</div>
-      <div>
-        <style="font-size: 0.9em; margin: 6px 0; max-width:250px;">
-        ${place.description || ''}
-    </div>
-      <a href="${place.url}" target="_blank">${translations[currentLang].weather.moreInfo}</a>
-      <div class="weather-box" style="margin-top:10px;">
-        <em>${translations[currentLang].weather.loading}</em>
-      </div>
-      ${place.stream ? `<div class="popup-stream" data-stream="${place.stream}" data-width="${place.streamWidth}" data-height="${place.streamHeight}" style="margin-top:10px;"></div>` : ''}
-    `;
+            <div class="popup-header">
+                <img src="${place.icon}" alt="${place.name}">
+                <strong class="popup-title">${place.name}</strong>
+            </div>
+
+            <div style="font-size: 0.9em; margin: 6px 0; max-width:250px;">
+                ${place.description || ''}
+            </div>
+
+            <a href="${place.url}" target="_blank">
+                ${translations[currentLang].weather.moreInfo}
+            </a>
+
+            <div class="weather-box" style="margin-top:10px;">
+                <em>${translations[currentLang].weather.loading}</em>
+            </div>
+
+            ${place.stream
+                ? `<div class="popup-stream" 
+                        data-stream="${place.stream}" 
+                        data-width="${place.streamWidth}" 
+                        data-height="${place.streamHeight}" 
+                        style="margin-top:10px;">
+                   </div>`
+                : ''
+            }
+        `;
 
         const marker = L.marker([place.lat, place.lon], { icon: customIcon })
-            .bindPopup(popupContent, { className: 'custom-popup'})
+            .bindPopup(popupContent, { className: 'custom-popup' })
             .addTo(layer);
 
+
+        // Popup avautuu
         marker.on('popupopen', async (e) => {
             const popup = e.popup;
             const weatherBox = popup.getElement().querySelector('.weather-box');
+
+            // Lataa sää vain kerran
             if (weatherBox && !weatherBox.dataset.loaded) {
                 const weather = await getWeather(place.lat, place.lon);
+
                 if (weather) {
                     weatherBox.innerHTML = `
-            <div class="weather-row">
-              <img src="https://openweathermap.org/img/wn/${weather.icon}.png">
-              <span>${weather.temp}°C — ${weather.desc}</span>
-            </div>
-            <small>${translations[currentLang].weather.feels} ${weather.feels}°C | ${translations[currentLang].weather.wind} ${weather.wind} m/s</small>
-          `;
+                        <div class="weather-row">
+                            <img src="https://openweathermap.org/img/wn/${weather.icon}.png">
+                            <span>${weather.temp}°C — ${weather.desc}</span>
+                        </div>
+                        <small>
+                            ${translations[currentLang].weather.feels} ${weather.feels}°C |
+                            ${translations[currentLang].weather.wind} ${weather.wind} m/s
+                        </small>
+                    `;
                 } else {
                     weatherBox.innerHTML = translations[currentLang].weather.error;
                 }
+
                 weatherBox.dataset.loaded = "true";
             }
 
+            // Lisää videostream vain kerran
             const container = popup.getElement().querySelector('.popup-stream');
+
             if (container && !container.querySelector('iframe')) {
                 const iframe = document.createElement('iframe');
                 iframe.src = container.dataset.stream;
@@ -114,6 +142,7 @@ function addMarkers(layer) {
         });
     });
 }
+
 
 document.addEventListener('languageReady', initMarkers);
 document.addEventListener('mapReady', initMarkers);
