@@ -19,7 +19,7 @@ window.getWeather = async function (lat, lon) {
 
 
 const places = [
-    { name: 'Rovaniemi', lat: 66.5, lon: 25.7, url: 'https://visitrovaniemi.fi', icon: 'roic.png', description: 'Rovaniemi on Lapin pääkaupunki ja tunnettu Joulupukin virallisena kotikaupunkina.' },
+    { name: 'Rovaniemi', lat: 66.5, lon: 25.7, url: 'https://visitrovaniemi.fi', icon: 'roic.png', description: 'Rovaniemi on Lapin pääkaupunki ja tunnettu Joulupukin virallisena kotikaupunkina. Rovaniemen alkutalvi tuo mukanaan ensilumen, huurteiset metsät ja hiljaisen luonnon rauhan. Marraskuussa voi nauttia varhaisista talviaktiviteeteista: SantaPark avaa ovensa ja ensimmäiset lumiaktiviteetit ovat saatavilla ja tarjoavat hauskoja elämyksiä koko perheelle. Joulunaika herättää Napapiirin eloon, vaikka Joulupukin Pajakylässä joulun tunnelma on koettavissa ympärivuotisesti. Talven pimenevissä illoissa jouluvalot koristavat kaupunkia tuovat iloista joulutunnelmaa. Suosituimmat elämykset, kuten husky- ja porosafarit sekä lumiaktiviteetit, kannattaa varata ajoissa.' },
     { name: 'Joulupukin Pajakylä', lat: 66.54, lon: 25.84, url: 'https://santaclausvillage.info/', icon: 'pukki.png', stream: 'https://www.youtube.com/embed/Cp4RRAEgpeU', streamWidth: 320, streamHeight: 180, description: 'Joulupukin Pajakylä on maailman kuuluisin joulukohde, jossa voi tavata Joulupukin ympäri vuoden.' },
     { name: 'Levi', lat: 67.80, lon: 24.80, url: 'https://www.levi.fi/', icon: 'levi.png' },
     { name: 'Ylläs', lat: 67.57, lon: 24.20, url: 'https://yllas.fi/', icon: 'yllas.png' }
