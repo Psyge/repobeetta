@@ -76,16 +76,14 @@ function addMarkers(layer) {
                 ${place.description || ''}
             </div>
 
-            <a href="${place.url}" target="_blank">
-                ${translations[currentLang].weather.moreInfo}
-            </a>
+            <a href="#" class="read-more" data-place="${place.name}">
+   ${translations[currentLang].weather.moreInfo}
+</a>
 
             <div class="weather-box" style="margin-top:10px;">
                 <em>${translations[currentLang].weather.loading}</em>
             </div>
-            <a href="#" class="read-more" data-place="${place.name}">
-   ${translations[currentLang].weather.moreInfo}
-</a>
+            
             ${place.stream
                 ? `<div class="popup-stream" 
                         data-stream="${place.stream}" 
