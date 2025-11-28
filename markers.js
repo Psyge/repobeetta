@@ -19,7 +19,17 @@ window.getWeather = async function (lat, lon) {
 
 
 const places = [
-    { name: 'Rovaniemi', lat: 66.5, lon: 25.7, url: 'https://visitrovaniemi.fi', icon: 'roic.png', description: 'Rovaniemi on Lapin pääkaupunki ja tunnettu Joulupukin virallisena kotikaupunkina. Rovaniemen alkutalvi tuo mukanaan ensilumen, huurteiset metsät ja hiljaisen luonnon rauhan. Marraskuussa voi nauttia varhaisista talviaktiviteeteista: SantaPark avaa ovensa ja ensimmäiset lumiaktiviteetit ovat saatavilla ja tarjoavat hauskoja elämyksiä koko perheelle. Joulunaika herättää Napapiirin eloon, vaikka Joulupukin Pajakylässä joulun tunnelma on koettavissa ympärivuotisesti. Talven pimenevissä illoissa jouluvalot koristavat kaupunkia tuovat iloista joulutunnelmaa. Suosituimmat elämykset, kuten husky- ja porosafarit sekä lumiaktiviteetit, kannattaa varata ajoissa.' },
+    { name: 'Rovaniemi', lat: 66.5, lon: 25.7, url: 'https://visitrovaniemi.fi', icon: 'roic.png',  short: 'Rovaniemi on Lapin pääkaupunki ja Joulupukin virallinen kotikaupunki.', 
+     description: `
+        Rovaniemi on Lapin pääkaupunki ja tunnettu Joulupukin virallisena kotikaupunkina. <br><br>
+    
+        Rovaniemen alkutalvi tuo mukanaan ensilumen, huurteiset metsät ja hiljaisen luonnon rauhan. <br><br>
+    
+    Marraskuussa voi nauttia varhaisista talviaktiviteeteista: SantaPark avaa ovensa ja ensimmäiset lumiaktiviteetit ovat saatavilla ja tarjoavat hauskoja elämyksiä koko perheelle. <br><br>
+    
+    Joulunaika herättää Napapiirin eloon, vaikka Joulupukin Pajakylässä joulun tunnelma on koettavissa ympärivuotisesti. Talven pimenevissä illoissa jouluvalot koristavat kaupunkia tuovat iloista joulutunnelmaa. <br><br>
+    Suosituimmat elämykset, kuten husky- ja porosafarit sekä lumiaktiviteetit, kannattaa varata ajoissa.` 
+    },
     { name: 'Joulupukin Pajakylä', lat: 66.54, lon: 25.84, url: 'https://santaclausvillage.info/', icon: 'pukki.png', stream: 'https://www.youtube.com/embed/Cp4RRAEgpeU', streamWidth: 320, streamHeight: 180, description: 'Joulupukin Pajakylä on maailman kuuluisin joulukohde, jossa voi tavata Joulupukin ympäri vuoden.' },
     { name: 'Levi', lat: 67.80, lon: 24.80, url: 'https://www.levi.fi/', icon: 'levi.png' },
     { name: 'Ylläs', lat: 67.57, lon: 24.20, url: 'https://yllas.fi/', icon: 'yllas.png' }
@@ -73,7 +83,7 @@ function addMarkers(layer) {
             </div>
 
             <div style="font-size: 0.9em; margin: 6px 0; max-width:250px;">
-                ${place.description || ''}
+               ${place.short || place.description}
             </div>
 
             <a href="#" class="read-more" data-place="${place.name}">
