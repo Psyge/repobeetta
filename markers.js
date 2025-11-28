@@ -83,7 +83,9 @@ function addMarkers(layer) {
             <div class="weather-box" style="margin-top:10px;">
                 <em>${translations[currentLang].weather.loading}</em>
             </div>
-
+            <a href="#" class="read-more" data-place="${place.name}">
+   ${translations[currentLang].weather.moreInfo}
+</a>
             ${place.stream
                 ? `<div class="popup-stream" 
                         data-stream="${place.stream}" 
@@ -141,6 +143,35 @@ function addMarkers(layer) {
             }
         });
     });
+}
+function showPlaceInfo(place) {
+    const defaultSection = document.getElementById("aurora-default");
+    const infoSection = document.getElementById("place-info");
+
+    // Piilotetaan oletussisältö
+    defaultSection.style.display = "none";
+
+    // Näytetään paikan sisältö
+    infoSection.style.display = "block";
+
+    infoSection.innerHTML = `
+        <h2>${place.name}</h2>
+        <p>${place.description || ''}</p>
+        ${place.url ? `<p><a href="${place.url}" target="_blank">Visit website</a></p>` : ''}
+        ${place.stream ? 
+            `<iframe src="${place.stream}" width="100%" height="250" style="border:none;margin-top:10px;"></iframe>` : ''}
+        <button id="back-to-default" style="margin-top:15px;">Takaisin ohjeisiin</button>
+    `;
+
+    // Scrollataan osioon
+    infoSection.scrollIntoView({ behavior: "smooth" });
+
+    // Lisää takaisin-napin toiminto
+    document.getElementById("back-to-default").onclick = () => {
+        infoSection.style.display = "none";
+        defaultSection.style.display = "block";
+        defaultSection.scrollIntoView({ behavior: "smooth" });
+    };
 }
 
 
