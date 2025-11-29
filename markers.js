@@ -21,7 +21,7 @@ window.getWeather = async function (lat, lon) {
 const places = [
     { name: 'Rovaniemi', lat: 66.5, lon: 25.7, url: 'https://visitrovaniemi.fi', icon: 'roic.png',  short: 'Rovaniemi on Lapin pääkaupunki ja Joulupukin virallinen kotikaupunki.', 
      description: `
-        <h3>Rovaniemi – Lapin pääkaupunki ja joulupukin koti</h3>
+        <h2>Rovaniemi – Lapin pääkaupunki ja joulupukin koti</h2>
 
   <p>
     Rovaniemi on Suomen Lapissa, Napapiirin tuntumassa sijaitseva elinvoimainen kaupunki, joka sijaitsee hyvien kulkuyhteyksien päässä. Rovaniemelle pääsee niin lentämällä kuin junalla. Rovaniemeä 
@@ -54,7 +54,7 @@ const places = [
     ` 
     },
     { name: 'Joulupukin Pajakylä', lat: 66.54, lon: 25.84, url: 'https://santaclausvillage.info/', icon: 'pukki.png', stream: 'https://www.youtube.com/embed/Cp4RRAEgpeU', streamWidth: 320, streamHeight: 180, short: 'Joulupukin pajakylä - Joulupukin virallinen kotipaikka', description: ` 
-    <h3>Joulupukin Pajakylä – Taianomainen kohtaamispaikka Napapiirillä</h3>
+    <h2>Joulupukin Pajakylä – Taianomainen kohtaamispaikka Napapiirillä</h2>
 
   <p>
     Joulupukin Pajakylä on yksi Rovaniemen tunnetuimmista 
@@ -94,7 +94,7 @@ const places = [
     },
     { name: 'Levi', lat: 67.80, lon: 24.80, url: 'https://www.levi.fi/', icon: 'levi.png', short: 'Levi - Suomen ehkä tunnetuin hiihtokeskus', descroption: 
         `
-  <h3>Levi – Suomen tunnetuin hiihtokeskus</h3>
+  <h2>Levi – Suomen tunnetuin hiihtokeskus</h2>
 
   <p>
     Levi sijaitsee Kittilässä, Lapissa, ja se on yksi Suomen 
@@ -145,7 +145,7 @@ const places = [
 `
 },
     { name: 'Ylläs', lat: 67.57, lon: 24.20, url: 'https://yllas.fi/', icon: 'yllas.png', short: 'Ylläs - Suomen suurin hiihtokeskus', description: `
-  <h3>Ylläs – Tunturien rauhaa ja Lapin upeita elämyksiä</h3>
+  <h2>Ylläs – Tunturien rauhaa ja Lapin upeita elämyksiä</h2>
 
   <p>
     Ylläs sijaitsee Kolarin kunnassa, Lapissa, ja se on yksi Suomen 
@@ -337,7 +337,7 @@ function showPlaceInfo(place) {
     infoSection.style.display = "block";
 
     infoSection.innerHTML = `
-        <h2>${place.name}</h2>
+        
         <p>${place.description || ''}</p>
         ${place.url ? `<p><a href="${place.url}" target="_blank">Visit website</a></p>` : ''}
         ${place.stream ? 
