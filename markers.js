@@ -92,7 +92,7 @@ const places = [
     elämyksen kaikenikäisille vierailijoille.
   </p>`
     },
-    { name: 'Levi', lat: 67.80, lon: 24.80, url: 'https://www.levi.fi/', icon: 'levi.png', short: 'Levi - Suomen ehkä tunnetuin hiihtokeskus', descroption: 
+    { name: 'Levi', lat: 67.80, lon: 24.80, url: 'https://www.levi.fi/', icon: 'levi.png', short: 'Levi - Suomen ehkä tunnetuin hiihtokeskus', description: 
         `
   <h2>Levi – Suomen tunnetuin hiihtokeskus</h2>
 
