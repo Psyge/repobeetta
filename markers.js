@@ -21,18 +21,192 @@ window.getWeather = async function (lat, lon) {
 const places = [
     { name: 'Rovaniemi', lat: 66.5, lon: 25.7, url: 'https://visitrovaniemi.fi', icon: 'roic.png',  short: 'Rovaniemi on Lapin pääkaupunki ja Joulupukin virallinen kotikaupunki.', 
      description: `
-        <p><strong>Rovaniemi</strong> on Lapin pääkaupunki ja tunnettu Joulupukin 
-            virallisena kotikaupunkina. Kaupunki houkuttelee matkailijoita ympäri vuoden ja  
-            erityisesti talvella, joka on varsinaista sesonki aikaa lapin matkailulle.</p>
+        <h2>Rovaniemi – Lapin pääkaupunki ja joulupukin koti</h2>
 
-            <p>Rovaniemi tarjoaa arktisia elämyksiä, jäljittelemätöntä luontoa ja 
-            Pohjoisen kulttuuria sekä revontuli- ja lumiaktiviteetteja. Alueelta löytyy myös Joulupukin Pajakylä, 
-            napapiiri sekä monipuolisia ulkoilureittejä.</p>
-            ` 
+  <p>
+    Rovaniemi on Suomessa, Napapiirin tuntumassa sijaitseva elinvoimainen kaupunki, joka sijaitsee hyvien kulkuyhteyksien päässä. Rovaniemelle pääsee niin lentämällä kuin junalla. Rovaniemeä 
+    pidetään yleisesti Lapin läänin niin sanottuna pääkaupunkina. 
+    Se toimii koko pohjoisen Suomen tärkeänä hallinnollisena, kaupallisena ja kulttuurisena keskuksena.
+  </p>
+
+  <p>
+    Kaupunki on kansainvälisesti tunnettu myös joulupukin virallisena kotipaikkana. 
+    Tämä maine tekee Rovaniemestä yhden Suomen suosituimmista matkailukohteista, 
+    erityisesti talvikuukausina, jolloin turistit saapuvat ympäri maailman kokemaan Lapin taian.
+  </p>
+
+  <h3>Talvella suosituimpia aktiviteetteja on:</h3>
+  <ul>
+    <li>Poro- ja huskyajelut</li>
+    <li>Moottorikelkkasafarit</li>
+    <li>Revontuliretket</li>
+    <li>Laskettelu, lumilautailu ja hiihtäminen Ounasvaaralla</li>
+    <li>Jääveistokset, iglut ja muut lumiaktiviteetit</li>
+    <li>Vierailut Joulupukin Pajakylässä ja Santa Parkissa</li>
+  </ul>
+
+  <h3>Tekemistä ympäri vuoden</h3>
+  <p>
+    Vaikka Rovaniemi on erityisen suosittu talvella, tarjoaa se runsaasti koettavaa myös muina vuodenaikoina. 
+    Kaupungista löytyy muun muassa upeita luontopolkuja, museoita kuten <em>Arktikum</em> ja <em>Pilke</em>, 
+    sekä vilkas kulttuuri- ja tapahtumatarjonta. 
+  </p>
+    ` 
     },
-    { name: 'Joulupukin Pajakylä', lat: 66.54, lon: 25.84, url: 'https://santaclausvillage.info/', icon: 'pukki.png', stream: 'https://www.youtube.com/embed/Cp4RRAEgpeU', streamWidth: 320, streamHeight: 180, description: 'Joulupukin Pajakylä on maailman kuuluisin joulukohde, jossa voi tavata Joulupukin ympäri vuoden.' },
-    { name: 'Levi', lat: 67.80, lon: 24.80, url: 'https://www.levi.fi/', icon: 'levi.png' },
-    { name: 'Ylläs', lat: 67.57, lon: 24.20, url: 'https://yllas.fi/', icon: 'yllas.png' }
+    { name: 'Joulupukin Pajakylä', lat: 66.54, lon: 25.84, url: 'https://santaclausvillage.info/', icon: 'pukki.png', stream: 'https://www.youtube.com/embed/Cp4RRAEgpeU', streamWidth: 320, streamHeight: 180, short: 'Joulupukin pajakylä - Joulupukin virallinen kotipaikka', description: ` 
+    <h2>Joulupukin Pajakylä – Taianomainen kohtaamispaikka Napapiirillä</h2>
+
+  <p>
+    Joulupukin Pajakylä on yksi Rovaniemen tunnetuimmista 
+    nähtävyyksistä. Se sijaitsee Napapiirillä, vain lyhyen 
+    matkan päässä Rovaniemen keskustasta, ja se toimii joulupukin 
+    virallisena kohtaamispaikkana ympäri vuoden. Pajakylä on 
+    muotoutunut kansainväliseksi matkailun vetonaulaksi, jossa vierailee vuosittain 
+    tuhansia turisteja eri puolilta maailmaa.
+  </p>
+
+  <h3>Mitä Pajakylässä voi kokea?</h3>
+  <ul>
+    <li>Voit tavata itse Joulupukin</li>
+    <li>Napapiirillä sijaitsee Joulupukin pääposti, josta voi lähettää kirjeitä erikoisleimalla ja seurata tonttujen postilajittelua.</li>
+    <li>Joulupukin pajakylässä sijaitsee napapiirin virallinen linja</li>
+    <li>Pajakylästä löytyy myös lahjatavaroita ja tunnelmallisia ruokapaikkoja joista saa muun muassa eri Lapin herkkuja.</li>
+    </ul>
+
+  <h3>Talven erikoisuuksia</h3>
+  <p>
+    Talvikaudella Pajakylä muuttuu satumaiseksi lumikeitaaksi. Vierailijat voivat nauttia 
+    poro- ja huskysafareista, moottorikelkka-ajeluista, jää- ja lumirakennelmista 
+    sekä mahdollisesti nähdä revontulet Napapiirin yllä.
+  </p>
+
+  <h3>Auki ympäri vuoden</h3>
+  <p>
+    Joulupukin Pajakylä ei ole vain joulusesongin kohde — se on avoinna jokaisena päivänä 
+    ympäri vuoden. Kesällä tunnelma on rauhallinen, ja vierailijat pääsevät tutustumaan 
+    alueeseen ilman talvikauden suuria kävijämääriä.
+  </p>
+
+  <p>
+    Oli vuodenaika mikä tahansa, Joulupukin Pajakylä tarjoaa ikimuistoisen 
+    elämyksen kaikenikäisille vierailijoille.
+  </p>`
+    },
+    { name: 'Levi', lat: 67.80, lon: 24.80, url: 'https://www.levi.fi/', icon: 'levi.png', short: 'Levi - Suomen ehkä tunnetuin hiihtokeskus', descroption: 
+        `
+  <h2>Levi – Suomen tunnetuin hiihtokeskus</h2>
+
+  <p>
+    Levi sijaitsee Kittilässä, Lapissa, ja se on yksi Suomen 
+    suosituimmista ja kansainvälisimmistä matkailukohteista. Se tunnetaan 
+    erityisesti laadukkaista rinteistään, monipuolisista aktiviteeteistaan ja 
+    vilkkaasta matkailuelämästä. Levi on myös Suomen suurin 
+    hiihtokeskus, joka houkuttelee vierailijoita ympäri vuoden.
+  </p>
+
+  <h3>Talven parhaat elämykset</h3>
+  <ul>
+    <li>Hiihto ja lumilautailu – kymmenet rinteet ja huippuluokan latuverkostot.</li>
+    <li>Alppihiihdon maailmancup – Levi isännöi vuosittain kauden avauskilpailuja.</li>
+    <li>Moottorikelkkasafarit – reittejä Lapin maisemissa niin aloittelijoille kuin kokeneille.</li>
+    <li>Husky- ja poroajelut – unohtumattomia elämyksiä talvisessa luonnossa.</li>
+    <li>Revontuliretket – mahdollisuus kokea pohjoisen taivas täydessä loistossaan.</li>
+    <li>Lumikenkäily ja jäärakennelmat – liikuntaa ja elämyksiä lumen keskellä.</li>
+  </ul>
+
+  <h3>Kesän ja syksyn aktiviteetit</h3>
+  <p>
+    Levi on monipuolinen ympärivuotinen kohde. Kesällä ja ruska-aikaan 
+    alue houkuttelee retkeilijöitä, maastopyöräilijöitä, kalastajia ja golfaajia. 
+    Levin huipulle pääsee myös gondolihissillä, joka tarjoaa upeat maisemat 
+    jokaisena vuodenaikana.
+  </p>
+
+  <h3>Majoitus ja palvelut</h3>
+  <p>
+    Levin kylästä löytyy laaja valikoima majoitusvaihtoehtoja mökeistä 
+    laadukkaisiin hotelleihin. Alue tarjoaa myös runsaasti ravintoloita, 
+    kahviloita, kauppoja ja viihdepalveluita. 
+  </p>
+
+  <h3>Hyvinvointi ja spa-elämykset</h3>
+  <p>
+    Levi tunnetaan myös hyvinvointipalveluistaan, josta löytyy Spa, wellness, rentoutumis ja hemmottelu palveluita niin lomailijoille 
+    kuin aktiiviurheilijoille.
+  </p>
+
+  <h3>Tapahtumat</h3>
+  <p>
+    Levillä järjestetään ympäri vuoden erilaisia tapahtumia – urheilukilpailuista 
+    musiikkitapahtumiin. Tunnelma on usein nuorekas, energinen ja 
+    kansainvälinen.
+  </p>
+
+`
+},
+    { name: 'Ylläs', lat: 67.57, lon: 24.20, url: 'https://yllas.fi/', icon: 'yllas.png', short: 'Ylläs - Suomen suurin hiihtokeskus', description: `
+  <h2>Ylläs – Tunturien rauhaa ja Lapin upeita elämyksiä</h2>
+
+  <p>
+    Ylläs sijaitsee Kolarin kunnassa, Lapissa, ja se on yksi Suomen 
+    tunnetuimmista talvi- ja luontomatkailukohteista. Alue koostuu kahdesta 
+    tunnelmallisesta kylästä: Äkäslompulosta ja Ylläsjärvestä, jotka tarjoavat 
+    aidon lappilaisen ympäristön ja upeat tunturimaisemat.
+  </p>
+
+  <h3>Mikä tekee Ylläksestä erityisen?</h3>
+
+  <h4>1. Suomen suurimmat rinne- ja hiihtoalueet</h4>
+  <p>
+    Ylläs tunnetaan laajoista ja monipuolisista laskettelurinteistään. Alueelta 
+    löytyy Suomen pisimmät rinteet sekä kattava latuverkosto, josta osa kulkee 
+    upeissa Pallas–Yllästunturin kansallispuiston maisemissa.
+  </p>
+
+  <h4>2. Kansallispuiston läheisyys</h4>
+  <p>
+    Ylläs toimii porttina yhteen Suomen kauneimmista kansallispuistoista. 
+    Pallas–Yllästunturin kansallispuisto tarjoaa kymmeniä kilometrejä 
+    merkittyjä vaellusreittejä, henkeäsalpaavat ruska- ja kesämaisemat 
+    sekä erinomaiset mahdollisuudet retkeilyyn ja marjastukseen.
+  </p>
+
+  <h4>3. Talvikauden elämykset</h4>
+  <ul>
+    <li>Husky- ja porosafarit</li>
+    <li>Moottorikelkkailu</li>
+    <li>Lumikenkäily ja fatbike-pyöräily</li>
+    <li>Revontuliretket ja valokuvauskurssit</li>
+  </ul>
+
+  <h4>4. Aito lappilainen hiljaisuus</h4>
+  <p>
+    Ylläs tarjoaa rauhallisemman ja luonnonläheisemmän tunnelman kuin monet 
+    vilkkaammat Lapin kohteet. Se on täydellinen paikka niille, jotka etsivät 
+    hiljaisuutta, puhdasta tunturi-ilmaa ja aitoja lappilaisia kokemuksia.
+  </p>
+
+  <h4>5. Kesän ja syksyn aktiviteetit</h4>
+  <p>
+    Ylläs on suosittu kohde myös talven ulkopuolella. Kesällä ja ruska-aikaan 
+    siellä voi patikoida tuntureilla, pyöräillä monipuolisilla reiteillä, 
+    kalastaa, meloa sekä nauttia Lapin yöttömästä yöstä.
+  </p>
+
+  <h4>6. Kylien palvelut</h4>
+  <p>
+    Äkäslompulon ja Ylläsjärven kylät tarjoavat kattavat palvelut: 
+    majoitusvaihtoehtoja mökeistä hotelleihin, ravintoloita, kauppoja, 
+    välinevuokraamoja sekä paikallisia tapahtumia ja kulttuuria.
+  </p>
+
+  <p>
+    Ylläs on täydellinen kohde niille, jotka etsivät yhdistelmää 
+    luonnon rauhaa, tunturien kauneutta ja monipuolisia aktiviteetteja 
+    ympäri vuoden.
+  </p>`
+
+ }
 ];
 
 let markersLayer;
