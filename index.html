@@ -9,7 +9,6 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <header class="banner">
   <!-- Piilotettu sivun otsikko hakukoneille -->
   <h1 id="page-title" style="position:absolute; left:-9999px;">RepoTracker – Seuraa revontulia reaaliajassa</h1>
@@ -28,26 +27,27 @@
       <img src="tiktok.png" alt="TikTok" class="icon">
     </a>
     <a href="https://www.buymeacoffee.com/repotracker" target="_blank">
-      <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" style="height:40px;width:auto;">
+      <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" class="icon">
     </a>
   </div>
 
-  <!-- Kielen vaihtopainikkeet -->
+  <!-- Kielen valinta -->
   <div class="language-switch">
     <button onclick="setLanguage('fi')">Suomi</button>
     <button onclick="setLanguage('en')">English</button>
   </div>
 
-  <!-- Menu-nappi mobiilille -->
+  <!-- Hamburger / menu mobiilille -->
   <div id="menu-btn" class="hamburger">&#9776;</div>
 </header>
 
-<!-- Navigointilinkit / napit kartalle -->
+<!-- Navigointi / napit kartalle -->
 <nav>
   <a href="#" id="locate-btn">Locate Me</a>
   <a href="#" id="forecast-btn">Forecast</a>
   <a href="#" id="show-help">Help</a>
 </nav>
+
 
 <!-- Help Popup -->
 <div id="help-popup" class="popup" style="display:none;">
