@@ -11,34 +11,43 @@
 <body>
 
 <header class="banner">
+  <!-- Piilotettu sivun otsikko hakukoneille -->
   <h1 id="page-title" style="position:absolute; left:-9999px;">RepoTracker – Seuraa revontulia reaaliajassa</h1>
-  <div id="menu-btn">☰</div>
 
+  <!-- Vasemman puolen logo -->
+  <div class="banner-left">
+    <img src="repo-neon.png" alt="RepoTracker Logo" class="logo">
+  </div>
+
+  <!-- Oikean puolen ikonit -->
+  <div class="banner-right">
+    <a href="https://instagram.com/repotracker_" target="_blank">
+      <img src="ig-icon.png" alt="Instagram" class="icon">
+    </a>
+    <a href="https://www.tiktok.com/@repotracker" target="_blank">
+      <img src="tiktok.png" alt="TikTok" class="icon">
+    </a>
+    <a href="https://www.buymeacoffee.com/repotracker" target="_blank">
+      <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" style="height:40px;width:auto;">
+    </a>
+  </div>
+
+  <!-- Kielen vaihtopainikkeet -->
   <div class="language-switch">
     <button onclick="setLanguage('fi')">Suomi</button>
     <button onclick="setLanguage('en')">English</button>
   </div>
 
-  <div class="banner-left">
-    <img src="repo-neon.png" alt="RepoTracker Logo" class="logo">
-  </div>
-
-  <div class="banner-right">
-    <a href="https://instagram.com/repotracker_" target="_blank"><img src="ig-icon.png" alt="Instagram" class="icon"></a>
-    <a href="https://www.tiktok.com/@repotracker" target="_blank"><img src="tiktok.png" alt="TikTok" class="icon"></a>
-    <a href="https://www.buymeacoffee.com/repotracker" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" style="height:40px;width:auto;"></a>
-  </div>
+  <!-- Menu-nappi mobiilille -->
+  <div id="menu-btn" class="hamburger">&#9776;</div>
 </header>
 
- <div class="logo">
-    <h1>Northern Lights</h1>
-  </div>
-  <nav>
-    <a href="#" id="locate-btn">Locate Me</a>
-    <a href="#" id="forecast-btn">Forecast</a>
-    <a href="#" id="show-help">Help</a>
-    <a href="#" id="menu-toggle" class="hamburger">&#9776;</a>
-  </nav>
+<!-- Navigointilinkit / napit kartalle -->
+<nav>
+  <a href="#" id="locate-btn">Locate Me</a>
+  <a href="#" id="forecast-btn">Forecast</a>
+  <a href="#" id="show-help">Help</a>
+</nav>
 
 <!-- Help Popup -->
 <div id="help-popup" class="popup" style="display:none;">
