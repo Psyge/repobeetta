@@ -376,34 +376,31 @@ function ensureChartJs() {
 // ------------------------
 async function fetchAuroraForecast() {
   try {
-    const response = await fetch('https://services.swpc.noaa.gov/text/3-day-forecast.txt', { cache: 'no-cache' });
+    const response = await fetch('https://services.swpc.noaa.gov/text/3-day-forecast.txt');
     if (!response.ok) throw new Error(`Verkkovirhe: ${response.status}`);
     const text = await response.text();
-
-    const today = new Date();
+    const today = new Date(); 
     const dayLabels = [];
-    for (let i = 0; i < 3; i++) {
-      const d = new Date(today);
-      d.setDate(today.getDate() + i);
-      dayLabels.push(d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }));
+    for (let i = 0; i < 3; i++) { 
+      const d = new Date(today); d.setDate(today.getDate() + i); 
+      dayLabels.push(d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })); 
     }
 
     const kpRegex = /[ \t]*(\d{2}-\d{2}UT)[ \t]+([\d\.\(\)G \t]+)/g;
-    const times = [], day1 = [], day2 = [], day3 = [];
+    const times = [], day1 = [], day2 = [], day3 = []; 
     let match;
     while ((match = kpRegex.exec(text)) !== null) {
       const time = match[1].trim();
       const clean = match[2].replace(/\(G\d\)/g, '').replace(/[ \t]+/g, ' ').trim();
       const values = clean.split(' ').map(Number);
-      if (values.length === 3 && values.every((v) => !isNaN(v))) {
-        times.push(time); day1.push(values[0]); day2.push(values[1]); day3.push(values[2]);
+      if (values.length === 3 && values.every(v => !isNaN(v))) { 
+        times.push(time); day1.push(values[0]); day2.push(values[1]); day3.push(values[2]); 
       }
     }
-    if (times.length === 0) throw new Error('Kp values not found.');
+    if (times.length === 0) throw new Error("Kp values not found.");
 
-    const ctxElement = document.getElementById('kpChart');
-    if (!ctxElement || !window.Chart) return; // Chart.js ei käytettävissä
-
+    const ctxElement = document.getElementById('kpChart'); 
+    if (!ctxElement) return;
     const ctx = ctxElement.getContext('2d');
     new Chart(ctx, {
       type: 'line',
@@ -419,23 +416,12 @@ async function fetchAuroraForecast() {
         responsive: true,
         plugins: {
           title: { display: true, text: 'Northern Lights forecast (NOAA)' },
-          tooltip: {
-            callbacks: {
-              label: function (context) {
-                const kp = context.parsed.y;
-                if (kp >= 5) return `Kp ${kp} - High chance`;
-                if (kp >= 3) return `Kp ${kp} - Moderate chance`;
-                return `Kp ${kp} - Low chance`;
-              }
-            }
-          }
+          tooltip: { callbacks: { label: function(context) { const kp = context.parsed.y; if (kp >= 5) return `Kp ${kp} - High chance`; if (kp >= 3) return `Kp ${kp} - Moderate chance`; return `Kp ${kp} - Low chance`; } } }
         },
-        scales: {
-          y: { min: 0, max: 9, title: { display: true, text: 'Kp Index' } },
-          x: { title: { display: true, text: 'UT Time (3h intervals)' } }
-        }
+        scales: { y: { min: 0, max: 9, title: { display: true, text: 'Kp Index' } }, x: { title: { display: true, text: 'UT Time (3h intervals)' } } }
       }
     });
+
 
   } catch (error) {
     console.error('Error fetching NOAA forecast:', error);
