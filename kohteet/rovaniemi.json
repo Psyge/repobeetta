@@ -1,30 +1,10 @@
+
 {
-name: 'Rovaniemi', lat: 66.5, lon: 25.7, url: 'https://visitrovaniemi.fi', icon: 'roic.png',  short: 'Rovaniemi on Lapin pääkaupunki ja Joulupukin virallinen kotikaupunki.', 
-     description: `
-        <h2>Rovaniemi – Lapin pääkaupunki ja joulupukin koti</h2>
-
-  <p>
-    Rovaniemi on elinvoimainen kaupunki Suomen Lapissa, aivan Napapiirin tuntumassa. Kaupunki sijaitsee hyvien kulkuyhteyksien varrella – Rovaniemelle pääsee kätevästi sekä lentäen että junalla. Rovaniemeä pidetään yleisesti Lapin pääkaupunkina, ja se toimii koko pohjoisen Suomen tärkeänä hallinnollisena, kaupallisena ja kulttuurisena keskuksena.
-  </p>
-
-  <p>
-    Rovaniemi tunnetaan kansainvälisesti joulupukin virallisena kotipaikkana, mikä tekee siitä yhden Suomen suosituimmista matkailukohteista. Erityisesti talvikuukausina turistit saapuvat ympäri maailmaa kokemaan Lapin taian ja ainutlaatuiset elämykset.
-  </p>
-<p>Yksi Rovaniemellä vierailevien suosikkikokemuksista on Napapiirin ylittäminen. Napapiiri kulkee kaupungin halki, ja sen voi ylittää esimerkiksi Joulupukin Pajakylässä, jossa raja on merkitty selkeästi maastoon. Napapiirin ylitys on monille matkailijoille unohtumaton hetki – se symboloi siirtymistä arktiselle alueelle.</p>
-
-  <h3>Talvella suosituimpia aktiviteetteja on:</h3>
-  <ul>
-    <li>Poro- ja huskyajelut</li>
-    <li>Moottorikelkkasafarit</li>
-    <li>Revontuliretket</li>
-    <li>Laskettelu, lumilautailu ja hiihtäminen Ounasvaaralla</li>
-    <li>Jääveistokset, iglut ja muut lumiaktiviteetit</li>
-    <li>Vierailut Joulupukin Pajakylässä ja Santa Parkissa</li>
-  </ul>
-
-  <h3>Tekemistä ympäri vuoden</h3>
-  <p>
-    Vaikka Rovaniemi on erityisen suosittu talvikohde, tarjoaa kaupunki runsaasti nähtävää ja koettavaa myös muina vuodenaikoina. Rovaniemellä voi tutustua upeisiin luontopoluihin, vierailla mielenkiintoisissa museoissa kuten Arktikum ja Pilke, sekä nauttia vilkkaasta kulttuuri- ja tapahtumatarjonnasta.
-  </p>
-    ` 
+  "name": "Rovaniemi",
+  "lat": 66.5,
+  "lon": 25.7,
+  "url": "https://visitrovaniemi.fi",
+  "icon": "roic.png",
+  "short": "Rovaniemi – Lapin pääkaupunki ja Joulupukin virallinen kotikaupunki",
+  "descriptionFile": "rovaniemi.html"
 }
