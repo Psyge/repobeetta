@@ -122,6 +122,17 @@ function showPlaceInfo(place) {
 // Karttaklikki → popup
 // ---------------------
 async function onMapClick(e) {
+  
+const t = e.originalEvent?.target;
+  if (t && (t.closest('#forecast-btn')
+         || t.closest('#close-forecast')
+         || t.closest('#forecast-popup')
+         || t.closest('#menu-btn')
+         || t.closest('#menu')
+         || t.closest('#locate-btn'))) {
+    return; // älä käsittele tätä karttaklkkina
+  }
+
   const lat = e.latlng.lat;
   const lon = e.latlng.lng;
   await showAuroraPopup(lat, lon, null, true);
@@ -213,6 +224,7 @@ async function showAuroraPopup(lat, lon, marker = null, showGoogleMapsLink = tru
 // ------------------------
 // UI-painikkeiden init
 // ------------------------
+
 function initButtons() {
   const helpPopup = document.getElementById('help-popup');
   const closePopupBtn = document.getElementById('close-popup');
@@ -239,31 +251,58 @@ function initButtons() {
 
   const menuBtn = document.getElementById('menu-btn');
   const menu = document.getElementById('menu');
+  const forecastBtn = document.getElementById('forecast-btn');
+  const forecastPopup = document.getElementById('forecast-popup');
+  const closeForecast = document.getElementById('close-forecast');
+  const locateBtn = document.getElementById('locate-btn');
+
+  // 🔒 Estä kuplinta kaikista UI-kontrolleista, jotta kartta ei saa niiden klikkejä
+  [menuBtn, menu, forecastBtn, forecastPopup, closeForecast, locateBtn, helpPopup, closePopupBtn, showHelpLink]
+    .filter(Boolean)
+    .forEach(el => {
+      // DOM-tasolla
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+
+      // Leaflet-tasolla
+      if (typeof L !== 'undefined') {
+        L.DomEvent.disableClickPropagation(el);
+        L.DomEvent.disableScrollPropagation(el);
+      }
+    });
+
+  // Menu toggle
   if (menuBtn && menu) {
     menuBtn.addEventListener('click', () => {
       menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
     });
   }
 
-  const forecastBtn = document.getElementById('forecast-btn');
-  const forecastPopup = document.getElementById('forecast-popup');
-  const closeForecast = document.getElementById('close-forecast');
+  // “Can I see” –popup (ennallaan, mutta suojattu)
   if (forecastBtn && forecastPopup) {
-    forecastBtn.addEventListener('click', async () => {
+    forecastBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       forecastPopup.style.display = 'flex';
       await ensureChartJs();
       fetchAuroraForecast();
     });
   }
   if (closeForecast && forecastPopup) {
-    closeForecast.addEventListener('click', () => {
+    closeForecast.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       forecastPopup.style.display = 'none';
     });
   }
 
-  const locateBtn = document.getElementById('locate-btn');
+  // Geolokaatio (lisätty stopPropagation varmuuden vuoksi)
   if (locateBtn) {
-    locateBtn.addEventListener('click', async () => {
+    locateBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       if (!navigator.geolocation) {
         alert('Geolocation not supported in this browser.');
         return;
@@ -282,6 +321,7 @@ function initButtons() {
     });
   }
 }
+
 
 // ------------------------
 // NOAA (Ovation) overlay
