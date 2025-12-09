@@ -10,93 +10,106 @@
 </head>
 <body>
 <header class="banner">
-  <!-- Piilotettu sivun otsikko hakukoneille -->
-  <h1 id="page-title" style="position:absolute; left:-9999px;">RepoTracker – Seuraa revontulia reaaliajassa</h1>
+  <h1 style="position:absolute; left:-9999px;">RepoTracker – Track the Northern Lights in real time</h1>
+  <div id="menu-btn">☰</div>
 
-  <!-- Vasemman puolen logo -->
   <div class="banner-left">
-    <img src="repo-neon.png" alt="RepoTracker Logo" class="logo">
+    <img src="images/repo-neon.png" alt="RepoTracker Logo" class="logo">
   </div>
 
-  <!-- Oikean puolen ikonit -->
   <div class="banner-right">
-    <a href="https://instagram.com/repotracker_" target="_blank">
-      <img src="ig-icon.png" alt="Instagram" class="icon">
+    <a href="https://instagram.com/repotracker_" target="_blank" class="social-btn instagram">
+      <img src="images/ig-icon.png" alt="Instagram" class="icon">
     </a>
     <a href="https://www.tiktok.com/@repotracker" target="_blank">
-      <img src="tiktok.png" alt="TikTok" class="icon">
+    <img src="images/tiktok.png" alt="Seuraa TikTokissa" class="icon">
     </a>
-    <a href="https://www.buymeacoffee.com/repotracker" target="_blank">
-      <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" class="icon">
-    </a>
-  </div>
+ <a href="https://www.buymeacoffee.com/repotracker" target="_blank">
+    <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" style="height: 50px; width: auto;"></a>
 
-  <!-- Kielen valinta -->
-  <div class="language-switch">
-    <button onclick="setLanguage('fi')">Suomi</button>
-    <button onclick="setLanguage('en')">English</button>
   </div>
+  
+<nav id="menu">
+  <a href="index.html">Front page</a>
+  <a href="/faq/">FAQ</a>
+  <a href="/contact/">Contact / Feedback</a>
+ </nav>
 
-  <!-- Hamburger / menu mobiilille -->
-  <div id="menu-btn" class="hamburger">&#9776;</div>
 </header>
 
-<!-- Navigointi / napit kartalle -->
-<nav>
-  <a href="#" id="locate-btn">Locate Me</a>
-  <a href="#" id="forecast-btn">Forecast</a>
-  <a href="#" id="show-help">Help</a>
-</nav>
-
-
+<div id="container">
+  <div id="map">
+  <button id="locate-btn">Can I See Northern Lights now?</button>
+  <button id="markers-btn">Show markers</button>  
+  <button id="forecast-btn">3 Day Forecast</button>  
+  </div>
+</div>
 
 
 <div id="forecast-popup" class="popup" style="display:none;">
   <div class="popup-content">
-    <h2 id="forecast-title">Northern Lights forecast (NOAA)</h2>
+    <h2>Northern Lights forecast (NOAA)</h2>
     <canvas id="kpChart" width="280" height="180"></canvas>
-    <div class="kp-legend">
-      <p id="kp-low"><span class="kp-dot" style="color:green;">●</span> Kp 0–2: No northern lights</p>
-      <p id="kp-mid"><span class="kp-dot" style="color:orange;">●</span> Kp 3–4: Opportunity to see Lapland</p>
-      <p id="kp-high"><span class="kp-dot" style="color:red;">●</span> Kp 5 or more: Widely visible</p>
+    
+<div class="kp-legend">
+      <p><span class="kp-dot" style="color:green;">●</span> Kp 0–2: No northern lights</p>
+      <p><span class="kp-dot" style="color:orange;">●</span> Kp 3–4: Opportunity to see Lapland</p>
+      <p><span class="kp-dot" style="color:red;">●</span> Kp 5 or more: Widely visible</p>
     </div>
+
+ 
     <button id="close-forecast">Close</button>
   </div>
 </div>
-<div id="container">
-  <div id="map"></div>
-</div>
+
+  
 <div id="info" class="loading">⏳ Loading northern lights forecast...</div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <section id="aurora-info" class="aurora-section">
     <div id="aurora-default">
-        <h1>Revontuliennuste ja reaaliaikainen aurorakartta – RepoTracker</h1>
+    <h2>Northern Lights forecast and real-time aurora map – RepoTracker</h2>
 
-        <p>
-            RepoTracker näyttää revontulet reaaliajassa Suomen ja Pohjoismaiden alueella.
-            Kartta kertoo, missä revontulet näkyvät juuri nyt ja lähituntien aikana.
-        </p>
+    <p>
+        RepoTracker shows the Northern Lights in real time in Finland and the Nordic countries.
+        The map shows where the Northern Lights are visible right now and in the coming hours.
+</p>
+  <p>Click anywhere on the map or use the "Can i see the Northern Lights" -button to see the aurora forecast for that location.<br>
+  Note: Cloud cover can affect visibility even if aurora activity is strong.
+  </p>
 
-        <h2>Miten RepoTrackerin ennuste toimii?</h2>
-        <p>
-            RepoTracker yhdistää geomagneettiset mittaukset, aurinkotuulen nopeuden,
-            Kp-indeksin ja pilvisyysdatan yhdeksi selkeäksi näkymäksi.
-        </p>
+<h2>How does the RepoTracker forecast work?</h2>
+<p>
+RepoTracker combines geomagnetic measurements, solar wind speed,
+        the Kp index, and cloud cover data into one clear view.
+</p>
 
-        <h2>Näin luet aurorakarttaa</h2>
-        <p>
-            Kartan värit näyttävät revontulten todennäköisyyden ja voimakkuuden…
-        </p>
-    </div>
+<h2>How to read the aurora map</h2>
+<p>
+The colors on the map indicate the probability and intensity of the northern lights:
+        red (weak), yellow/orange (good chance), and green
+        (very strong activity) and indicate a higher probability.
+        Cloud cover may obstruct visibility.
+    </p>
 
-    <!-- Tänne markkerin tiedot tulevat -->
-    <div id="place-info" style="display:none;"></div>
+    <h2>Best time to see the Northern Lights</h2>
+    <p>
+        The Northern Lights occur most often from September to March, especially between 9 p.m. and 2 a.m.
+        Clear skies, high solar wind speeds, and low light pollution significantly improve
+        the chances of seeing them.
+</p>
+    </div>      
+<div id="place-info" style="display:none;"></div>
 </section>
 
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="language.js"></script>
+<!-- Kartta ja NOAA-data -->
 <script src="script.js"></script>
+
+<!-- Markerit -->
 <script src="markers.js"></script>
+
 
 </body>
 </html>
