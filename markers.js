@@ -51,7 +51,7 @@
         className: 'custom-marker',
         html: `
           <div class="marker-wrapper">
-            images/pinni.png
+            pinni.png
             ${place.icon}
           </div>
         `,
