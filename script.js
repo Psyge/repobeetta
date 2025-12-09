@@ -295,7 +295,7 @@ async function showAuroraPopup(lat, lon, marker = null, showGoogleMapsLink = tru
 
   if (showGoogleMapsLink) {
     popupContent += `<br><strong>Coordinates:</strong> ${lat.toFixed(4)}, ${lon.toFixed(4)}<br>
-      https://www.google.com/maps?q=${lat},${lon}Open in Google Maps</a>`;
+      <a href="https://www.google.com/maps?q=${lat},${lon}">Open in Google Maps</a>`;
   }
 
   if (marker) {
