@@ -99,11 +99,7 @@
           const weather = await (getWeatherFn || getWeatherGlobal)(place.lat, place.lon);
           if (weather) {
             weatherBox.innerHTML = `
-              <div class="weather-row">
-                https://openweathermap.org/img/wn/${weather.icon}.png
-                <span>${weather.temp}°C — ${weather.desc}</span>
-              </div>
-              <small>Feels like ${weather.feels}°C | Wind ${weather.wind} m/s</small>
+              <div class="weather-row"><img src="https://openweathermap.org/img/wn/${weather.icon}.png"><span>${weather.temp}°C — ${weather.desc}</span></div><small>Feels like ${weather.feels}°C | Wind ${weather.wind} m/s</small>
             `;
           } else {
             weatherBox.textContent = 'Weather not available';
