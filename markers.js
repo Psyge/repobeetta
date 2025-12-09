@@ -61,7 +61,7 @@
 
       const popupContent = `
         <div class="popup-header">
-          ${place.icon}
+          <img src="${place.icon}" alt="${place.name}">
           <strong class="popup-title">${place.name}</strong>
         </div>
 
@@ -69,7 +69,7 @@
           ${place.short || ''}
         </div>
 
-        #Read more</a>
+        <a href="#" class="read-more" data-place="${place.name}">Read more</a>
 
         <div class="weather-box" style="margin-top:10px;">
           <em>Retrieving weather data...</em>
