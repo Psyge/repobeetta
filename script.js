@@ -23,6 +23,47 @@ async function getWeather(lat, lon) {
   }
 }
 
+async function loadPlaces() {
+  try {
+    const res = await fetch('kohteet/index.json', { cache: 'no-cache' });
+    if (!res.ok) throw new Error('index.json ei löydy');
+    const manifest = await res.json();
+    const files = Array.isArray(manifest.files) ? manifest.files : [];
+
+    const loaded = await Promise.all(files.map(async (file) => {
+      const metaRes = await fetch(`kohteet/${file}`, { cache: 'no-cache' });
+      if (!metaRes.ok) throw new Error(`Virhe ladattaessa ${file}`);
+      const meta = await metaRes.json();
+
+      
+let description = meta.description || '';
+      if (!description && meta.descriptionFile) {
+        const htmlRes = await fetch(`kohteet/${meta.descriptionFile}`, { cache: 'no-cache' });
+        description = htmlRes.ok ? await htmlRes.text() : '';
+      }
+
+      return {
+        name: meta.name,
+        lat: meta.lat,
+        lon: meta.lon,
+        url: meta.url || '',
+        icon: meta.icon || 'images/iconi.png',
+        short: meta.short || '',
+        description: description || '',
+        stream: meta.stream || '',
+        streamWidth: meta.streamWidth || 0,
+        streamHeight: meta.streamHeight || 0
+      };
+    }));
+
+    return loaded;
+  } catch (e) {
+    console.error('Paikkojen lataus epäonnistui:', e);
+    return [];
+  }
+}
+
+
 // --- Show place info ---
 
 function showPlaceInfo(place) {
