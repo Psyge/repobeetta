@@ -1,381 +1,204 @@
+ body, html {
+          margin: 0;
+          padding: 0;
+          height: 100%;
+          background: #000 url('revontulet.png') no-repeat center top;
+          background-size: cover;
+          background-attachment: fixed;
+          font-family: 'Segoe UI', Arial, sans-serif;
+          color: #fff;
+          overflow-x: hidden;
+        }
 
-/* ------------------------------
-  Yleiset asetukset
---------------------------------*/
-body, html {
-  margin: 0;
-  padding: 0;
-  min-height: 100%;
-  background: #000 url('revontulet.png') no-repeat center top;
-  background-size: cover;
-  background-attachment: fixed;
-  font-family: 'Segoe UI', Arial, sans-serif;
-  color: #fff;
-}
+        a {
+          text-decoration: none;
+          color: inherit;
+        }
 
-a {
-  text-decoration: none;
-  color: inherit;
-}
+        /* ------------------------------
+          Banner / Header
+        --------------------------------*/
+        header.banner {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100px;
+          background: url('revontulet.png') no-repeat center bottom;
+          background-size: cover;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0 20px;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+          z-index: 1000;
+        }
 
-/* ------------------------------
-  Banner / Header
---------------------------------*/
-header.banner {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100px;
-  background: url('revontulet.png') no-repeat center bottom;
-  background-size: cover;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-  z-index: 1000;
-}
+        header.banner::after {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 15px;
+          background: linear-gradient(to bottom, rgba(30,136,229,1), rgba(30,136,229,0));
+          pointer-events: none;
+        }
 
-/* Vain ohut hehku/gradientti; EI layout-ominaisuuksia tähän */
-header.banner::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 15px;
-  background: linear-gradient(to bottom, rgba(30,136,229,1), rgba(30,136,229,0));
-  pointer-events: none; /* tärkeä: ei estä klikkauksia */
-}
+        .banner-left .logo h1 {
+          margin: 0;
+          font-size: 1.8rem;
+          font-weight: 700;
+          color: #00ffcc;
+        }
 
-/* Logo */
-.banner-left .logo {
-  height: 80px;
-}
-.banner-left .logo h1 {
-  margin: 0;
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #00ffcc;
-}
+        .banner-right {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          padding-right: 40px;
+        }
 
-/* Oikean puolen ikonit / napit */
-.banner-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.banner-right img,
-.banner-right .icon {
-  height: 32px;
-  width: 32px;
-  filter: drop-shadow(0 0 4px rgba(0,0,0,0.4));
-  transition: transform 0.2s ease;
-}
-.banner-right img.icon {
-  height: 36px;
-}
-.banner-right img:hover,
-.banner-right .icon:hover {
-  transform: scale(1.1);
-}
+        .banner-right img, .banner-right .icon {
+          height: 32px;
+          width: 32px;
+          filter: drop-shadow(0 0 4px rgba(0,0,0,0.4));
+          transition: transform 0.2s ease;
+          cursor: pointer;
+        }
 
-/* Kieli-valinta */
-.language-switch button {
-  margin-left: 8px;
-  padding: 4px 8px;
-  background: rgba(255,255,255,0.2);
-  border: none;
-  color: white;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-}
-.language-switch button:hover {
-  background: rgba(255,255,255,0.4);
-}
+        .banner-right img:hover { transform: scale(1.1); }
 
-/* Hamburger / mobiili menu */
-.hamburger {
-  display: none;
-  font-size: 28px;
-  cursor: pointer;
-  color: white;
-}
+        /* ------------------------------
+          Navigaatio
+        --------------------------------*/
+        nav {
+          position: fixed;
+          top: 100px;
+          left: 0;
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          gap: 20px;
+          z-index: 900;
+          padding: 10px 0;
+        }
+        nav a {
+          padding: 8px 16px;
+          border-radius: 4px;
+          background: rgba(0,0,0,0.6);
+          font-weight: bold;
+          transition: 0.3s;
+          border: 1px solid rgba(0, 255, 204, 0.2);
+        }
+        nav a:hover {
+          background: rgba(0,255,204,0.2);
+          color: #00ffcc;
+        }
 
-/* ================== NAV ================== */
-nav {
-  position: fixed;
-  top: 100px; /* bannerin alapuolelle */
-  left: 0;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  z-index: 900;
-}
-nav a {
-  text-decoration: none;
-  color: white;
-  font-weight: bold;
-  padding: 8px 12px;
-  border-radius: 4px;
-  background: rgba(0,0,0,0.4);
-  transition: background 0.3s, color 0.3s;
-}
-nav a:hover {
-  background: rgba(0,255,204,0.2);
-  color: #00ffcc;
-}
+        /* ------------------------------
+          Kartta & Toiminnot
+        --------------------------------*/
+        #map {
+          width: 100%;
+          height: 100vh; /* Täysi korkeus, koska sivu on sovellusmainen */
+          position: absolute;
+          top: 0;
+          left: 0;
+          z-index: 1;
+        }
 
-/* ------------------------------
-  Kartta
---------------------------------*/
-#map {
-  width: 100%;
-  height: 55vh;
-  margin-top: 100px; /* bannerin korkeus */
-  position: relative;
-  z-index: 1;
-}
+        /* Alkuperäinen info-paneeli sovitettuna uuteen tyyliin */
+        .info-panel {
+            position: absolute; 
+            top: 160px; /* Navin alapuolelle */
+            left: 20px;
+            background: rgba(10, 15, 25, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 15px; border-radius: 12px;
+            color: #ffffff; border: 1px solid rgba(0, 255, 204, 0.3);
+            z-index: 500; min-width: 180px;
+        }
 
-/* Info-paneeli */
-#info {
-  position: absolute;
-  top: 190px;
-  left: 10px;
-  z-index: 500;
-  color: white;
-  background: rgba(0,0,0,0.5);
-  padding: 5px 10px;
-  border-radius: 5px;
-}
+        .label { font-size: 10px; color: #00ffcc; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 4px; }
+        .kp-badge { font-size: 22px; font-weight: 800; color: #00ffcc; display: flex; align-items: center; gap: 8px; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #00ffcc; }
 
-/* ------------------------------
-  Napit
---------------------------------*/
-#locate-btn, #forecast-btn, #menu-btn {
-  position: absolute;
-  z-index: 1001; /* yli headerin (1000) */
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 8px 12px;
-  border: none;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  transition: all 0.2s ease;
-}
+        /* Napit uuden CSS:n tyylillä */
+        #locate-btn, #forecast-btn {
+            position: absolute;
+            z-index: 1001;
+            padding: 10px 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            border: none;
+            transition: 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
 
-/* “Can I see Northern Lights?” – oletan että tämä on #forecast-btn */
-#forecast-btn {
-  top: 90px;
-  right: 10px;
-  background: #fff;
-  color: #000;
-  border: 1px solid #ccc;
-}
-#forecast-btn:hover {
-  background: #e0e0e0;
-}
+        #forecast-btn {
+            bottom: 40px; left: 50%; transform: translateX(-50%);
+            background: #00ffcc; color: #000;
+        }
+        #locate-btn {
+            bottom: 40px; right: 20px;
+            background: #1e88e5; color: white;
+        }
 
-#locate-btn {
-  top: 20px;
-  right: 10px;
-  background: #1e88e5;
-  color: white;
-}
-#locate-btn:hover {
-  background: #1565c0;
-}
+        /* Markerit (Annettu CSS) */
+        .marker-wrapper {
+          position: relative;
+          width: 32px;
+          height: 48px;
+          animation: float 2s infinite;
+        }
+        .marker-wrapper img.pin {
+          width: 32px !important;
+          height: 48px !important;
+        }
+        .marker-wrapper img.pin-icon {
+          position: absolute;
+          top: 7px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 18px !important;
+          height: 18px !important;
+          border-radius: 50%;
+          background: white;
+        }
+        @keyframes float {
+          0% { transform: translateY(0); }
+          50% { transform: translateY(-5px); }
+          100% { transform: translateY(0); }
+        }
 
-#menu-btn {
-  top: 30px;
-  left: 20px;
-  font-size: 24px;
-  color: white;
-}
-#menu-btn:hover {
-  color: #cce4ff;
-}
+        .custom-popup .leaflet-popup-content-wrapper { 
+            background: rgba(10, 15, 25, 0.95); 
+            color: white; 
+            border: 1px solid #00ffcc; 
+            border-radius: 12px; 
+        }
 
-/* Menu */
-#menu {
-  display: none;
-  position: fixed;
-  top: 100px;
-  left: 0;
-  background: rgba(30,136,229,0.95);
-  width: 220px;
-  flex-direction: column;
-  padding: 10px 0;
-  z-index: 7000;
-}
-#menu a {
-  display: block;
-  padding: 12px 20px;
-  color: white;
-}
-#menu a:hover {
-  background: rgba(255,255,255,0.15);
-}
+        #forecast-popup {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(10, 15, 25, 0.98); padding: 30px; border-radius: 20px;
+            z-index: 2000; color: white; width: 80%; max-width: 600px; border: 1px solid #00ffcc;
+            flex-direction: column;
+        }
 
-/* ------------------------------
-  Markerit & pop-upit
---------------------------------*/
-.marker-wrapper {
-  position: relative;
-  width: 32px;
-  height: 48px;
-  animation: float 2s infinite;
-}
-.marker-wrapper img.pin {
-  width: 32px !important;
-  height: 48px !important;
-}
-.marker-wrapper img.pin-icon {
-  position: absolute;
-  top: 4px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 20px !important;
-  height: 20px !important;
-  border-radius: 50%;
-  background: white;
-  padding: 2px;
-  box-shadow: 0 0 2px rgba(0,0,0,0.3);
-}
-@keyframes float {
-  0% { transform: scale(0.9); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(0.9); }
-}
+        #place-info { 
+            display: none; 
+            position: fixed; top: 160px; right: 20px;
+            background: rgba(10, 15, 25, 0.95); color: white; padding: 25px; 
+            border-radius: 15px; border: 1px solid #00ffcc; z-index: 1002;
+            max-width: 350px;
+        }
 
-.custom-popup .leaflet-popup-content-wrapper {
-  width: 280px !important;
-  max-width: 280px !important;
-}
-.custom-popup .leaflet-popup-content {
-  width: auto !important;
-  padding: 0;
-  text-align: center;
-}
-
-/* ------------------------------
-  FAQ ja aurora-sectiot
---------------------------------*/
-#revontuli-faq,
-.aurora-section,
-#northern-lights-faq {
-  max-width: 900px;
-  margin: 120px auto 40px auto;
-  padding: 20px;
-  background: rgba(0,0,0,0.8);
-  color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-}
-
-#revontuli-faq h2 {
-  font-size: 28px;
-  text-align: center;
-  color: #1e88e5;
-  margin-bottom: 20px;
-}
-.faq-item {
-  margin-bottom: 20px;
-  padding: 15px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 6px;
-  transition: background 0.3s ease;
-}
-.faq-item:hover {
-  background: rgba(255,255,255,0.15);
-}
-.faq-item h3 {
-  font-size: 20px;
-  margin-bottom: 8px;
-  color: #cce4ff;
-}
-.faq-item p,
-.faq-item ul {
-  font-size: 16px;
-  line-height: 1.5;
-}
-.faq-item ul {
-  margin: 8px 0 0 20px;
-}
-.faq-item li {
-  margin-bottom: 4px;
-}
-.faq-img {
-  width: 100%;
-  max-width: 600px;
-  border-radius: 8px;
-  margin: 10px 0;
-  display: block;
-}
-
-.aurora-section h1 {
-  font-size: 2rem;
-  margin-bottom: 20px;
-  color: #fff;
-}
-.aurora-section h2 {
-  margin-top: 10px;
-  color: #a8e1ff;
-}
-.aurora-section p {
-  margin-bottom: 15px;
-  font-size: 1rem;
-}
-
-/* ------------------------------
-  Mobiili / responsive
---------------------------------*/
-@media (max-width: 768px) {
-  header.banner {
-    flex-direction: row;
-    justify-content: space-between;
-    height: 100px;
-    padding: 0;
-  }
-
-  .banner-left .logo {
-    height: 60px;
-    margin: 0;
-    padding-left: 20px;
-  }
-
-  .banner-right img,
-  .banner-right .icon {
-    height: 22px;
-    width: 22px;
-  }
-
-  #info {
-    position: fixed;
-    bottom: 10px;
-    left: 10px;
-    font-size: 12px;
-    max-width: 70%;
-    height: 60px;
-    padding: 4px 8px;
-  }
-
-  #locate-btn {
-    bottom: 80px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    font-size: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  #locate-btn::before {
-    content: "🧭";
-    font-size: 24px;
-  }
-}
+        @media (max-width: 768px) {
+            header.banner { height: 80px; }
+            nav { top: 80px; font-size: 12px; }
+            .info-panel { top: 140px; }
+            #locate-btn { bottom: 20px; right: 20px; width: 50px; height: 50px; font-size: 0; }
+            #locate-btn::before { content: "🧭"; font-size: 20px; }
+        }
