@@ -1,364 +1,555 @@
- let map, auroraCanvas, ctx, markersLayer;
-        let time = 0;
-        let kpIndex = 3.0;
-        let ovationData = null;
-        let placeMarkers = new Map();
-        let readMoreBound = false;
-        
-        const KP_URL = 'https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json';
-        const OVATION_URL = 'https://services.swpc.noaa.gov/json/ovation_aurora_latest.json';
 
-        async function initApp() {
-            map = L.map('map', {
-                center: [65, 25],
-                zoom: 4,
-                minZoom: 2,
-                maxZoom: 15,
-                zoomControl: false,
-                attributionControl: false
-            });
+// ===============================
+// Aurora/RepoTracker main script
+// ===============================
 
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 20 }).addTo(map);
+let map;
+let auroraLayer = null;        // array of overlays
+let userMarker = null;
+let currentData = null;        // NOAA JSON
+let placeMarkers = new Map(); // id -> Leaflet marker
 
-            const AuroraLayer = L.Layer.extend({
-                onAdd: function(map) {
-                    const container = L.DomUtil.create('div', 'leaflet-aurora-layer');
-                    this._canvas = L.DomUtil.create('canvas', 'aurora-canvas', container);
-                    this._canvas.style.pointerEvents = 'none';
-                    map.getPanes().overlayPane.appendChild(container);
-                    this._map = map;
-                    auroraCanvas = this._canvas;
-                    ctx = auroraCanvas.getContext('2d');
-                    map.on('move moveend zoomend', this._reset, this);
-                    this._reset();
-                    return this;
-                },
-                _reset: function() {
-                    const topLeft = this._map.containerPointToLayerPoint([0, 0]);
-                    L.DomUtil.setPosition(this._canvas, topLeft);
-                    const size = this._map.getSize();
-                    this._canvas.width = size.x;
-                    this._canvas.height = size.y;
-                }
-            });
-            map.addLayer(new AuroraLayer());
+// ------------------------------
+// Weather from Cloudflare Worker
+// ------------------------------
+async function getWeather(lat, lon) {
+  const url = `https://repotracker.masto84.workers.dev/?lat=${lat}&lon=${lon}`;
+  try {
+    const res = await fetch(url, { cache: 'no-cache' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    return {
+      temp: Math.round(data.main.temp),
+      feels: Math.round(data.main.feels_like),
+      wind: data.wind.speed,
+      desc: data.weather[0]?.description ?? '',
+      icon: data.weather[0]?.icon ?? '01d',
+      clouds: data.clouds?.all ?? 100
+    };
+  } catch (err) {
+    console.error('Weather fetch error:', err);
+    return null;
+  }
+}
 
-            markersLayer = L.layerGroup().addTo(map);
+// ----------------------------------------------
+// Places loader (kohteet/index.json + per-kohde)
+// ----------------------------------------------
+async function loadPlaces() {
+  try {
+    const res = await fetch('kohteet/index.json', { cache: 'no-cache' });
+    if (!res.ok) throw new Error('index.json ei löydy');
+    const manifest = await res.json();
+    const files = Array.isArray(manifest.files) ? manifest.files : [];
 
-            initButtons();
-            const places = await loadPlaces();
-            initMarkers(map, getWeather, showPlaceInfo, places);
+    const loaded = await Promise.all(
+      files.map(async (file) => {
+        const metaRes = await fetch(`kohteet/${file}`, { cache: 'no-cache' });
+        if (!metaRes.ok) throw new Error(`Virhe ladattaessa ${file}`);
+        const meta = await metaRes.json();
 
-            fetchKPData();
-            fetchOvationData();
-            setInterval(fetchKPData, 300000);
-            setInterval(fetchOvationData, 300000);
-            
-            animate();
-            map.on('click', onMapClick);
+        const id = file.replace(/\.json$/i, '');
+
+        // Tuki joko suoraan JSON "description" -kentälle tai erilliselle HTML-tiedostolle "descriptionFile"
+        let description = meta.description || '';
+        if (!description && meta.descriptionFile) {
+          const htmlRes = await fetch(`kohteet/${meta.descriptionFile}`, { cache: 'no-cache' });
+          description = htmlRes.ok ? await htmlRes.text() : '';
         }
 
-        async function loadPlaces() {
-            try {
-                const res = await fetch('kohteet/index.json', { cache: 'no-cache' });
-                const manifest = await res.json();
-                const files = manifest.files || [];
-                const loaded = await Promise.all(files.map(async (file) => {
-                    try {
-                        const mRes = await fetch(`kohteet/${file}`, { cache: 'no-cache' });
-                        const meta = await mRes.json();
-                        const id = file.replace(/\.json$/i, '').toLowerCase();
-                        return { id, ...meta, icon: meta.icon || 'images/iconi.png' };
-                    } catch (e) { return null; }
-                }));
-                return loaded.filter(p => p !== null);
-            } catch (e) { return []; }
+        return {
+          id,
+          name: meta.name,
+          lat: meta.lat,
+          lon: meta.lon,
+          url: meta.url || '',
+          icon: meta.icon || 'images/iconi.png',
+          short: meta.short || '',
+          description: description || '',
+          stream: meta.stream || '',
+          streamWidth: meta.streamWidth || 320,
+          streamHeight: meta.streamHeight || 180
+        };
+      })
+    );
+
+    return loaded;
+  } catch (e) {
+    console.error('Paikkojen lataus epäonnistui:', e);
+    return [];
+  }
+}
+
+// ------------------------------------
+// "Read more" -paneeli (place-info DIV)
+// ------------------------------------
+function showPlaceInfo(place) {
+  const defaultSection = document.getElementById('aurora-default');
+  const infoSection = document.getElementById('place-info');
+
+  if (defaultSection) defaultSection.style.display = 'none';
+  if (infoSection) infoSection.style.display = 'block';
+
+  const linkHtml = place.url
+    ? `<p>${place.url}Visit website</a></p>`
+    : '';
+
+  const streamHtml = place.stream
+    ? `${place.stream}</iframe>`
+    : '';
+
+  if (infoSection) {
+    infoSection.innerHTML = `
+      ${place.description || ''}
+      ${linkHtml}
+      ${streamHtml}
+      <button id="back-to-default" style="margin-top:15px;">Back to instructions</button>
+    `;
+    infoSection.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  const backBtn = document.getElementById('back-to-default');
+  if (backBtn) {
+    backBtn.onclick = () => {
+      if (infoSection) infoSection.style.display = 'none';
+      if (defaultSection) defaultSection.style.display = 'block';
+      if (defaultSection) defaultSection.scrollIntoView({ behavior: 'smooth' });
+    };
+  }
+}
+
+// -------------------------
+// Leaflet markerit + popup
+// -------------------------
+
+// ---------------------
+// Karttaklikki → popup
+// ---------------------
+async function onMapClick(e) {
+  
+const t = e.originalEvent?.target;
+  if (t && (t.closest('#forecast-btn')
+         || t.closest('#close-forecast')
+         || t.closest('#forecast-popup')
+         || t.closest('#menu-btn')
+         || t.closest('#menu')
+         || t.closest('#locate-btn'))) {
+    return; // älä käsittele tätä karttaklkkina
+  }
+
+  const lat = e.latlng.lat;
+  const lon = e.latlng.lng;
+  await showAuroraPopup(lat, lon, null, true);
+}
+
+// ---------------------
+// App init / Leaflet
+// ---------------------
+
+async function initAppMap() {
+  if (typeof L === 'undefined') {
+    console.error('Leaflet not loaded');
+    return;
+  }
+
+  // --- kaikki vanhasta initApp:sta karttaan liittyvä ---
+  map = L.map('map', { center: [65, 25], zoom: 4, minZoom: 2, maxZoom: 15 });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap &copy; CARTO',
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(map);
+
+  map.setMaxBounds([[-90, -180], [90, 180]]);
+  map.on('drag', () => map.panInsideBounds([[-90, -180], [90, 180]], { animate: false }));
+
+  map.on('click', onMapClick);
+
+  // Lataa paikat ja luo markerit
+  const places = await loadPlaces();
+  if (places.length === 0) {
+    console.warn('Ei kohteita manifestista: lisää /kohteet/index.json ja per-kohde tiedostot.');
+  }
+  initMarkers(map, getWeather, showPlaceInfo, places);
+
+  // NOAA-data + päivitys
+  fetchAuroraData();
+  setInterval(fetchAuroraData, 5 * 60 * 1000);
+await openPlaceFromUrlParam();
+  // Mahdollinen muu karttaan liittyvä initialisointi...
+}
+
+
+
+
+console.debug('Saatavilla marker-id:t:', Array.from(placeMarkers.keys()));
+async function openPlaceFromUrlParam() {
+  const params = new URLSearchParams(window.location.search);
+  const kohdeIdRaw = params.get('kohde'); // määritellään ensin
+  if (!kohdeIdRaw) return;
+
+  const kohdeId = kohdeIdRaw.toLowerCase(); // normalisointi
+  const existing = placeMarkers.get(kohdeId);
+
+  if (!existing) {
+    console.warn(`Markeria ei löytynyt id:llä "${kohdeId}". Saatavilla:`, Array.from(placeMarkers.keys()));
+    return; // ei fallbackia → ei luoda uutta popupia
+  }
+
+  const ll = existing.getLatLng();
+  map.setView(ll, Math.max(map.getZoom(), 12));
+  existing.openPopup();
+}
+
+
+
+
+
+
+// ---------------------------------------
+// Auroran mahdollisuus -popup valitusta
+// ---------------------------------------
+async function showAuroraPopup(lat, lon, marker = null, showGoogleMapsLink = true) {
+  let score = 0;
+  let auroraIntensity = 0;
+
+  // Lähin piste intensiteeteistä
+  if (currentData && Array.isArray(currentData.coordinates)) {
+    let nearest = null, minDist = Infinity;
+    currentData.coordinates.forEach((p) => {
+      let pointLon = p[0] < 0 ? p[0] + 360 : p[0];
+      const pointLat = p[1], intensity = p[2];
+      const dist = Math.hypot(pointLat - lat, Math.abs(pointLon - lon));
+      if (dist < minDist) { minDist = dist; nearest = intensity; }
+    });
+    auroraIntensity = nearest || 0;
+    if (auroraIntensity > 60) score += 2;
+    else if (auroraIntensity > 30) score += 1;
+  }
+
+  // Sää (pilvisyys)
+  const weather = await getWeather(lat, lon);
+  const clouds = weather ? weather.clouds : 100;
+  if (clouds < 30) score += 2;
+  else if (clouds < 60) score += 1;
+
+  // Liikennevalostatus
+  let statusEmoji = '🔴', statusText = 'Low chance';
+  if (score >= 3) { statusEmoji = '🟢'; statusText = 'High chance!'; }
+  else if (score === 2) { statusEmoji = '🟡'; statusText = 'Moderate chance'; }
+
+  let popupContent = `
+    <strong>Your Northern Lights chance is now:</strong><br>
+    ${statusEmoji} ${statusText}<br>
+    Aurora intensity: ${auroraIntensity.toFixed(1)}<br>
+    Clouds: ${clouds}%<br>
+    Temp: ${weather ? weather.temp + '°C' : 'N/A'}
+  `;
+
+  if (showGoogleMapsLink) {
+    popupContent += `<br><strong>Coordinates:</strong> ${lat.toFixed(4)}, ${lon.toFixed(4)}<br>
+      <a href="https://www.google.com/maps?q=${lat},${lon}">Open in Google Maps</a>`;
+  }
+
+  if (marker) {
+    marker.setLatLng([lat, lon]).bindPopup(popupContent).openPopup();
+  } else {
+    L.popup().setLatLng([lat, lon]).setContent(popupContent).openOn(map);
+  }
+}
+
+// ------------------------
+// UI-painikkeiden init
+// ------------------------
+
+
+function initButtons() {
+  const helpPopup = document.getElementById('help-popup');
+  const closePopupBtn = document.getElementById('close-popup');
+  const dontShowAgainCheckbox = document.getElementById('dont-show-again');
+  const showHelpLink = document.getElementById('show-help');
+
+  if (helpPopup && !localStorage.getItem('hideHelpPopup')) {
+    helpPopup.style.display = 'flex';
+  }
+  if (closePopupBtn) {
+    closePopupBtn.addEventListener('click', () => {
+      if (dontShowAgainCheckbox && dontShowAgainCheckbox.checked) {
+        localStorage.setItem('hideHelpPopup', 'true');
+      }
+      if (helpPopup) helpPopup.style.display = 'none';
+    });
+  }
+  if (showHelpLink && helpPopup) {
+    showHelpLink.addEventListener('click', (e) => {
+      e.preventDefault();     // tämä linkki avaa popupin
+      e.stopPropagation();
+      helpPopup.style.display = 'flex';
+    });
+  }
+
+  const menuBtn = document.getElementById('menu-btn');
+  const menu = document.getElementById('menu');
+  const forecastBtn = document.getElementById('forecast-btn');
+  const forecastPopup = document.getElementById('forecast-popup');
+  const closeForecast = document.getElementById('close-forecast');
+  const locateBtn = document.getElementById('locate-btn');
+
+  // 1) Nappulat (eivät navigoi)
+  [menuBtn, forecastBtn, closeForecast, locateBtn, closePopupBtn]
+    .filter(Boolean)
+    .forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+    });
+
+  // 2) Kontit (menu, forecastPopup, helpPopup): EI preventDefault
+  [menu, forecastPopup, helpPopup]
+    .filter(Boolean)
+    .forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+      if (typeof L !== 'undefined') {
+        L.DomEvent.disableClickPropagation(el);
+        L.DomEvent.disableScrollPropagation(el);
+      }
+    });
+
+  // 3) Menun linkit: navigoivat
+  document.querySelectorAll('#menu a[href]').forEach(a => {
+    a.addEventListener('click', (e) => {
+      e.stopPropagation(); // sallitaan navigointi, estetään vain kartan reagointi
+      // a.target = '_self'; // halutessa varmistus
+    });
+  });
+
+  // 4) Menu toggle
+  if (menuBtn && menu) {
+    menuBtn.addEventListener('click', () => {
+      menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
+    });
+  }
+
+  // 5) Forecast-popup avaus/sulku
+  if (forecastBtn && forecastPopup) {
+    forecastBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      forecastPopup.style.display = 'flex';
+      await ensureChartJs();
+      fetchAuroraForecast();
+    });
+  }
+  if (closeForecast && forecastPopup) {
+    closeForecast.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      forecastPopup.style.display = 'none';
+    });
+  }
+
+  // 6) Geolokaatio
+  if (locateBtn) {
+    locateBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!navigator.geolocation) {
+        alert('Geolocation not supported in this browser.');
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+          map.setView([lat, lon], 6);
+          if (!userMarker) userMarker = L.marker([lat, lon]).addTo(map);
+          await showAuroraPopup(lat, lon, userMarker, false);
+        },
+        (err) => alert('Location failed: ' + err.message),
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+      );
+    });
+  }
+}
+
+
+
+// ------------------------
+// NOAA (Ovation) overlay
+// ------------------------
+async function fetchAuroraData() {
+          const info = document.getElementById('loader');
+          try {
+            const res = await fetch('https://services.swpc.noaa.gov/json/ovation_aurora_latest.json');
+            const data = await res.json();
+            currentData = data;
+            if (info) info.style.display = 'none';
+            drawAuroraOverlay(data.coordinates);
+          } catch (err) {
+            if (info) info.innerText = "Error loading data";
+          }
         }
-
-        function initMarkers(targetMap, getWeatherFn, showPlaceInfoFn, places = []) {
-            if (!targetMap || !Array.isArray(places)) return;
-            markersLayer.clearLayers();
-
-            places.forEach(place => {
-                const customIcon = L.divIcon({
-                    className: 'custom-marker',
-                    html: `
-                        <div class="marker-wrapper">
-                            <img src="pinni.png" class="pin">
-                            <img src="${place.icon}" class="pin-icon" onerror="this.src='images/iconi.png'">
-                        </div>
-                    `,
-                    iconSize: [32, 48],
-                    iconAnchor: [16, 48],
-                    popupAnchor: [0, -52]
-                });
-
-                const popupContent = `
-                    <div class="popup-header">
-                        <img src="${place.icon}" alt="${place.name}" onerror="this.src='images/iconi.png'">
-                        <strong class="popup-title">${place.name}</strong>
-                    </div>
-                    <div style="font-size:0.9em; margin:6px 0; max-width:250px; color:#ddd;">
-                        ${place.short || 'Kaunis revontulikohde'}
-                    </div>
-                    <div id="aurora-chance-box" style="margin-bottom:8px; font-weight:bold; color:#00ffcc;">Lasketaan mahdollisuutta...</div>
-                    <a href="#" class="read-more" data-place="${place.id}">Lue lisää</a>
-                    <div class="weather-box" style="margin-top:10px;">
-                        <em>Haetaan säätietoja...</em>
-                    </div>
-                `;
-
-                const marker = L.marker([place.lat, place.lon], { icon: customIcon })
-                    .bindPopup(popupContent, { className: 'custom-popup' })
-                    .addTo(markersLayer);
-
-                marker.on('popupopen', async (e) => {
-                    const popupEl = e.popup.getElement();
-                    
-                    // Lasketaan revontulimahdollisuus klikatessa
-                    const chanceBox = popupEl.querySelector('#aurora-chance-box');
-                    if (chanceBox) {
-                        const weather = await getWeatherFn(place.lat, place.lon);
-                        const intensity = calculateIntensity(place.lat, place.lon);
-                        const clouds = weather ? weather.clouds : 100;
-                        const score = (intensity > 30 ? 1 : 0) + (clouds < 40 ? 2 : (clouds < 70 ? 1 : 0));
-                        const status = score >= 3 ? '🟢 Erinomainen' : (score >= 2 ? '🟡 Kohtalainen' : '🔴 Heikko');
-                        chanceBox.innerHTML = `Mahdollisuus: ${status} (${intensity}%)`;
-                    }
-
-                    // Sää
-                    const weatherBox = popupEl.querySelector('.weather-box');
-                    if (weatherBox && !weatherBox.dataset.loaded) {
-                        const weather = await getWeatherFn(place.lat, place.lon);
-                        if (weather) {
-                            weatherBox.innerHTML = `
-                                <div class="weather-row">
-                                    <img src="https://openweathermap.org/img/wn/${weather.icon}.png">
-                                    <span>${weather.temp}°C — ${weather.desc}</span>
-                                </div>
-                                <small>Pilvisyys: ${weather.clouds}% | Tuuli: ${weather.wind} m/s</small>
-                            `;
-                        } else { weatherBox.textContent = 'Säätietoa ei saatavilla'; }
-                        weatherBox.dataset.loaded = 'true';
-                    }
-                });
-
-                placeMarkers.set(place.id, { marker, data: place });
-            });
-
-            if (!readMoreBound) {
-                document.addEventListener('click', function (e) {
-                    const link = e.target.closest('.read-more');
-                    if (!link) return;
-                    e.preventDefault();
-                    const id = link.dataset.place;
-                    const p = places.find(item => item.id === id);
-                    if (p) showPlaceInfoFn(p);
-                });
-                readMoreBound = true;
-            }
-        }
-
-        function calculateIntensity(lat, lon) {
-            if (!ovationData?.coordinates) return 0;
-            let minDist = Infinity, intensity = 0;
-            ovationData.coordinates.forEach(p => {
-                let pLon = p[0] > 180 ? p[0] - 360 : p[0];
-                let dist = Math.hypot(p[1] - lat, pLon - lon);
-                if (dist < minDist) { minDist = dist; intensity = p[2]; }
-            });
-            return intensity;
-        }
-
-        async function onMapClick(e) {
-            if (e.originalEvent.target.closest('.leaflet-marker-icon')) return;
-            
-            const intensity = calculateIntensity(e.latlng.lat, e.latlng.lng);
-            const weather = await getWeather(e.latlng.lat, e.latlng.lng);
-            const clouds = weather ? weather.clouds : 100;
-            const score = (intensity > 30 ? 1 : 0) + (clouds < 40 ? 2 : (clouds < 70 ? 1 : 0));
-            const status = score >= 3 ? '🟢 Erinomainen' : (score >= 2 ? '🟡 Kohtalainen' : '🔴 Heikko');
-
-            const content = `
-                <div class="aurora-popup-content">
-                    <strong>Valittu sijainti</strong><br>
-                    Mahdollisuus: ${status}<br>
-                    Intensiteetti: ${intensity}% | Pilvet: ${clouds}%<br>
-                    <small>${e.latlng.lat.toFixed(3)}, ${e.latlng.lng.toFixed(3)}</small>
-                </div>
-            `;
-            L.popup().setLatLng(e.latlng).setContent(content).openOn(map);
-        }
-
-        async function getWeather(lat, lon) {
-            try {
-                const res = await fetch(`https://repotracker.masto84.workers.dev/?lat=${lat}&lon=${lon}`);
-                const data = await res.json();
-                return {
-                    temp: Math.round(data.main.temp),
-                    desc: data.weather[0].description,
-                    icon: data.weather[0].icon,
-                    clouds: data.clouds.all,
-                    wind: data.wind.speed
-                };
-            } catch (e) { return null; }
-        }
-
-        function showPlaceInfo(place) {
-            const info = document.getElementById('place-info');
-            info.style.display = 'block';
-            info.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <h2 style="margin:0; color:#00ffcc;">${place.name}</h2>
-                    <button class="btn" onclick="this.parentElement.parentElement.style.display='none'" style="padding:4px 10px;">X</button>
-                </div>
-                <div style="margin-top:15px; line-height:1.6; max-height:400px; overflow-y:auto;">
-                    ${place.description || 'Ei lisätietoja saatavilla.'}
-                </div>
-            `;
-        }
-
-        function drawAurora() {
-            if (!ctx || !map) return;
-            ctx.clearRect(0, 0, auroraCanvas.width, auroraCanvas.height);
-            const zoom = map.getZoom();
-            const scaleFactor = Math.pow(2, zoom - 4);
-            const layers = Math.floor(4 + (kpIndex / 2));
-            const targetLat = 75 - (kpIndex * 2.5);
-            
-            for (let j = 0; j < layers; j++) {
-                ctx.save();
-                ctx.globalCompositeOperation = 'screen';
-                ctx.filter = `blur(${(20 + j * 5) * (zoom / 4)}px)`;
-                ctx.strokeStyle = `hsla(${kpIndex > 4.5 && j === 0 ? 330 : 145 + (j * 4)}, 100%, 60%, ${(0.3 + (kpIndex/10 * 0.5)) / layers})`;
-                ctx.lineWidth = Math.max(10, 30 * scaleFactor);
-                ctx.shadowBlur = 10 * scaleFactor;
-                ctx.beginPath();
-                for (let i = 0; i <= 45; i++) {
-                    const lon = -180 + (i / 45) * 360;
-                    const wave = Math.sin(i * 0.15 + time * 0.3 + j) * (1.1 + kpIndex * 0.4);
-                    const pt = map.latLngToContainerPoint([targetLat + wave, lon]);
-                    if (i === 0) ctx.moveTo(pt.x, pt.y); else ctx.lineTo(pt.x, pt.y);
-                }
-                ctx.stroke(); ctx.restore();
-            }
-        }
-
-        function animate() { drawAurora(); time += 0.006; requestAnimationFrame(animate); }
 
         async function fetchKPData() {
             try {
-                const res = await fetch(KP_URL);
+                const res = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json');
                 const data = await res.json();
-                if (data.length > 1) { kpIndex = parseFloat(data[data.length - 1][1]); updateUI(kpIndex); }
-            } catch (e) {}
+                const badge = document.getElementById('kpVal');
+                if(badge) badge.innerText = data[data.length-1][1];
+            } catch(e) {}
         }
 
-        async function fetchOvationData() {
-            try {
-                const res = await fetch(OVATION_URL);
-                ovationData = await res.json();
-            } catch (e) {}
-        }
+        // TÄMÄ FUNKTIO KORVAA VANHAN drawAuroraOverlay:n
+        function drawAuroraOverlay(points) {
+            if (!ctx || !points) return;
+            ctx.clearRect(0, 0, auroraCanvas.width, auroraCanvas.height);
+            
+            const p1 = map.latLngToContainerPoint([65, 25]);
+            const p2 = map.latLngToContainerPoint([65.5, 25.5]);
+            const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+            const radius = Math.max(10, dist * 1.5);
+            
+            createSprites(radius);
+            ctx.globalCompositeOperation = 'screen';
 
-        function updateUI(val) {
-            document.getElementById('kpVal').innerText = val.toFixed(1);
-            document.getElementById('statusDot').style.background = val >= 5 ? '#ff3366' : (val >= 3 ? '#ffcc00' : '#00ffcc');
-            document.getElementById('activityText').innerText = val >= 5 ? "Myrsky" : (val >= 3 ? "Aktiivista" : "Rauhallista");
-        }
+            points.filter(p => p[2] > 2).forEach(p => {
+                const rawLon = p[0];
+                const lat = p[1];
+                const intensity = p[2];
+                const offsets = [0, -360, 360];
 
-        function initButtons() {
-            document.getElementById('forecast-btn').onclick = () => {
-                document.getElementById('forecast-popup').style.display = 'flex';
-                fetchAuroraForecast();
-            };
-            document.getElementById('close-forecast').onclick = () => document.getElementById('forecast-popup').style.display = 'none';
-            document.getElementById('locate-btn').onclick = () => navigator.geolocation.getCurrentPosition(pos => map.setView([pos.coords.latitude, pos.coords.longitude], 8));
-        }
+                offsets.forEach(offset => {
+                    let lon = (rawLon > 180 ? rawLon - 360 : rawLon) + offset;
+                    const pos = map.latLngToContainerPoint([lat, lon]);
 
-       async function fetchAuroraForecast() {
-            try {
-                const errorContainer = document.getElementById('errorMessage');
-                if (errorContainer) errorContainer.textContent = 'Ladataan tietoja...';
+                    if (pos.x < -radius * 2 || pos.x > auroraCanvas.width + radius * 2 || 
+                        pos.y < -radius * 2 || pos.y > auroraCanvas.height + radius * 2) return;
 
-                const response = await fetch('https://services.swpc.noaa.gov/text/3-day-forecast.txt');
-                if (!response.ok) throw new Error(`Verkkovirhe: ${response.status}`);
-                const text = await response.text();
-                
-                const today = new Date();
-                const dayLabels = [];
-                for (let i = 0; i < 3; i++) {
-                    const d = new Date(today);
-                    d.setDate(today.getDate() + i);
-                    dayLabels.push(d.toLocaleDateString('fi-FI', { day: 'numeric', month: 'short' }));
-                }
+                    let sprite = spriteGreen;
+                    if (intensity > 35) sprite = spriteYellow;
+                    if (intensity > 70) sprite = spriteRed;
 
-                const kpRegex = /[ \t]*(\d{2}-\d{2}UT)[ \t]+([\d\.\(\)G \t]+)/g;
-                const times = [], day1 = [], day2 = [], day3 = [];
-                let match;
-                while ((match = kpRegex.exec(text)) !== null) {
-                    const timeStr = match[1].trim();
-                    const clean = match[2].replace(/\(G\d\)/g, '').replace(/[ \t]+/g, ' ').trim();
-                    const values = clean.split(' ').map(Number);
-                    if (values.length === 3 && values.every(v => !isNaN(v))) {
-                        times.push(timeStr);
-                        day1.push(values[0]);
-                        day2.push(values[1]);
-                        day3.push(values[2]);
-                    }
-                }
-
-                if (times.length === 0) throw new Error("Datan jäsennys epäonnistui.");
-                if (errorContainer) errorContainer.textContent = '';
-
-                const ctxChart = document.getElementById('kpChart').getContext('2d');
-                if (forecastChart) forecastChart.destroy();
-
-                forecastChart = new Chart(ctxChart, {
-                    type: 'line',
-                    data: {
-                        labels: times,
-                        datasets: [
-                            { 
-                                label: dayLabels[0], data: day1, borderColor: '#00ffcc', 
-                                pointBackgroundColor: day1.map(v => v >= 5 ? 'red' : (v >= 3 ? 'orange' : 'green')),
-                                pointRadius: 6, tension: 0.3, fill: false 
-                            },
-                            { 
-                                label: dayLabels[1], data: day2, borderColor: '#1e88e5', 
-                                pointBackgroundColor: day2.map(v => v >= 5 ? 'red' : (v >= 3 ? 'orange' : 'green')),
-                                pointRadius: 6, tension: 0.3, fill: false 
-                            },
-                            { 
-                                label: dayLabels[2], data: day3, borderColor: '#6f42c1', 
-                                pointBackgroundColor: day3.map(v => v >= 5 ? 'red' : (v >= 3 ? 'orange' : 'green')),
-                                pointRadius: 6, tension: 0.3, fill: false 
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { labels: { color: '#fff', font: { size: 14 } } },
-                            tooltip: {
-                                callbacks: {
-                                    label: (ctx) => `Kp ${ctx.parsed.y}: ${ctx.parsed.y >= 5 ? 'Korkea' : (ctx.parsed.y >= 3 ? 'Kohtalainen' : 'Matala')}`
-                                }
-                            }
-                        },
-                        scales: {
-                            y: { min: 0, max: 9, ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' }, title: { display: true, text: 'Kp-indeksi', color: '#00ffcc' } },
-                            x: { ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' }, title: { display: true, text: 'Aika (UT)', color: '#00ffcc' } }
-                        }
-                    }
+                    ctx.globalAlpha = Math.min(1, (intensity / 80) + 0.1);
+                    ctx.drawImage(sprite, pos.x - (radius * 1.25), pos.y - (radius * 1.25));
                 });
-
-            } catch (error) {
-                if (document.getElementById('errorMessage')) {
-                    document.getElementById('errorMessage').innerHTML = `<span style="color:red">⚠️ Virhe: ${error.message}</span>`;
-                }
-            }
+            });
+            ctx.globalAlpha = 1;
         }
+// ------------------------
+// Chart.js latausvarmistus
+// ------------------------
+function ensureChartJs() {
+  return new Promise((resolve) => {
+    if (window.Chart) return resolve();
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+    script.onload = () => resolve();
+    script.onerror = () => {
+      console.error('Chart.js load failed');
+      resolve(); // ei estä UI:ta, mutta kaavio ei piirry
+    };
+    document.head.appendChild(script);
+  });
+}
 
-        window.onload = initApp;
+// ------------------------
+// Forecast (3-day) kaavio
+// ------------------------
+async function fetchAuroraForecast() {
+  try {
+    const response = await fetch('https://services.swpc.noaa.gov/text/3-day-forecast.txt');
+    if (!response.ok) throw new Error(`Verkkovirhe: ${response.status}`);
+    const text = await response.text();
+    const today = new Date(); 
+    const dayLabels = [];
+    for (let i = 0; i < 3; i++) { 
+      const d = new Date(today); d.setDate(today.getDate() + i); 
+      dayLabels.push(d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })); 
+    }
+
+    const kpRegex = /[ \t]*(\d{2}-\d{2}UT)[ \t]+([\d\.\(\)G \t]+)/g;
+    const times = [], day1 = [], day2 = [], day3 = []; 
+    let match;
+    while ((match = kpRegex.exec(text)) !== null) {
+      const time = match[1].trim();
+      const clean = match[2].replace(/\(G\d\)/g, '').replace(/[ \t]+/g, ' ').trim();
+      const values = clean.split(' ').map(Number);
+      if (values.length === 3 && values.every(v => !isNaN(v))) { 
+        times.push(time); day1.push(values[0]); day2.push(values[1]); day3.push(values[2]); 
+      }
+    }
+    if (times.length === 0) throw new Error("Kp values not found.");
+
+    const ctxElement = document.getElementById('kpChart'); 
+    if (!ctxElement) return;
+    const ctx = ctxElement.getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: times,
+        datasets: [
+          { label: dayLabels[0], data: day1, borderColor: '#007bff', pointBackgroundColor: day1.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'), pointRadius: 6, tension: 0.3 },
+          { label: dayLabels[1], data: day2, borderColor: '#6f42c1', pointBackgroundColor: day2.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'), pointRadius: 6, tension: 0.3 },
+          { label: dayLabels[2], data: day3, borderColor: '#20c997', pointBackgroundColor: day3.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'), pointRadius: 6, tension: 0.3 }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: { display: true, text: 'Northern Lights forecast (NOAA)' },
+          tooltip: { callbacks: { label: function(context) { const kp = context.parsed.y; if (kp >= 5) return `Kp ${kp} - High chance`; if (kp >= 3) return `Kp ${kp} - Moderate chance`; return `Kp ${kp} - Low chance`; } } }
+        },
+        scales: { y: { min: 0, max: 9, title: { display: true, text: 'Kp Index' } }, x: { title: { display: true, text: 'UT Time (3h intervals)' } } }
+      }
+    });
+
+
+  } catch (error) {
+    console.error('Error fetching NOAA forecast:', error);
+    const container = document.getElementById('errorMessage');
+    if (container) {
+      container.textContent = '⚠️ Error downloading NOAA data: ' + error.message;
+      container.style.color = 'red';
+      container.style.fontWeight = 'bold';
+    }
+  }
+}
+
+
+document.addEventListener('DOMContentLoaded', async () => {
+  // 1) UI-napit (menu, help-popup, forecast, locate, jne.) AINA
+  if (typeof initButtons === 'function') {
+    try { initButtons(); } catch (e) { console.error('initButtons error:', e); }
+  }
+
+  // 2) Kartta vain jos #map löytyy ja Leaflet on ladattu
+  const hasMap = !!document.getElementById('map');
+  const leafletLoaded = (typeof L !== 'undefined');
+
+  if (hasMap && leafletLoaded && typeof initAppMap === 'function') {
+    try { await initAppMap(); } catch (e) { console.error('initAppMap error:', e); }
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
