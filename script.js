@@ -4,11 +4,14 @@
 // ===============================
 
 let map;
-let auroraLayer = null;        // array of overlays
+let auroraCanvas = null; // Alustetaan nulliksi
+let ctx = null;          // Alustetaan nulliksi
 let userMarker = null;
-let currentData = null;        // NOAA JSON
-let placeMarkers = new Map(); // id -> Leaflet marker
+let currentData = null;
+let placeMarkers = new Map();
 
+// Spritet ja säädöt
+let spriteGreen, spriteYellow, spriteRed, currentRadius = 0;
 // ------------------------------
 // Weather from Cloudflare Worker
 // ------------------------------
@@ -381,70 +384,50 @@ function initButtons() {
 // ------------------------
 // NOAA (Ovation) overlay
 // ------------------------
-async function fetchAuroraData() {
-  const info = document.getElementById('info');
-  if (!info) return;
-  info.className = 'loading';
-  info.innerHTML = '⏳ Loading northern lights forecast...';
-
-  const directUrl = 'https://services.swpc.noaa.gov/json/ovation_aurora_latest.json';
-  const proxyUrl = 'https://corsproxy.io/?' + directUrl;
-
-  try {
-    const res = await fetch(directUrl, { cache: 'no-cache' }).catch(() => fetch(proxyUrl, { cache: 'no-cache' }));
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    if (!data.coordinates || !Array.isArray(data.coordinates)) throw new Error('Invalid data format.');
-    currentData = data;
-
-    const obsTime = new Date(data['Observation Time']).toLocaleString();
-    const forecastTime = new Date(data['Forecast Time']).toLocaleString();
-    info.className = '';
-    info.innerHTML = `<strong>📡 Northern Lights forecast</strong><br><small>Observation: ${obsTime}<br>Forecast: ${forecastTime}<br>Points: ${data.coordinates.length}</small>`;
-
-    drawAuroraOverlay(data.coordinates);
-  } catch (err) {
-    console.error('Aurora data error', err);
-    info.className = 'error';
-    info.innerHTML = `<strong>❌ Error</strong><br><small>No northern lights forecast available.<br>${err.message}</small>`;
-  }
-}
-
-// --- Dynaaminen revontulitaso (Canvas) ---
 const AuroraLayer = L.Layer.extend({
     onAdd: function(map) {
+        // Luodaan container ja canvas
         this._container = L.DomUtil.create('div', 'leaflet-aurora-layer');
         this._canvas = L.DomUtil.create('canvas', 'aurora-canvas', this._container);
+        
+        // Lisätään kartan overlay-tasoon
         map.getPanes().overlayPane.appendChild(this._container);
+        
+        // Asetetaan globaalit muuttujat, jotta drawAuroraOverlay löytää ne
         auroraCanvas = this._canvas;
         ctx = auroraCanvas.getContext('2d');
+        
         map.on('move moveend zoomend', this._update, this);
         this._update();
     },
     _update: function() {
+        if (!map || !auroraCanvas) return;
+
         const size = map.getSize();
-        // Kohdistetaan canvas kartan näkyvään osaan
         const topLeft = map.containerPointToLayerPoint([0, 0]);
         L.DomUtil.setPosition(this._canvas, topLeft);
         
         auroraCanvas.width = size.x;
         auroraCanvas.height = size.y;
         
-        // Pehmennetään revontulia zoomin mukaan
         const zoom = map.getZoom();
         const blurValue = Math.max(8, zoom * 2.5);
         this._canvas.style.filter = `blur(${blurValue}px)`;
         
-        if (currentData) drawAuroraOverlay(currentData.coordinates);
+        // Piirretään vain jos data on jo ladattu
+        if (currentData && currentData.coordinates) {
+            drawAuroraOverlay(currentData.coordinates);
+        }
     }
 });
 
 function drawAuroraOverlay(points) {
+    // TÄRKEÄ: Tarkistetaan että ctx on olemassa (ReferenceError fix)
     if (!ctx || !points || !auroraCanvas) return;
+    
     ctx.clearRect(0, 0, auroraCanvas.width, auroraCanvas.height);
     
     const zoom = map.getZoom();
-    // Lasketaan dynaaminen säde, joka skaalautuu zoomin mukaan
     const radius = Math.max(15, zoom * 5);
     
     createSprites(radius);
@@ -452,18 +435,15 @@ function drawAuroraOverlay(points) {
 
     points.forEach(p => {
         const intensity = p[2];
-        if (intensity < 2) return; // Ohitetaan heikot pisteet suorituskyvyn takia
+        if (intensity < 2) return;
 
         const lat = p[1];
         let lon = p[0];
-        
-        // NOAA:n data on 0-360, muutetaan se -180 - 180 muotoon
         if (lon > 180) lon -= 360;
 
-        // Leaflet hoitaa pituuspiirien jatkuvuuden automaattisesti containerPoint-laskennassa
+        // Leaflet hoitaa pituuspiirien jatkuvuuden (ei kasaantumista 0-kohtaan)
         const pos = map.latLngToContainerPoint([lat, lon]);
 
-        // Tarkistetaan onko piste edes lähellä ruutua (optimointi)
         if (pos.x < -radius * 2 || pos.x > auroraCanvas.width + radius * 2 || 
             pos.y < -radius * 2 || pos.y > auroraCanvas.height + radius * 2) return;
 
@@ -471,11 +451,29 @@ function drawAuroraOverlay(points) {
         if (intensity > 35) sprite = spriteYellow;
         if (intensity > 70) sprite = spriteRed;
 
-        // Säädetään läpinäkyvyys intensiteetin mukaan
         ctx.globalAlpha = Math.min(0.4, (intensity / 150) + 0.05);
         ctx.drawImage(sprite, pos.x - sprite.width / 2, pos.y - sprite.height / 2);
     });
     ctx.globalAlpha = 1;
+}
+
+async function fetchAuroraData() {
+    try {
+        const res = await fetch('https://services.swpc.noaa.gov/json/ovation_aurora_latest.json');
+        const data = await res.json();
+        currentData = data;
+        
+        if (document.getElementById('loader')) {
+            document.getElementById('loader').style.display = 'none';
+        }
+
+        // Kutsutaan piirtoa vain jos karttataso on jo valmis
+        if (ctx) {
+            drawAuroraOverlay(data.coordinates);
+        }
+    } catch (err) {
+        console.error('Aurora data error:', err);
+    }
 }
 
 // ------------------------
