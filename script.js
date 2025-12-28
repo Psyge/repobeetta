@@ -419,23 +419,19 @@ function drawAuroraOverlay(points) {
 
   const canvasWidth = 3600, canvasHeight = 500;
 
-  // Käytetään yhtä funktiota piirtämiseen, joka osaa käsitellä maailman ympäri jatkuvuuden
   const createCanvasOverlay = () => {
     const canvas = document.createElement('canvas');
     canvas.width = canvasWidth; canvas.height = canvasHeight;
     const ctx = canvas.getContext('2d');
 
     points.forEach((p) => {
-      // Normalisoidaan pituuspiiri välille 0-360 (0 = nollameridiaani)
-      let lon = p[0];
-      if (lon < 0) lon += 360;
-      
+      let lon = p[0]; // NOAA antaa arvot -180...180
       const lat = p[1], intensity = p[2];
       if (intensity < 1) return;
 
-      // Lasketaan X-koordinaatti niin, että 0-360 vastaa canvasWidthiä
-      const x = (lon / 360) * canvasWidth;
-      // Latitudi 40-90 väli (koska bounds on asetettu niin)
+      // Lasketaan X-koordinaatti: -180 on 0px, 0 on 1800px, 180 on 3600px
+      const x = ((lon + 180) / 360) * canvasWidth;
+      // Y-koordinaatti: 90N on 0px, 40N on 500px (skaalaus 50 asteen matkalla)
       const y = ((90 - lat) / 50) * canvasHeight;
 
       const radius = Math.min(60, Math.max(10, intensity * 3));
@@ -449,17 +445,21 @@ function drawAuroraOverlay(points) {
       ctx.arc(x, y, radius, 0, Math.PI * 2); 
       ctx.fill();
 
-      // Piirretään piste myös "rajan yli", jos se on lähellä reunaa
+      // Korjataan Greenwichin ja päivämäärärajan jatkuvuus piirtämällä reunojen yli
       if (x < radius) {
+        // Jos piste on lähellä vasenta reunaa (-180°), piirretään se myös oikeaan reunaan (+180°)
+        ctx.beginPath();
         ctx.arc(x + canvasWidth, y, radius, 0, Math.PI * 2);
         ctx.fill();
       } else if (x > canvasWidth - radius) {
+        // Jos piste on lähellä oikeaa reunaa (+180°), piirretään se myös vasempaan reunaan (-180°)
+        ctx.beginPath();
         ctx.arc(x - canvasWidth, y, radius, 0, Math.PI * 2);
         ctx.fill();
       }
     });
 
-    // Asetetaan bounds vastaamaan normalisoitua 0-360 pituuspiiriä (Leafletissä -180 to 180)
+    // Bounds vastaa tarkalleen pituuspiirejä -180:stä 180:een
     const bounds = [[40, -180], [90, 180]];
     const overlay = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.75 }).addTo(map);
     auroraLayer.push(overlay);
