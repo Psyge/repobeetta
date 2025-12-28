@@ -410,63 +410,72 @@ async function fetchAuroraData() {
   }
 }
 
+// --- Dynaaminen revontulitaso (Canvas) ---
+const AuroraLayer = L.Layer.extend({
+    onAdd: function(map) {
+        this._container = L.DomUtil.create('div', 'leaflet-aurora-layer');
+        this._canvas = L.DomUtil.create('canvas', 'aurora-canvas', this._container);
+        map.getPanes().overlayPane.appendChild(this._container);
+        auroraCanvas = this._canvas;
+        ctx = auroraCanvas.getContext('2d');
+        map.on('move moveend zoomend', this._update, this);
+        this._update();
+    },
+    _update: function() {
+        const size = map.getSize();
+        // Kohdistetaan canvas kartan näkyvään osaan
+        const topLeft = map.containerPointToLayerPoint([0, 0]);
+        L.DomUtil.setPosition(this._canvas, topLeft);
+        
+        auroraCanvas.width = size.x;
+        auroraCanvas.height = size.y;
+        
+        // Pehmennetään revontulia zoomin mukaan
+        const zoom = map.getZoom();
+        const blurValue = Math.max(8, zoom * 2.5);
+        this._canvas.style.filter = `blur(${blurValue}px)`;
+        
+        if (currentData) drawAuroraOverlay(currentData.coordinates);
+    }
+});
+
 function drawAuroraOverlay(points) {
-  if (!map) return;
+    if (!ctx || !points || !auroraCanvas) return;
+    ctx.clearRect(0, 0, auroraCanvas.width, auroraCanvas.height);
+    
+    const zoom = map.getZoom();
+    // Lasketaan dynaaminen säde, joka skaalautuu zoomin mukaan
+    const radius = Math.max(15, zoom * 5);
+    
+    createSprites(radius);
+    ctx.globalCompositeOperation = 'screen';
 
-  // Poista vanhat overlayt
-  if (auroraLayer) auroraLayer.forEach((l) => map.removeLayer(l));
-  auroraLayer = [];
+    points.forEach(p => {
+        const intensity = p[2];
+        if (intensity < 2) return; // Ohitetaan heikot pisteet suorituskyvyn takia
 
-  const canvasWidth = 3600, canvasHeight = 500;
+        const lat = p[1];
+        let lon = p[0];
+        
+        // NOAA:n data on 0-360, muutetaan se -180 - 180 muotoon
+        if (lon > 180) lon -= 360;
 
-  // Tämä funktio luo yhden canvaksen ja asettaa sen tiettyihin koordinaatteihin
-  const createLayer = (minLon, maxLon) => {
-    const canvas = document.createElement('canvas');
-    canvas.width = canvasWidth; canvas.height = canvasHeight;
-    const ctx = canvas.getContext('2d');
+        // Leaflet hoitaa pituuspiirien jatkuvuuden automaattisesti containerPoint-laskennassa
+        const pos = map.latLngToContainerPoint([lat, lon]);
 
-    points.forEach((p) => {
-      let lon = p[0]; // NOAA: -180...180
-      const lat = p[1], intensity = p[2];
-      if (intensity < 1) return;
+        // Tarkistetaan onko piste edes lähellä ruutua (optimointi)
+        if (pos.x < -radius * 2 || pos.x > auroraCanvas.width + radius * 2 || 
+            pos.y < -radius * 2 || pos.y > auroraCanvas.height + radius * 2) return;
 
-      // Lasketaan X niin, että -180 on 0 ja 180 on canvasWidth
-      const x = ((lon + 180) / 360) * canvasWidth;
-      const y = ((90 - lat) / 50) * canvasHeight;
+        let sprite = spriteGreen;
+        if (intensity > 35) sprite = spriteYellow;
+        if (intensity > 70) sprite = spriteRed;
 
-      const radius = Math.min(60, Math.max(10, intensity * 3));
-      const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
-      grad.addColorStop(0, `rgba(50,255,100,${Math.min(0.3, intensity / 10)})`);
-      grad.addColorStop(0.5, `rgba(0,200,100,${Math.min(0.1, intensity / 15)})`);
-      grad.addColorStop(1, 'rgba(0,0,0,0)');
-      
-      ctx.fillStyle = grad;
-      ctx.beginPath(); 
-      ctx.arc(x, y, radius, 0, Math.PI * 2); 
-      ctx.fill();
-
-      // TÄRKEÄ KORJAUS: Piirretään piste myös rajan yli, jos se on lähellä -180 tai 180
-      if (x < radius) {
-        ctx.beginPath();
-        ctx.arc(x + canvasWidth, y, radius, 0, Math.PI * 2);
-        ctx.fill();
-      } else if (x > canvasWidth - radius) {
-        ctx.beginPath();
-        ctx.arc(x - canvasWidth, y, radius, 0, Math.PI * 2);
-        ctx.fill();
-      }
+        // Säädetään läpinäkyvyys intensiteetin mukaan
+        ctx.globalAlpha = Math.min(0.4, (intensity / 150) + 0.05);
+        ctx.drawImage(sprite, pos.x - sprite.width / 2, pos.y - sprite.height / 2);
     });
-
-    const bounds = [[40, minLon], [90, maxLon]];
-    const overlay = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.75 }).addTo(map);
-    auroraLayer.push(overlay);
-  };
-
-  // Piirretään kolme kerrosta: keskelle, vasemmalle ja oikealle
-  // Tämä korjaa sen, että revontulet näkyvät vaikka karttaa pyörittäisi ympäri
-  createLayer(-180, 180);  // Keskikohta (Greenwich on nollassa)
-  createLayer(-540, -180); // Vasen puoli
-  createLayer(180, 540);   // Oikea puoli
+    ctx.globalAlpha = 1;
 }
 
 // ------------------------
