@@ -279,7 +279,7 @@
        async function fetchAuroraForecast() {
             try {
                 const errorContainer = document.getElementById('errorMessage');
-                if (errorContainer) errorContainer.textContent = '';
+                if (errorContainer) errorContainer.textContent = 'Ladataan tietoja...';
 
                 const response = await fetch('https://services.swpc.noaa.gov/text/3-day-forecast.txt');
                 if (!response.ok) throw new Error(`Verkkovirhe: ${response.status}`);
@@ -297,64 +297,66 @@
                 const times = [], day1 = [], day2 = [], day3 = [];
                 let match;
                 while ((match = kpRegex.exec(text)) !== null) {
-                    const timeLabel = match[1].trim();
+                    const timeStr = match[1].trim();
                     const clean = match[2].replace(/\(G\d\)/g, '').replace(/[ \t]+/g, ' ').trim();
                     const values = clean.split(' ').map(Number);
                     if (values.length === 3 && values.every(v => !isNaN(v))) {
-                        times.push(timeLabel);
+                        times.push(timeStr);
                         day1.push(values[0]);
                         day2.push(values[1]);
                         day3.push(values[2]);
                     }
                 }
 
-                if (times.length === 0) throw new Error("Kp-arvoja ei löytynyt.");
+                if (times.length === 0) throw new Error("Datan jäsennys epäonnistui.");
+                if (errorContainer) errorContainer.textContent = '';
 
-                const ctxElement = document.getElementById('kpChart');
-                if (!ctxElement) return;
-
+                const ctxChart = document.getElementById('kpChart').getContext('2d');
                 if (forecastChart) forecastChart.destroy();
 
-                const ctxChart = ctxElement.getContext('2d');
                 forecastChart = new Chart(ctxChart, {
                     type: 'line',
                     data: {
                         labels: times,
                         datasets: [
-                            { label: dayLabels[0], data: day1, borderColor: '#00ffcc', pointBackgroundColor: day1.map(kp => kp >= 5 ? 'red' : (kp >= 3 ? 'orange' : 'green')), pointRadius: 5, tension: 0.3 },
-                            { label: dayLabels[1], data: day2, borderColor: '#1e88e5', pointBackgroundColor: day2.map(kp => kp >= 5 ? 'red' : (kp >= 3 ? 'orange' : 'green')), pointRadius: 5, tension: 0.3 },
-                            { label: dayLabels[2], data: day3, borderColor: '#6f42c1', pointBackgroundColor: day3.map(kp => kp >= 5 ? 'red' : (kp >= 3 ? 'orange' : 'green')), pointRadius: 5, tension: 0.3 }
+                            { 
+                                label: dayLabels[0], data: day1, borderColor: '#00ffcc', 
+                                pointBackgroundColor: day1.map(v => v >= 5 ? 'red' : (v >= 3 ? 'orange' : 'green')),
+                                pointRadius: 6, tension: 0.3, fill: false 
+                            },
+                            { 
+                                label: dayLabels[1], data: day2, borderColor: '#1e88e5', 
+                                pointBackgroundColor: day2.map(v => v >= 5 ? 'red' : (v >= 3 ? 'orange' : 'green')),
+                                pointRadius: 6, tension: 0.3, fill: false 
+                            },
+                            { 
+                                label: dayLabels[2], data: day3, borderColor: '#6f42c1', 
+                                pointBackgroundColor: day3.map(v => v >= 5 ? 'red' : (v >= 3 ? 'orange' : 'green')),
+                                pointRadius: 6, tension: 0.3, fill: false 
+                            }
                         ]
                     },
                     options: {
                         responsive: true,
+                        maintainAspectRatio: false,
                         plugins: {
-                            legend: { labels: { color: 'white' } },
+                            legend: { labels: { color: '#fff', font: { size: 14 } } },
                             tooltip: {
                                 callbacks: {
-                                    label: function(context) {
-                                        const kp = context.parsed.y;
-                                        let chance = "Heikko";
-                                        if (kp >= 5) chance = "Todella korkea!";
-                                        else if (kp >= 3) chance = "Mahdollinen";
-                                        return `Kp ${kp} (${chance})`;
-                                    }
+                                    label: (ctx) => `Kp ${ctx.parsed.y}: ${ctx.parsed.y >= 5 ? 'Korkea' : (ctx.parsed.y >= 3 ? 'Kohtalainen' : 'Matala')}`
                                 }
                             }
                         },
                         scales: {
-                            y: { min: 0, max: 9, ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } },
-                            x: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                            y: { min: 0, max: 9, ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' }, title: { display: true, text: 'Kp-indeksi', color: '#00ffcc' } },
+                            x: { ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' }, title: { display: true, text: 'Aika (UT)', color: '#00ffcc' } }
                         }
                     }
                 });
 
             } catch (error) {
-                console.error('Error fetching NOAA forecast:', error);
-                const container = document.getElementById('errorMessage');
-                if (container) {
-                    container.textContent = '⚠️ Virhe haettaessa NOAA-tietoja: ' + error.message;
-                    container.style.color = '#ff3366';
+                if (document.getElementById('errorMessage')) {
+                    document.getElementById('errorMessage').innerHTML = `<span style="color:red">⚠️ Virhe: ${error.message}</span>`;
                 }
             }
         }
