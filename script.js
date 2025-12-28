@@ -276,64 +276,87 @@
             document.getElementById('locate-btn').onclick = () => navigator.geolocation.getCurrentPosition(pos => map.setView([pos.coords.latitude, pos.coords.longitude], 8));
         }
 
-        async function fetchAuroraForecast() {
-  try {
-    const response = await fetch('https://services.swpc.noaa.gov/text/3-day-forecast.txt');
-    if (!response.ok) throw new Error(`Verkkovirhe: ${response.status}`);
-    const text = await response.text();
-    const today = new Date(); 
-    const dayLabels = [];
-    for (let i = 0; i < 3; i++) { 
-      const d = new Date(today); d.setDate(today.getDate() + i); 
-      dayLabels.push(d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })); 
-    }
+       async function fetchAuroraForecast() {
+            try {
+                const errorContainer = document.getElementById('errorMessage');
+                if (errorContainer) errorContainer.textContent = '';
 
-    const kpRegex = /[ \t]*(\d{2}-\d{2}UT)[ \t]+([\d\.\(\)G \t]+)/g;
-    const times = [], day1 = [], day2 = [], day3 = []; 
-    let match;
-    while ((match = kpRegex.exec(text)) !== null) {
-      const time = match[1].trim();
-      const clean = match[2].replace(/\(G\d\)/g, '').replace(/[ \t]+/g, ' ').trim();
-      const values = clean.split(' ').map(Number);
-      if (values.length === 3 && values.every(v => !isNaN(v))) { 
-        times.push(time); day1.push(values[0]); day2.push(values[1]); day3.push(values[2]); 
-      }
-    }
-    if (times.length === 0) throw new Error("Kp values not found.");
+                const response = await fetch('https://services.swpc.noaa.gov/text/3-day-forecast.txt');
+                if (!response.ok) throw new Error(`Verkkovirhe: ${response.status}`);
+                const text = await response.text();
+                
+                const today = new Date();
+                const dayLabels = [];
+                for (let i = 0; i < 3; i++) {
+                    const d = new Date(today);
+                    d.setDate(today.getDate() + i);
+                    dayLabels.push(d.toLocaleDateString('fi-FI', { day: 'numeric', month: 'short' }));
+                }
 
-    const ctxElement = document.getElementById('kpChart'); 
-    if (!ctxElement) return;
-    const ctx = ctxElement.getContext('2d');
-    new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: times,
-        datasets: [
-          { label: dayLabels[0], data: day1, borderColor: '#007bff', pointBackgroundColor: day1.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'), pointRadius: 6, tension: 0.3 },
-          { label: dayLabels[1], data: day2, borderColor: '#6f42c1', pointBackgroundColor: day2.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'), pointRadius: 6, tension: 0.3 },
-          { label: dayLabels[2], data: day3, borderColor: '#20c997', pointBackgroundColor: day3.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'), pointRadius: 6, tension: 0.3 }
-        ]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          title: { display: true, text: 'Northern Lights forecast (NOAA)' },
-          tooltip: { callbacks: { label: function(context) { const kp = context.parsed.y; if (kp >= 5) return `Kp ${kp} - High chance`; if (kp >= 3) return `Kp ${kp} - Moderate chance`; return `Kp ${kp} - Low chance`; } } }
-        },
-        scales: { y: { min: 0, max: 9, title: { display: true, text: 'Kp Index' } }, x: { title: { display: true, text: 'UT Time (3h intervals)' } } }
-      }
-    });
+                const kpRegex = /[ \t]*(\d{2}-\d{2}UT)[ \t]+([\d\.\(\)G \t]+)/g;
+                const times = [], day1 = [], day2 = [], day3 = [];
+                let match;
+                while ((match = kpRegex.exec(text)) !== null) {
+                    const timeLabel = match[1].trim();
+                    const clean = match[2].replace(/\(G\d\)/g, '').replace(/[ \t]+/g, ' ').trim();
+                    const values = clean.split(' ').map(Number);
+                    if (values.length === 3 && values.every(v => !isNaN(v))) {
+                        times.push(timeLabel);
+                        day1.push(values[0]);
+                        day2.push(values[1]);
+                        day3.push(values[2]);
+                    }
+                }
 
+                if (times.length === 0) throw new Error("Kp-arvoja ei löytynyt.");
 
-  } catch (error) {
-    console.error('Error fetching NOAA forecast:', error);
-    const container = document.getElementById('errorMessage');
-    if (container) {
-      container.textContent = '⚠️ Error downloading NOAA data: ' + error.message;
-      container.style.color = 'red';
-      container.style.fontWeight = 'bold';
-    }
-  }
-}
+                const ctxElement = document.getElementById('kpChart');
+                if (!ctxElement) return;
+
+                if (forecastChart) forecastChart.destroy();
+
+                const ctxChart = ctxElement.getContext('2d');
+                forecastChart = new Chart(ctxChart, {
+                    type: 'line',
+                    data: {
+                        labels: times,
+                        datasets: [
+                            { label: dayLabels[0], data: day1, borderColor: '#00ffcc', pointBackgroundColor: day1.map(kp => kp >= 5 ? 'red' : (kp >= 3 ? 'orange' : 'green')), pointRadius: 5, tension: 0.3 },
+                            { label: dayLabels[1], data: day2, borderColor: '#1e88e5', pointBackgroundColor: day2.map(kp => kp >= 5 ? 'red' : (kp >= 3 ? 'orange' : 'green')), pointRadius: 5, tension: 0.3 },
+                            { label: dayLabels[2], data: day3, borderColor: '#6f42c1', pointBackgroundColor: day3.map(kp => kp >= 5 ? 'red' : (kp >= 3 ? 'orange' : 'green')), pointRadius: 5, tension: 0.3 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { labels: { color: 'white' } },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const kp = context.parsed.y;
+                                        let chance = "Heikko";
+                                        if (kp >= 5) chance = "Todella korkea!";
+                                        else if (kp >= 3) chance = "Mahdollinen";
+                                        return `Kp ${kp} (${chance})`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: { min: 0, max: 9, ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                            x: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error fetching NOAA forecast:', error);
+                const container = document.getElementById('errorMessage');
+                if (container) {
+                    container.textContent = '⚠️ Virhe haettaessa NOAA-tietoja: ' + error.message;
+                    container.style.color = '#ff3366';
+                }
+            }
+        }
 
         window.onload = initApp;
