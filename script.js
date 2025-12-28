@@ -419,19 +419,19 @@ function drawAuroraOverlay(points) {
 
   const canvasWidth = 3600, canvasHeight = 500;
 
-  const createCanvasOverlay = () => {
+  // Tämä funktio luo yhden canvaksen ja asettaa sen tiettyihin koordinaatteihin
+  const createLayer = (minLon, maxLon) => {
     const canvas = document.createElement('canvas');
     canvas.width = canvasWidth; canvas.height = canvasHeight;
     const ctx = canvas.getContext('2d');
 
     points.forEach((p) => {
-      let lon = p[0]; // NOAA antaa arvot -180...180
+      let lon = p[0]; // NOAA: -180...180
       const lat = p[1], intensity = p[2];
       if (intensity < 1) return;
 
-      // Lasketaan X-koordinaatti: -180 on 0px, 0 on 1800px, 180 on 3600px
+      // Lasketaan X niin, että -180 on 0 ja 180 on canvasWidth
       const x = ((lon + 180) / 360) * canvasWidth;
-      // Y-koordinaatti: 90N on 0px, 40N on 500px (skaalaus 50 asteen matkalla)
       const y = ((90 - lat) / 50) * canvasHeight;
 
       const radius = Math.min(60, Math.max(10, intensity * 3));
@@ -445,27 +445,28 @@ function drawAuroraOverlay(points) {
       ctx.arc(x, y, radius, 0, Math.PI * 2); 
       ctx.fill();
 
-      // Korjataan Greenwichin ja päivämäärärajan jatkuvuus piirtämällä reunojen yli
+      // TÄRKEÄ KORJAUS: Piirretään piste myös rajan yli, jos se on lähellä -180 tai 180
       if (x < radius) {
-        // Jos piste on lähellä vasenta reunaa (-180°), piirretään se myös oikeaan reunaan (+180°)
         ctx.beginPath();
         ctx.arc(x + canvasWidth, y, radius, 0, Math.PI * 2);
         ctx.fill();
       } else if (x > canvasWidth - radius) {
-        // Jos piste on lähellä oikeaa reunaa (+180°), piirretään se myös vasempaan reunaan (-180°)
         ctx.beginPath();
         ctx.arc(x - canvasWidth, y, radius, 0, Math.PI * 2);
         ctx.fill();
       }
     });
 
-    // Bounds vastaa tarkalleen pituuspiirejä -180:stä 180:een
-    const bounds = [[40, -180], [90, 180]];
+    const bounds = [[40, minLon], [90, maxLon]];
     const overlay = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.75 }).addTo(map);
     auroraLayer.push(overlay);
   };
 
-  createCanvasOverlay();
+  // Piirretään kolme kerrosta: keskelle, vasemmalle ja oikealle
+  // Tämä korjaa sen, että revontulet näkyvät vaikka karttaa pyörittäisi ympäri
+  createLayer(-180, 180);  // Keskikohta (Greenwich on nollassa)
+  createLayer(-540, -180); // Vasen puoli
+  createLayer(180, 540);   // Oikea puoli
 }
 
 // ------------------------
