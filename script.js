@@ -382,63 +382,92 @@ function initButtons() {
 // NOAA (Ovation) overlay
 // ------------------------
 async function fetchAuroraData() {
-          const info = document.getElementById('loader');
-          try {
-            const res = await fetch('https://services.swpc.noaa.gov/json/ovation_aurora_latest.json');
-            const data = await res.json();
-            currentData = data;
-            if (info) info.style.display = 'none';
-            drawAuroraOverlay(data.coordinates);
-          } catch (err) {
-            if (info) info.innerText = "Error loading data";
-          }
-        }
+  const info = document.getElementById('info');
+  if (!info) return;
+  info.className = 'loading';
+  info.innerHTML = '⏳ Loading northern lights forecast...';
 
-        async function fetchKPData() {
-            try {
-                const res = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json');
-                const data = await res.json();
-                const badge = document.getElementById('kpVal');
-                if(badge) badge.innerText = data[data.length-1][1];
-            } catch(e) {}
-        }
+  const directUrl = 'https://services.swpc.noaa.gov/json/ovation_aurora_latest.json';
+  const proxyUrl = 'https://corsproxy.io/?' + directUrl;
 
-        // TÄMÄ FUNKTIO KORVAA VANHAN drawAuroraOverlay:n
-        function drawAuroraOverlay(points) {
-            if (!ctx || !points) return;
-            ctx.clearRect(0, 0, auroraCanvas.width, auroraCanvas.height);
-            
-            const p1 = map.latLngToContainerPoint([65, 25]);
-            const p2 = map.latLngToContainerPoint([65.5, 25.5]);
-            const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
-            const radius = Math.max(10, dist * 1.5);
-            
-            createSprites(radius);
-            ctx.globalCompositeOperation = 'screen';
+  try {
+    const res = await fetch(directUrl, { cache: 'no-cache' }).catch(() => fetch(proxyUrl, { cache: 'no-cache' }));
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (!data.coordinates || !Array.isArray(data.coordinates)) throw new Error('Invalid data format.');
+    currentData = data;
 
-            points.filter(p => p[2] > 2).forEach(p => {
-                const rawLon = p[0];
-                const lat = p[1];
-                const intensity = p[2];
-                const offsets = [0, -360, 360];
+    const obsTime = new Date(data['Observation Time']).toLocaleString();
+    const forecastTime = new Date(data['Forecast Time']).toLocaleString();
+    info.className = '';
+    info.innerHTML = `<strong>📡 Northern Lights forecast</strong><br><small>Observation: ${obsTime}<br>Forecast: ${forecastTime}<br>Points: ${data.coordinates.length}</small>`;
 
-                offsets.forEach(offset => {
-                    let lon = (rawLon > 180 ? rawLon - 360 : rawLon) + offset;
-                    const pos = map.latLngToContainerPoint([lat, lon]);
+    drawAuroraOverlay(data.coordinates);
+  } catch (err) {
+    console.error('Aurora data error', err);
+    info.className = 'error';
+    info.innerHTML = `<strong>❌ Error</strong><br><small>No northern lights forecast available.<br>${err.message}</small>`;
+  }
+}
 
-                    if (pos.x < -radius * 2 || pos.x > auroraCanvas.width + radius * 2 || 
-                        pos.y < -radius * 2 || pos.y > auroraCanvas.height + radius * 2) return;
+function drawAuroraOverlay(points) {
+  if (!map) return;
 
-                    let sprite = spriteGreen;
-                    if (intensity > 35) sprite = spriteYellow;
-                    if (intensity > 70) sprite = spriteRed;
+  // Poista vanhat overlayt
+  if (auroraLayer) auroraLayer.forEach((l) => map.removeLayer(l));
+  auroraLayer = [];
 
-                    ctx.globalAlpha = Math.min(1, (intensity / 80) + 0.1);
-                    ctx.drawImage(sprite, pos.x - (radius * 1.25), pos.y - (radius * 1.25));
-                });
-            });
-            ctx.globalAlpha = 1;
-        }
+  const canvasWidth = 3600, canvasHeight = 500;
+
+  // Käytetään yhtä funktiota piirtämiseen, joka osaa käsitellä maailman ympäri jatkuvuuden
+  const createCanvasOverlay = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = canvasWidth; canvas.height = canvasHeight;
+    const ctx = canvas.getContext('2d');
+
+    points.forEach((p) => {
+      // Normalisoidaan pituuspiiri välille 0-360 (0 = nollameridiaani)
+      let lon = p[0];
+      if (lon < 0) lon += 360;
+      
+      const lat = p[1], intensity = p[2];
+      if (intensity < 1) return;
+
+      // Lasketaan X-koordinaatti niin, että 0-360 vastaa canvasWidthiä
+      const x = (lon / 360) * canvasWidth;
+      // Latitudi 40-90 väli (koska bounds on asetettu niin)
+      const y = ((90 - lat) / 50) * canvasHeight;
+
+      const radius = Math.min(60, Math.max(10, intensity * 3));
+      const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
+      grad.addColorStop(0, `rgba(50,255,100,${Math.min(0.3, intensity / 10)})`);
+      grad.addColorStop(0.5, `rgba(0,200,100,${Math.min(0.1, intensity / 15)})`);
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      
+      ctx.fillStyle = grad;
+      ctx.beginPath(); 
+      ctx.arc(x, y, radius, 0, Math.PI * 2); 
+      ctx.fill();
+
+      // Piirretään piste myös "rajan yli", jos se on lähellä reunaa
+      if (x < radius) {
+        ctx.arc(x + canvasWidth, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (x > canvasWidth - radius) {
+        ctx.arc(x - canvasWidth, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
+
+    // Asetetaan bounds vastaamaan normalisoitua 0-360 pituuspiiriä (Leafletissä -180 to 180)
+    const bounds = [[40, -180], [90, 180]];
+    const overlay = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.75 }).addTo(map);
+    auroraLayer.push(overlay);
+  };
+
+  createCanvasOverlay();
+}
+
 // ------------------------
 // Chart.js latausvarmistus
 // ------------------------
