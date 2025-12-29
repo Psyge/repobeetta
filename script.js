@@ -9,6 +9,7 @@ let ctx = null;          // Alustetaan nulliksi
 let userMarker = null;
 let currentData = null;
 let placeMarkers = new Map();
+let animationFrameId;
 
 // Spritet ja säädöt
 let spriteGreen, spriteYellow, spriteRed, currentRadius = 0;
@@ -381,33 +382,40 @@ function initButtons() {
 // ------------------------
 // NOAA (Ovation) overlay
 // ------------------------
+
+
 const AuroraLayer = L.Layer.extend({
     onAdd: function(map) {
         this._container = L.DomUtil.create('div', 'leaflet-aurora-layer');
         this._canvas = L.DomUtil.create('canvas', 'aurora-canvas', this._container);
         map.getPanes().overlayPane.appendChild(this._container);
-        
         auroraCanvas = this._canvas;
         ctx = auroraCanvas.getContext('2d');
         
         map.on('move moveend zoomend', this._update, this);
+        this._startAnimation(); // Käynnistetään liike
         this._update();
     },
+    onRemove: function(map) {
+        cancelAnimationFrame(animationFrameId);
+    },
+    _startAnimation: function() {
+        const render = () => {
+            if (currentData) drawAuroraOverlay(currentData.coordinates);
+            animationFrameId = requestAnimationFrame(render);
+        };
+        render();
+    },
     _update: function() {
-        if (!map || !auroraCanvas) return;
         const size = map.getSize();
         const topLeft = map.containerPointToLayerPoint([0, 0]);
         L.DomUtil.setPosition(this._canvas, topLeft);
-        
         auroraCanvas.width = size.x;
         auroraCanvas.height = size.y;
         
         const zoom = map.getZoom();
-        // Pehmeys säätyy dynaamisesti
-        const blurValue = zoom > 8 ? 15 : Math.max(10, zoom * 3);
+        const blurValue = zoom > 8 ? 20 : Math.max(12, zoom * 3.5);
         this._canvas.style.filter = `blur(${blurValue}px)`;
-        
-        if (currentData) drawAuroraOverlay(currentData.coordinates);
     }
 });
 
@@ -417,25 +425,22 @@ function createSprites(radius) {
     
     const create = (color) => {
         const s = document.createElement('canvas');
-        // Tehdään canvaksesta tarpeeksi suuri laajalle hajontatallennukselle
         s.width = s.height = radius * 4;
         const c = s.getContext('2d');
         const center = s.width / 2;
-        
-        // Luodaan erittäin pehmeä liukuväri
-        const g = c.createRadialGradient(center, center, 0, center, center, radius * 2);
-        g.addColorStop(0, `rgba(${color}, 0.6)`);   // Keskeltä kuultava
-        g.addColorStop(0.3, `rgba(${color}, 0.15)`); // Nopeasti haalistuva
-        g.addColorStop(1, `rgba(${color}, 0)`);     // Reunoilta täysin näkymätön
-        
+        const g = c.createRadialGradient(center, center, 0, center, center, radius);
+        g.addColorStop(0, `rgba(${color}, 0.9)`); // Vahva keskusta
+        g.addColorStop(0.4, `rgba(${color}, 0.2)`); 
+        g.addColorStop(1, `rgba(${color}, 0)`);
         c.fillStyle = g;
         c.fillRect(0, 0, s.width, s.height);
         return s;
     };
     
-    spriteGreen = create('60, 255, 120');
-    spriteYellow = create('255, 255, 80');
-    spriteRed = create('255, 80, 80');
+    // Neon-värikoodit
+    spriteGreen = create('0, 255, 150');  // Sähköinen vihreä
+    spriteYellow = create('200, 255, 0'); // Neon lime
+    spriteRed = create('255, 0, 100');    // Neon pinkki/punainen
 }
 
 function drawAuroraOverlay(points) {
@@ -443,30 +448,31 @@ function drawAuroraOverlay(points) {
     ctx.clearRect(0, 0, auroraCanvas.width, auroraCanvas.height);
     
     const zoom = map.getZoom();
-    
-    // RADIKAALI SKAALAUS:
-    // Pienillä zoomeilla (2-5) pallot ovat pieniä.
-    // Suurilla zoomeilla (8-15) ne kasvavat jättimäisiksi pilviksi.
-    let radius = zoom * 8; 
-    if (zoom > 7) radius = zoom * 25; // Erittäin suuri koko lähellä
-    if (zoom > 10) radius = zoom * 45; // Maksimi peitto kaupunkitasolla
-    
+    const time = Date.now() * 0.001; // Aika sekunteina animaatiota varten
+
+    // JÄTTIKOKO LÄHELLÄ:
+    let radius = zoom * 10;
+    if (zoom > 7) radius = zoom * 50; 
+    if (zoom > 10) radius = zoom * 100; // Massiivinen peitto
+
     createSprites(radius);
     ctx.globalCompositeOperation = 'screen';
 
-    points.forEach(p => {
+    points.forEach((p, index) => {
         const lat = p[1];
         const intensity = p[2];
 
-        // Vain pohjoinen ja riittävä kirkkaus
         if (lat < 45 || intensity < 4) return;
 
         let lon = p[0];
         if (lon > 180) lon -= 360;
 
-        const pos = map.latLngToContainerPoint([lat, lon]);
+        // LIIKE: Lisätään pieni aaltoilu sijaintiin
+        const offsetLat = Math.sin(time + index) * 0.2; 
+        const offsetLon = Math.cos(time * 0.8 + index) * 0.2;
 
-        // Pidetään huoli, ettei piirretä jos piste on täysin ruudun ulkopuolella
+        const pos = map.latLngToContainerPoint([lat + offsetLat, lon + offsetLon]);
+
         if (pos.x < -radius * 2 || pos.x > auroraCanvas.width + radius * 2 || 
             pos.y < -radius * 2 || pos.y > auroraCanvas.height + radius * 2) return;
 
@@ -474,28 +480,24 @@ function drawAuroraOverlay(points) {
         if (intensity > 35) sprite = spriteYellow;
         if (intensity > 70) sprite = spriteRed;
 
-        // LÄPINÄKYVYYS: 
-        // Mitä enemmän zoomataan, sitä läpinäkyvämpiä yksittäiset pilvet ovat, 
-        // jotta ne sulautuvat toisiinsa kauniisti.
-        const zoomOpacityFactor = Math.max(0.05, 0.4 - (zoom * 0.02));
-        ctx.globalAlpha = Math.min(zoomOpacityFactor, (intensity / 150));
+        // KIRKKAUS: Nostettu alpha, jotta värit loistavat
+        const zoomAlpha = zoom > 8 ? 0.6 : 0.4;
+        ctx.globalAlpha = Math.min(zoomAlpha, (intensity / 100));
         
-        // Piirretään sprite (tämä on se "sumupallo")
         ctx.drawImage(sprite, pos.x - sprite.width / 2, pos.y - sprite.height / 2);
-        
-        // Jos ollaan tosi lähellä, piirretään toinen, vielä suurempi ja himmeämpi kerros 
-        // päälle täyttämään aukkoja
+
+        // Lisäkerros syvyyttä varten
         if (zoom > 8) {
-            ctx.globalAlpha = ctx.globalAlpha * 0.5;
+            ctx.globalAlpha *= 0.4;
+            const pulse = Math.sin(time * 2 + index) * 0.1 + 1; // Pieni sykintä
             ctx.drawImage(sprite, 
-                pos.x - (sprite.width * 1.5) / 2, 
-                pos.y - (sprite.height * 1.5) / 2, 
-                sprite.width * 1.5, 
-                sprite.height * 1.5
+                pos.x - (sprite.width * 1.8 * pulse) / 2, 
+                pos.y - (sprite.height * 1.8 * pulse) / 2, 
+                sprite.width * 1.8 * pulse, 
+                sprite.height * 1.8 * pulse
             );
         }
     });
-    ctx.globalAlpha = 1;
 }
 
 async function fetchAuroraData() {
