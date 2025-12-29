@@ -383,101 +383,91 @@ function initButtons() {
 // ------------------------
 const AuroraLayer = L.Layer.extend({
     onAdd: function(map) {
-        // Luodaan container ja canvas
         this._container = L.DomUtil.create('div', 'leaflet-aurora-layer');
         this._canvas = L.DomUtil.create('canvas', 'aurora-canvas', this._container);
-        
-        // Lisätään kartan overlay-tasoon
         map.getPanes().overlayPane.appendChild(this._container);
         
-        // Asetetaan globaalit muuttujat, jotta drawAuroraOverlay löytää ne
         auroraCanvas = this._canvas;
         ctx = auroraCanvas.getContext('2d');
         
         map.on('move moveend zoomend', this._update, this);
         this._update();
     },
-   _update: function() {
-    if (!map || !auroraCanvas) return;
-    const size = map.getSize();
-    const topLeft = map.containerPointToLayerPoint([0, 0]);
-    L.DomUtil.setPosition(this._canvas, topLeft);
-    
-    auroraCanvas.width = size.x;
-    auroraCanvas.height = size.y;
-    
-    const zoom = map.getZoom();
-    // Blur-arvo: vähennetään blurausta kun zoomataan lähelle, jotta muodot säilyvät
-    const blurValue = zoom > 8 ? 10 : Math.max(8, zoom * 2.5);
-    this._canvas.style.filter = `blur(${blurValue}px)`;
-    
-    if (currentData && currentData.coordinates) {
-        drawAuroraOverlay(currentData.coordinates);
+    _update: function() {
+        if (!map || !auroraCanvas) return;
+        const size = map.getSize();
+        const topLeft = map.containerPointToLayerPoint([0, 0]);
+        L.DomUtil.setPosition(this._canvas, topLeft);
+        
+        auroraCanvas.width = size.x;
+        auroraCanvas.height = size.y;
+        
+        const zoom = map.getZoom();
+        // Pehmeys säätyy dynaamisesti
+        const blurValue = zoom > 8 ? 15 : Math.max(10, zoom * 3);
+        this._canvas.style.filter = `blur(${blurValue}px)`;
+        
+        if (currentData) drawAuroraOverlay(currentData.coordinates);
     }
-}
 });
 
 function createSprites(radius) {
     if (radius === currentRadius) return;
     currentRadius = radius;
+    
     const create = (color) => {
         const s = document.createElement('canvas');
-        s.width = s.height = radius * 6; 
+        s.width = s.height = radius * 4;
         const c = s.getContext('2d');
         const center = s.width / 2;
-        const g = c.createRadialGradient(center, center, 0, center, center, radius * 2);
-        g.addColorStop(0, `rgba(${color}, 0.7)`);
-        g.addColorStop(0.4, `rgba(${color}, 0.15)`);
+        const g = c.createRadialGradient(center, center, 0, center, center, radius);
+        g.addColorStop(0, `rgba(${color}, 1)`);
+        g.addColorStop(0.5, `rgba(${color}, 0.2)`);
         g.addColorStop(1, `rgba(${color}, 0)`);
         c.fillStyle = g;
         c.fillRect(0, 0, s.width, s.height);
         return s;
     };
-    spriteGreen = create('40, 255, 120');
-    spriteYellow = create('255, 255, 0');
-    spriteRed = create('255, 40, 0');
+    
+    spriteGreen = create('50, 255, 100');
+    spriteYellow = create('255, 255, 50');
+    spriteRed = create('255, 50, 50');
 }
 
 function drawAuroraOverlay(points) {
     if (!ctx || !points || !auroraCanvas) return;
-    
     ctx.clearRect(0, 0, auroraCanvas.width, auroraCanvas.height);
     
     const zoom = map.getZoom();
+    // Skaalaus: pidetään revontulet laajoina myös lähellä
+    const radius = zoom > 7 ? (zoom * 12) : (zoom * 6);
     
-    // KORJAUS 2: Tehokkaampi skaalaus zoomatessa. 
-    // Mitä suurempi zoom, sitä suuremmaksi säde kasvaa suhteessa.
-    const baseRadius = Math.max(12, zoom * 4.5);
-    const radius = zoom > 7 ? baseRadius * 2.5 : baseRadius; 
-    
-    createSprites(radius);
+    createSprites(radius); // Luodaan hehkuefektit
     ctx.globalCompositeOperation = 'screen';
 
     points.forEach(p => {
         const lat = p[1];
         const intensity = p[2];
 
-        // KORJAUS 1: Piirretään vain pohjoiset revontulet (lat > 40)
-        // Samalla suodatetaan pois erittäin heikot kohdat (intensity < 5)
-        if (lat < 40 || intensity < 5) return;
+        // Suodatetaan: Vain pohjoinen (> 45N) ja riittävä voimakkuus
+        if (lat < 45 || intensity < 4) return;
 
         let lon = p[0];
         if (lon > 180) lon -= 360;
 
+        // Muutetaan koordinaatit HTML5-pikseleiksi
         const pos = map.latLngToContainerPoint([lat, lon]);
 
-        // Optimointi: ei piirretä jos on kaukana ruudun ulkopuolella
-        if (pos.x < -radius * 2 || pos.x > auroraCanvas.width + radius * 2 || 
-            pos.y < -radius * 2 || pos.y > auroraCanvas.height + radius * 2) return;
+        // Piirretään vain jos piste on ruudulla
+        if (pos.x < -radius || pos.x > auroraCanvas.width + radius || 
+            pos.y < -radius || pos.y > auroraCanvas.height + radius) return;
 
         let sprite = spriteGreen;
         if (intensity > 35) sprite = spriteYellow;
         if (intensity > 70) sprite = spriteRed;
 
-        // Lisätään läpinäkyvyyttä zoomatessa, jotta isoista palloista tulee "sumumaisia"
-        const alphaBoost = zoom > 8 ? 0.02 : 0.05;
-        ctx.globalAlpha = Math.min(0.3, (intensity / 180) + alphaBoost);
-        
+        // Säädetään kirkkaus (alpha)
+        ctx.globalAlpha = Math.min(0.4, (intensity / 160) + 0.05);
         ctx.drawImage(sprite, pos.x - sprite.width / 2, pos.y - sprite.height / 2);
     });
     ctx.globalAlpha = 1;
