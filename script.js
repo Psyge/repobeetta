@@ -155,35 +155,32 @@ async function initAppMap() {
     return;
   }
 
-  // --- kaikki vanhasta initApp:sta karttaan liittyvä ---
   map = L.map('map', { center: [65, 25], zoom: 4, minZoom: 2, maxZoom: 15 });
 
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap &copy; CARTO',
+    attribution: '© OpenStreetMap © CARTO',
     subdomains: 'abcd',
     maxZoom: 19
   }).addTo(map);
 
-  map.setMaxBounds([[-90, -180], [90, 180]]);
-  map.on('drag', () => map.panInsideBounds([[-90, -180], [90, 180]], { animate: false }));
+  // --- LISÄÄ TÄMÄ OSA ---
+  // Aktivoidaan revontulitaso
+  const auroraLayerInstance = new AuroraLayer();
+  map.addLayer(auroraLayerInstance);
+  // ----------------------
 
+  map.setMaxBounds([[-90, -180], [90, 180]]);
   map.on('click', onMapClick);
 
-  // Lataa paikat ja luo markerit
   const places = await loadPlaces();
-  if (places.length === 0) {
-    console.warn('Ei kohteita manifestista: lisää /kohteet/index.json ja per-kohde tiedostot.');
+  if (places.length > 0 && typeof initMarkers === 'function') {
+      initMarkers(map, getWeather, showPlaceInfo, places);
   }
-  initMarkers(map, getWeather, showPlaceInfo, places);
 
-  // NOAA-data + päivitys
   fetchAuroraData();
   setInterval(fetchAuroraData, 5 * 60 * 1000);
-await openPlaceFromUrlParam();
-  // Mahdollinen muu karttaan liittyvä initialisointi...
+  await openPlaceFromUrlParam();
 }
-
-
 
 
 console.debug('Saatavilla marker-id:t:', Array.from(placeMarkers.keys()));
@@ -420,6 +417,27 @@ const AuroraLayer = L.Layer.extend({
         }
     }
 });
+
+function createSprites(radius) {
+    if (radius === currentRadius) return;
+    currentRadius = radius;
+    const create = (color) => {
+        const s = document.createElement('canvas');
+        s.width = s.height = radius * 6; 
+        const c = s.getContext('2d');
+        const center = s.width / 2;
+        const g = c.createRadialGradient(center, center, 0, center, center, radius * 2);
+        g.addColorStop(0, `rgba(${color}, 0.7)`);
+        g.addColorStop(0.4, `rgba(${color}, 0.15)`);
+        g.addColorStop(1, `rgba(${color}, 0)`);
+        c.fillStyle = g;
+        c.fillRect(0, 0, s.width, s.height);
+        return s;
+    };
+    spriteGreen = create('40, 255, 120');
+    spriteYellow = create('255, 255, 0');
+    spriteRed = create('255, 40, 0');
+}
 
 function drawAuroraOverlay(points) {
     // TÄRKEÄ: Tarkistetaan että ctx on olemassa (ReferenceError fix)
