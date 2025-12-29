@@ -417,21 +417,25 @@ function createSprites(radius) {
     
     const create = (color) => {
         const s = document.createElement('canvas');
+        // Tehdään canvaksesta tarpeeksi suuri laajalle hajontatallennukselle
         s.width = s.height = radius * 4;
         const c = s.getContext('2d');
         const center = s.width / 2;
-        const g = c.createRadialGradient(center, center, 0, center, center, radius);
-        g.addColorStop(0, `rgba(${color}, 1)`);
-        g.addColorStop(0.5, `rgba(${color}, 0.2)`);
-        g.addColorStop(1, `rgba(${color}, 0)`);
+        
+        // Luodaan erittäin pehmeä liukuväri
+        const g = c.createRadialGradient(center, center, 0, center, center, radius * 2);
+        g.addColorStop(0, `rgba(${color}, 0.6)`);   // Keskeltä kuultava
+        g.addColorStop(0.3, `rgba(${color}, 0.15)`); // Nopeasti haalistuva
+        g.addColorStop(1, `rgba(${color}, 0)`);     // Reunoilta täysin näkymätön
+        
         c.fillStyle = g;
         c.fillRect(0, 0, s.width, s.height);
         return s;
     };
     
-    spriteGreen = create('50, 255, 100');
-    spriteYellow = create('255, 255, 50');
-    spriteRed = create('255, 50, 50');
+    spriteGreen = create('60, 255, 120');
+    spriteYellow = create('255, 255, 80');
+    spriteRed = create('255, 80, 80');
 }
 
 function drawAuroraOverlay(points) {
@@ -439,36 +443,57 @@ function drawAuroraOverlay(points) {
     ctx.clearRect(0, 0, auroraCanvas.width, auroraCanvas.height);
     
     const zoom = map.getZoom();
-    // Skaalaus: pidetään revontulet laajoina myös lähellä
-    const radius = zoom > 7 ? (zoom * 12) : (zoom * 6);
     
-    createSprites(radius); // Luodaan hehkuefektit
+    // RADIKAALI SKAALAUS:
+    // Pienillä zoomeilla (2-5) pallot ovat pieniä.
+    // Suurilla zoomeilla (8-15) ne kasvavat jättimäisiksi pilviksi.
+    let radius = zoom * 8; 
+    if (zoom > 7) radius = zoom * 25; // Erittäin suuri koko lähellä
+    if (zoom > 10) radius = zoom * 45; // Maksimi peitto kaupunkitasolla
+    
+    createSprites(radius);
     ctx.globalCompositeOperation = 'screen';
 
     points.forEach(p => {
         const lat = p[1];
         const intensity = p[2];
 
-        // Suodatetaan: Vain pohjoinen (> 45N) ja riittävä voimakkuus
+        // Vain pohjoinen ja riittävä kirkkaus
         if (lat < 45 || intensity < 4) return;
 
         let lon = p[0];
         if (lon > 180) lon -= 360;
 
-        // Muutetaan koordinaatit HTML5-pikseleiksi
         const pos = map.latLngToContainerPoint([lat, lon]);
 
-        // Piirretään vain jos piste on ruudulla
-        if (pos.x < -radius || pos.x > auroraCanvas.width + radius || 
-            pos.y < -radius || pos.y > auroraCanvas.height + radius) return;
+        // Pidetään huoli, ettei piirretä jos piste on täysin ruudun ulkopuolella
+        if (pos.x < -radius * 2 || pos.x > auroraCanvas.width + radius * 2 || 
+            pos.y < -radius * 2 || pos.y > auroraCanvas.height + radius * 2) return;
 
         let sprite = spriteGreen;
         if (intensity > 35) sprite = spriteYellow;
         if (intensity > 70) sprite = spriteRed;
 
-        // Säädetään kirkkaus (alpha)
-        ctx.globalAlpha = Math.min(0.4, (intensity / 160) + 0.05);
+        // LÄPINÄKYVYYS: 
+        // Mitä enemmän zoomataan, sitä läpinäkyvämpiä yksittäiset pilvet ovat, 
+        // jotta ne sulautuvat toisiinsa kauniisti.
+        const zoomOpacityFactor = Math.max(0.05, 0.4 - (zoom * 0.02));
+        ctx.globalAlpha = Math.min(zoomOpacityFactor, (intensity / 150));
+        
+        // Piirretään sprite (tämä on se "sumupallo")
         ctx.drawImage(sprite, pos.x - sprite.width / 2, pos.y - sprite.height / 2);
+        
+        // Jos ollaan tosi lähellä, piirretään toinen, vielä suurempi ja himmeämpi kerros 
+        // päälle täyttämään aukkoja
+        if (zoom > 8) {
+            ctx.globalAlpha = ctx.globalAlpha * 0.5;
+            ctx.drawImage(sprite, 
+                pos.x - (sprite.width * 1.5) / 2, 
+                pos.y - (sprite.height * 1.5) / 2, 
+                sprite.width * 1.5, 
+                sprite.height * 1.5
+            );
+        }
     });
     ctx.globalAlpha = 1;
 }
