@@ -5,6 +5,7 @@ let userMarker = null;
 let currentData = null;
 let placeMarkers = new Map();
 let animationFrameId;
+let kpChartInstance = null;
 
 // Spritet ja säädöt
 let spriteGreen, spriteYellow, spriteRed, currentRadius = 0;
@@ -564,33 +565,61 @@ async function fetchAuroraForecast() {
     const ctxElement = document.getElementById('kpChart'); 
     if (!ctxElement) return;
     const ctx = ctxElement.getContext('2d');
-    new Chart(ctx, {
+
+    // --- TÄRKEÄ KORJAUS: TUHOTAAN VANHA KAAVIO ---
+    if (kpChartInstance) {
+      kpChartInstance.destroy();
+    }
+
+    // Luodaan uusi kaavio ja tallennetaan se muuttujaan
+    kpChartInstance = new Chart(ctx, {
       type: 'line',
       data: {
         labels: times,
         datasets: [
-          { label: dayLabels[0], data: day1, borderColor: '#007bff', pointBackgroundColor: day1.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'), pointRadius: 6, tension: 0.3 },
-          { label: dayLabels[1], data: day2, borderColor: '#6f42c1', pointBackgroundColor: day2.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'), pointRadius: 6, tension: 0.3 },
-          { label: dayLabels[2], data: day3, borderColor: '#20c997', pointBackgroundColor: day3.map(kp => kp < 3 ? 'green' : kp < 5 ? 'orange' : 'red'), pointRadius: 6, tension: 0.3 }
+          { label: dayLabels[0], data: day1, borderColor: '#00ffcc', pointBackgroundColor: day1.map(kp => kp < 3 ? '#00ffcc' : kp < 5 ? '#ffcc00' : '#ff3366'), pointRadius: 5, tension: 0.3, fill: false },
+          { label: dayLabels[1], data: day2, borderColor: '#6f42c1', pointBackgroundColor: day2.map(kp => kp < 3 ? '#00ffcc' : kp < 5 ? '#ffcc00' : '#ff3366'), pointRadius: 5, tension: 0.3, fill: false },
+          { label: dayLabels[2], data: day3, borderColor: '#20c997', pointBackgroundColor: day3.map(kp => kp < 3 ? '#00ffcc' : kp < 5 ? '#ffcc00' : '#ff3366'), pointRadius: 5, tension: 0.3, fill: false }
         ]
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
-          title: { display: true, text: 'Northern Lights forecast (NOAA)' },
-          tooltip: { callbacks: { label: function(context) { const kp = context.parsed.y; if (kp >= 5) return `Kp ${kp} - High chance`; if (kp >= 3) return `Kp ${kp} - Moderate chance`; return `Kp ${kp} - Low chance`; } } }
+          legend: { labels: { color: '#fff' } },
+          tooltip: { 
+            callbacks: { 
+              label: function(context) { 
+                const kp = context.parsed.y; 
+                if (kp >= 5) return `Kp ${kp} - High chance`; 
+                if (kp >= 3) return `Kp ${kp} - Moderate chance`; 
+                return `Kp ${kp} - Low chance`; 
+              } 
+            } 
+          }
         },
-        scales: { y: { min: 0, max: 9, title: { display: true, text: 'Kp Index' } }, x: { title: { display: true, text: 'UT Time (3h intervals)' } } }
+        scales: { 
+          y: { 
+            min: 0, max: 9, 
+            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+            ticks: { color: '#fff' },
+            title: { display: true, text: 'Kp Index', color: '#fff' } 
+          }, 
+          x: { 
+            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+            ticks: { color: '#fff' },
+            title: { display: true, text: 'UT Time', color: '#fff' } 
+          } 
+        }
       }
     });
-
 
   } catch (error) {
     console.error('Error fetching NOAA forecast:', error);
     const container = document.getElementById('errorMessage');
     if (container) {
       container.textContent = '⚠️ Error downloading NOAA data: ' + error.message;
-      container.style.color = 'red';
+      container.style.color = '#ff3366';
       container.style.fontWeight = 'bold';
     }
   }
