@@ -88,17 +88,31 @@ header.banner {
     top: 0;
     left: 0;
     width: 100%;
-    height: 80px; /* Hieman matalampi ja sirompi */
-    background: rgba(10, 15, 25, 0.7); /* Tumma ja läpikuultava */
-    backdrop-filter: blur(15px); /* Lasiefekti */
-    -webkit-backdrop-filter: blur(15px);
+    height: 90px;
+    background: linear-gradient(180deg, rgba(5, 10, 20, 0.95) 0%, rgba(10, 20, 35, 0.8) 100%);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 30px;
-    z-index: 10000; /* Varmistetaan että on kaiken päällä */
-    border-bottom: 1px solid rgba(0, 255, 204, 0.2); /* Ohut neon-reuna */
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    padding: 0 40px;
+    z-index: 10000;
+    /* Kaksoisreunus: sisempi kirkas, ulompi pehmeä */
+    border-bottom: 1px solid rgba(0, 255, 204, 0.3);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 
+                inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+header.banner::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 10%;
+    width: 30%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(0, 255, 204, 0.15) 0%, transparent 70%);
+    filter: blur(30px);
+    z-index: -1;
+    animation: aurora-move 8s ease-in-out infinite alternate;
 }
 header.banner::after {
     content: "";
@@ -114,28 +128,48 @@ header.banner::after {
 .banner-left {
     display: flex;
     align-items: center;
-    height: 100%;
+    position: relative;
 }
 .banner-left .logo {
-    height: 60px; /* Skaalattu sopivaksi uuteen korkeuteen */
-    transition: transform 0.3s ease;
-    filter: drop-shadow(0 0 8px rgba(0, 255, 204, 0.3));
+    height: 65px;
+    z-index: 2;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    filter: drop-shadow(0 0 15px rgba(0, 255, 204, 0.4));
 }
 .banner-right {
     display: flex;
     align-items: center;
-    gap: 20px;
-    right: 0; /* Poistettu kova haku, käytetään flexin väliä */
+    gap: 15px;
+}
+.banner-right .icon-container {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.banner-right .icon-container:hover {
+    background: rgba(0, 255, 204, 0.1);
+    border-color: rgba(0, 255, 204, 0.5);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 255, 204, 0.2);
+}
+.banner-left:hover .logo {
+    transform: scale(1.1) rotate(-2deg);
+    filter: drop-shadow(0 0 25px rgba(0, 255, 204, 0.7));
 }
 .banner-left .logo:hover {
     transform: scale(1.05);
 }
 .banner-right .icon {
-    width: 28px;
-    height: 28px;
-    filter: invert(1) drop-shadow(0 0 5px rgba(0, 255, 204, 0.5));
-    transition: all 0.3s ease;
-    opacity: 0.8;
+    width: 24px;
+    height: 24px;
+    filter: invert(1);
+    opacity: 0.9;
 }
 .banner-right .icon:hover {
     opacity: 1;
@@ -160,16 +194,23 @@ header.banner::after {
 #locate-btn:hover { background: #1565c0; }
 
 #menu-btn {
-    position: static; /* Poistettu absolute, jotta pysyy flex-järjestyksessä */
-    font-size: 28px;
-    color: #00ffcc;
-    margin-right: 15px;
-    text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+    position: static;
+    font-size: 32px;
+    color: #fff;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-right: 25px;
+    display: flex;
+    align-items: center;
 }
 #menu {
     display: none; position: fixed; top: 100px; left: 0;
     background: rgba(30,136,229,0.95); width: 220px;
     box-shadow: 2px 4px 8px rgba(0,0,0,0.4); flex-direction: column; padding: 10px 0; z-index: 7000;
+}
+#menu-btn:hover {
+    color: #00ffcc;
+    text-shadow: 0 0 15px #00ffcc;
 }
 #menu a { display: block; padding: 12px 20px; color: white; text-decoration: none; font-family: Arial, sans-serif; }
 #menu a:hover { background: rgba(255,255,255,0.15); }
@@ -208,11 +249,10 @@ header.banner::after {
 }
 @keyframes float { 0% { transform: scale(0.9); } 50% { transform: scale(1.2); } }
 
-@keyframes aurora-glow {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
+@keyframes aurora-move {
+    from { transform: translateX(-10%) skewX(-10deg); opacity: 0.5; }
+    to { transform: translateX(50%) skewX(10deg); opacity: 0.8; }
 }
-
 .pin { width: 100%; height: auto; max-width: 32px; max-height: 48px; }
 .pin-icon {
     position: absolute; top: 4px; left: 50%; transform: translateX(-50%);
