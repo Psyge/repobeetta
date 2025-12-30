@@ -156,7 +156,11 @@ header.banner::before {
 }
 
 #map {
-    margin-top: 100px; /* Sopiva väli leijuvaan banneriin */
+     width: 100%;
+    height: 60vh;   /* kartta vie 45% sivusta */
+    margin-top: 100px;
+    position: relative;
+    z-index: 1; /* Sopiva väli leijuvaan banneriin */
 }
 
 #info {
