@@ -140,7 +140,16 @@ The colors on the map indicate the probability and intensity of the northern lig
 
 <!-- Markerit -->
 <script src="markers.js"></script>
-
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    // Muut alustukset...
+    fetchKPData(); // <--- LISÄÄ TÄMÄ RIVI
+    
+    // Voit myös laittaa sen päivittymään automaattisesti tunnin välein
+    setInterval(fetchKPData, 3600000); 
+});
+  
+</script>
 
 </body>
 </html>
