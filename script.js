@@ -436,7 +436,7 @@ function createSprites(radius) {
     };
     
     // Neon-värikoodit
-    spriteGreen = create('0, 255, 150');  // Sähköinen vihreä
+    spriteGreen = create('50, 255, 150');  // Sähköinen vihreä
     spriteYellow = create('200, 255, 0'); // Neon lime
     spriteRed = create('255, 0, 100');    // Neon pinkki/punainen
 }
