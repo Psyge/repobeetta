@@ -197,13 +197,9 @@ header.banner::after {
 }
 
 .popup-content {
-  background: #222;
-  color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  max-width: 300px;
-  text-align: center;
-  box-shadow: 0 0 10px rgba(0,0,0,0.8);
+  display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(10, 15, 25, 0.98); padding: 25px; border-radius: 20px;
+            z-index: 9999; color: white; width: 85%; max-width: 700px; border: 1px solid #00ffcc;
 }
 
 .popup-content button {
