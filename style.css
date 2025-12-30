@@ -311,7 +311,7 @@ header.banner::before {
         left: 3% !important;
         width: 180px;
     }
-}
+
     #info { position: fixed; bottom: 10px; left: 10px; font-size: 12px; height: 60px; }
     #locate-btn {
         bottom: 80px; right: 20px; width: 50px; height: 50px; border-radius: 50%; font-size: 0;
