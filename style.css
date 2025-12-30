@@ -114,17 +114,7 @@ header.banner::before {
     z-index: -1;
     animation: aurora-move 8s ease-in-out infinite alternate;
 }
-header.banner::after {
-    content: "";
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #00ffcc, #33ccff, #00ffcc, transparent);
-    background-size: 200% 100%;
-    animation: aurora-glow 5s linear infinite;
-}
+
 .banner-left {
     display: flex;
     align-items: center;
@@ -162,9 +152,7 @@ header.banner::after {
     transform: scale(1.1) rotate(-2deg);
     filter: drop-shadow(0 0 25px rgba(0, 255, 204, 0.7));
 }
-.banner-left .logo:hover {
-    transform: scale(1.05);
-}
+
 .banner-right .icon {
     width: 24px;
     height: 24px;
