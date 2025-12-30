@@ -317,4 +317,5 @@ header.banner::before {
     }
 #forecast-btn::before { content: "📊"; font-size: 24px; }    
 #kpDesc { display: none; }
+#desc::before [ content: "KP-Ind";}    
 }
