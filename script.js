@@ -1,8 +1,3 @@
-
-// ===============================
-// Aurora/RepoTracker main script
-// ===============================
-
 let map;
 let auroraCanvas = null; // Alustetaan nulliksi
 let ctx = null;          // Alustetaan nulliksi
@@ -13,6 +8,7 @@ let animationFrameId;
 
 // Spritet ja säädöt
 let spriteGreen, spriteYellow, spriteRed, currentRadius = 0;
+
 // ------------------------------
 // Weather from Cloudflare Worker
 // ------------------------------
@@ -156,32 +152,35 @@ async function initAppMap() {
     return;
   }
 
+  // --- kaikki vanhasta initApp:sta karttaan liittyvä ---
   map = L.map('map', { center: [65, 25], zoom: 4, minZoom: 2, maxZoom: 15 });
 
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '© OpenStreetMap © CARTO',
+    attribution: '&copy; OpenStreetMap &copy; CARTO',
     subdomains: 'abcd',
     maxZoom: 19
   }).addTo(map);
 
-  // --- LISÄÄ TÄMÄ OSA ---
-  // Aktivoidaan revontulitaso
-  const auroraLayerInstance = new AuroraLayer();
-  map.addLayer(auroraLayerInstance);
-  // ----------------------
-
   map.setMaxBounds([[-90, -180], [90, 180]]);
+  map.on('drag', () => map.panInsideBounds([[-90, -180], [90, 180]], { animate: false }));
+
   map.on('click', onMapClick);
 
+  // Lataa paikat ja luo markerit
   const places = await loadPlaces();
-  if (places.length > 0 && typeof initMarkers === 'function') {
-      initMarkers(map, getWeather, showPlaceInfo, places);
+  if (places.length === 0) {
+    console.warn('Ei kohteita manifestista: lisää /kohteet/index.json ja per-kohde tiedostot.');
   }
+  initMarkers(map, getWeather, showPlaceInfo, places);
 
+  // NOAA-data + päivitys
   fetchAuroraData();
   setInterval(fetchAuroraData, 5 * 60 * 1000);
-  await openPlaceFromUrlParam();
+await openPlaceFromUrlParam();
+  // Mahdollinen muu karttaan liittyvä initialisointi...
 }
+
+
 
 
 console.debug('Saatavilla marker-id:t:', Array.from(placeMarkers.keys()));
@@ -382,8 +381,6 @@ function initButtons() {
 // ------------------------
 // NOAA (Ovation) overlay
 // ------------------------
-
-
 const AuroraLayer = L.Layer.extend({
     onAdd: function(map) {
         this._container = L.DomUtil.create('div', 'leaflet-aurora-layer');
@@ -518,7 +515,6 @@ async function fetchAuroraData() {
         console.error('Aurora data error:', err);
     }
 }
-
 // ------------------------
 // Chart.js latausvarmistus
 // ------------------------
