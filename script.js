@@ -152,26 +152,27 @@ async function initAppMap() {
     return;
   }
 
-  // --- kaikki vanhasta initApp:sta karttaan liittyvä ---
   map = L.map('map', { center: [65, 25], zoom: 4, minZoom: 2, maxZoom: 15 });
 
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap &copy; CARTO',
+    attribution: '© OpenStreetMap © CARTO',
     subdomains: 'abcd',
     maxZoom: 19
   }).addTo(map);
 
-  map.setMaxBounds([[-90, -180], [90, 180]]);
-  map.on('drag', () => map.panInsideBounds([[-90, -180], [90, 180]], { animate: false }));
+  // --- LISÄÄ TÄMÄ OSA ---
+  // Aktivoidaan revontulitaso
+  const auroraLayerInstance = new AuroraLayer();
+  map.addLayer(auroraLayerInstance);
+  // ----------------------
 
+  map.setMaxBounds([[-90, -180], [90, 180]]);
   map.on('click', onMapClick);
 
-  // Lataa paikat ja luo markerit
   const places = await loadPlaces();
-  if (places.length === 0) {
-    console.warn('Ei kohteita manifestista: lisää /kohteet/index.json ja per-kohde tiedostot.');
+  if (places.length > 0 && typeof initMarkers === 'function') {
+      initMarkers(map, getWeather, showPlaceInfo, places);
   }
-  initMarkers(map, getWeather, showPlaceInfo, places);
 
   // NOAA-data + päivitys
   fetchAuroraData();
