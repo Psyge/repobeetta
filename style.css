@@ -275,19 +275,11 @@ header.banner::before {
 }
 /* MOBIILI */
 @media (max-width: 768px) {
-    header.banner {
-        top: 10px;
-        width: 94%;
-        height: 60px; /* Matalampi banneri */
-        padding: 0 10px;
-        border-radius: 16px;
-    }
-
-    .banner-left .logo {
-        height: 70px; /* Kohtuullisen kokoinen mobiilissa, ei täytä ruutua */
-        left: 45px; /* Tilaa menu-napille */
-        top: 55%; /* Hienosäätö keskitykseen */
-    }
+  header.banner {
+    justify-content: flex-start; /* Logo ja menu vierekkäin vasemmalle */
+    gap: 20px;
+}
+.banner-right { display: none; } /* Piilotetaan turhat ikonit bannerista */
 
     #menu-btn {
         font-size: 28px;
@@ -324,4 +316,51 @@ header.banner::before {
         
     }
 #forecast-btn::before { content: "📊"; font-size: 24px; }    
+}
+.floating-btn {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: rgba(30, 136, 229, 0.9);
+    color: white;
+    border: 1px solid rgba(0, 255, 204, 0.4);
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 1000;
+}
+
+.floating-btn:hover {
+    transform: scale(1.1);
+    background: #1e88e5;
+    box-shadow: 0 0 15px #00ffcc;
+}
+#kp-container {
+    position: fixed;
+    bottom: 30px;
+    left: 20px;
+    z-index: 1000;
+}
+.info-panel {
+    position: absolute;
+    bottom: 70px; /* Nousee napin yläpuolelle */
+    left: 0;
+    background: rgba(10, 15, 25, 0.95);
+    padding: 15px;
+    border-radius: 15px;
+    border: 1px solid #00ffcc;
+    min-width: 150px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+/* Piilotuslogiikka */
+.hidden {
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
 }
