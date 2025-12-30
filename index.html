@@ -46,9 +46,10 @@
   </div>
 </div>
 <div class="info-panel">
-        <div style="font-size: 10px; color: #00ffcc; opacity: 0.8; margin-bottom: 2px;">KP-INDEKSI</div>
-        <div class="kp-badge" id="kpVal">--</div>
-    </div>
+    <div style="font-size: 10px; color: #00ffcc; opacity: 0.8; margin-bottom: 2px;">KP-INDEKSI</div>
+    <div class="kp-badge" id="kpVal">--</div>
+    <div id="kpDesc" style="font-size: 11px; color: #fff; margin-top: 5px; opacity: 0.9;">Ladataan...</div>
+</div>
 
 <div id="forecast-popup" class="popup" style="display:none;">
   <div class="popup-content">
@@ -69,29 +70,42 @@
   
 <div id="info" class="loading">⏳ Loading northern lights forecast...</div>
 <script>
- async function fetchKPData() {
+async function fetchKPData() {
     try {
         const res = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json');
-        if (!res.ok) throw new Error("Yhteysvirhe");
-        
         const data = await res.json();
         
-        // Varmistetaan, että dataa on (vähintään otsikko + yksi rivi)
         if (data && data.length > 1) {
-            const lastEntry = data[data.length - 1];
-            const kpRaw = lastEntry[1]; // Kp-arvo on toisessa sarakkeessa
+            const lastRow = data[data.length - 1];
+            const kpVal = parseFloat(lastRow[1]);
             
-            // Päivitetään tekstiksi (pyöristettynä tai sellaisenaan)
-            document.getElementById('kpVal').innerText = parseFloat(kpRaw).toFixed(1);
+            const badge = document.getElementById('kpVal');
+            const desc = document.getElementById('kpDesc');
             
-            // Valinnainen: Vaihda väriä Kp-arvon mukaan
-            const kp = parseFloat(kpRaw);
-            const color = kp >= 5 ? '#ff4444' : (kp >= 3 ? '#ffbb33' : '#00ffcc');
-            document.getElementById('kpVal').style.color = color;
+            if (badge) {
+                badge.innerText = isNaN(kpVal) ? "--" : kpVal.toFixed(1);
+                
+                // Vaihdetaan väri ja teksti Kp-arvon perusteella
+                if (kpVal >= 5) {
+                    badge.style.color = "#ff3366"; // Punainen
+                    desc.innerText = "● Widely visible";
+                    desc.style.color = "#ff3366";
+                } else if (kpVal >= 3) {
+                    badge.style.color = "#ffcc00"; // Keltainen
+                    desc.innerText = "● Opportunity to see (Lapland)";
+                    desc.style.color = "#ffcc00";
+                } else {
+                    badge.style.color = "#00ffcc"; // Neon-vihreä
+                    desc.innerText = "● No northern lights";
+                    desc.style.color = "#00ffcc";
+                }
+            }
         }
     } catch(e) {
-        console.error("Kp-datan haku epäonnistui:", e);
-        document.getElementById('kpVal').innerText = "?";
+        console.error("Kp-haku epäonnistui:", e);
+        if(document.getElementById('kpDesc')) {
+            document.getElementById('kpDesc').innerText = "Data ei saatavilla";
+        }
     }
 }
 </script>
