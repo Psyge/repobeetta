@@ -318,5 +318,5 @@ header.banner::before {
 #forecast-btn::before { content: "📊"; font-size: 24px; }  
 .info-panel { min-width: auto; }    
 #kpDesc { display: none; }
-#desc::before [ content: "KP-Ind";}    
+#idesc::before [ content: "KP-Ind";}    
 }
