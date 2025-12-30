@@ -316,9 +316,5 @@ header.banner::before {
         
     }
 #forecast-btn::before { content: "📊"; font-size: 24px; }    
-.info-panel {
-        top: 150px; right: 20px; width: 50px; height: 50px; border-radius: 50%; font-size: 0;
-        display: flex; align-items: center; justify-content: center;
-    }
-.info-panel::before { content: "⚡"; font-size: 24px; }
+#kpDesc { display: none; }
 }
