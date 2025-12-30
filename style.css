@@ -278,6 +278,7 @@ header.banner::before {
   header.banner {
     justify-content: flex-start; /* Logo ja menu vierekkäin vasemmalle */
     gap: 20px;
+    width: 350px;  
 }
 .banner-right { display: none; } /* Piilotetaan turhat ikonit bannerista */
 
