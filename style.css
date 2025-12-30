@@ -3,8 +3,16 @@
             background: rgba(10, 15, 25, 0.8); padding: 12px; border-radius: 12px;
             border: 1px solid rgba(0, 255, 204, 0.2); z-index: 1000;
             backdrop-filter: blur(5px);
+            min-width: 120px; /* Varmistetaan, että teksti mahtuu yhdelle riville */
+    text-align: left;
         }
         .kp-badge { font-size: 1.4rem; font-weight: 800; color: #00ffcc; }
+#kpDesc {
+    font-family: sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 /* Perusasetukset */
 .popup-header {
       position: relative;
