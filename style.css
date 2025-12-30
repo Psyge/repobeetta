@@ -315,7 +315,8 @@ header.banner::before {
         display: flex; align-items: center; justify-content: center;
         
     }
-#forecast-btn::before { content: "📊"; font-size: 24px; }    
+#forecast-btn::before { content: "📊"; font-size: 24px; }  
+.info-panel { min-width: auto; }    
 #kpDesc { display: none; }
 #desc::before [ content: "KP-Ind";}    
 }
