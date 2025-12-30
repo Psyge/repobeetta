@@ -173,28 +173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setInterval(fetchKPData, 3600000); 
 });
   </script>
-  <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const kpBtn = document.getElementById('kp-toggle-btn');
-    const kpBox = document.getElementById('kp-info-box');
 
-    // Kp-ikkunan avaaminen/sulkeminen
-    kpBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        kpBox.classList.toggle('hidden');
-    });
-
-    // Suljetaan Kp-ikkuna jos klikataan muualta
-    document.addEventListener('click', function() {
-        kpBox.classList.add('hidden');
-    });
-
-    // Estetään sulkeutuminen jos klikataan itse boksia
-    kpBox.addEventListener('click', function(e) {
-        e.stopPropagation();
-    });
-});  
-</script>
 
 </body>
 </html>
