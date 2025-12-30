@@ -85,34 +85,38 @@ body, html {
 
 header.banner {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 90px;
-    background: linear-gradient(180deg, rgba(5, 10, 20, 0.95) 0%, rgba(10, 20, 35, 0.8) 100%);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    top: 15px; /* Nostetaan irti yläreunasta */
+    left: 50%;
+    transform: translateX(-50%); /* Keskitys */
+    width: 95%; /* Ei koko leveyttä */
+    max-width: 1400px;
+    height: 70px;
+    background: rgba(5, 12, 24, 0.7); /* Erittäin tumma lasi */
+    backdrop-filter: blur(25px) saturate(150%);
+    -webkit-backdrop-filter: blur(25px) saturate(150%);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 40px;
+    padding: 0 25px;
     z-index: 10000;
-    /* Kaksoisreunus: sisempi kirkas, ulompi pehmeä */
-    border-bottom: 1px solid rgba(0, 255, 204, 0.3);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 
-                inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    border-radius: 20px; /* Pyöristetyt kulmat */
+    border: 1px solid rgba(0, 255, 204, 0.3); /* Kirkas neon-reunus */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7), 
+                0 0 15px rgba(0, 255, 204, 0.1);
 }
+header.banner::after { display: none; }
 header.banner::before {
     content: "";
     position: absolute;
-    top: 0;
-    left: 10%;
-    width: 30%;
-    height: 100%;
-    background: radial-gradient(circle, rgba(0, 255, 204, 0.15) 0%, transparent 70%);
-    filter: blur(30px);
-    z-index: -1;
-    animation: aurora-move 8s ease-in-out infinite alternate;
+    inset: -1px; /* Hieman isompi kuin laatikko */
+    border-radius: 20px;
+    padding: 1px; /* Reunan paksuus */
+    background: linear-gradient(90deg, #00ffcc, #007bff, #00ffcc);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.5;
 }
 
 .banner-left {
@@ -121,53 +125,39 @@ header.banner::before {
     position: relative;
 }
 .banner-left .logo {
-    height: 65px;
-    z-index: 2;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    filter: drop-shadow(0 0 15px rgba(0, 255, 204, 0.4));
+    height: 45px; /* Napakampi koko */
+    filter: drop-shadow(0 0 10px rgba(0, 255, 204, 0.5));
+    transition: 0.4s;
+}
+.banner-left .logo:hover {
+    filter: drop-shadow(0 0 20px #00ffcc);
+    transform: scale(1.05);
 }
 .banner-right {
     display: flex;
     align-items: center;
     gap: 15px;
 }
-.banner-right .icon-container {
+.banner-right img, .banner-right .icon {
+    height: 30px;
+    width: auto;
+    padding: 8px;
     background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 10px;
     border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: 0.3s;
     cursor: pointer;
 }
-.banner-right .icon-container:hover {
-    background: rgba(0, 255, 204, 0.1);
-    border-color: rgba(0, 255, 204, 0.5);
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 255, 204, 0.2);
-}
-.banner-left:hover .logo {
-    transform: scale(1.1) rotate(-2deg);
-    filter: drop-shadow(0 0 25px rgba(0, 255, 204, 0.7));
-}
 
-.banner-right .icon {
-    width: 24px;
-    height: 24px;
-    filter: invert(1);
-    opacity: 0.9;
-}
-.banner-right .icon:hover {
-    opacity: 1;
+.banner-right img:hover, .banner-right .icon:hover {
+    background: rgba(0, 255, 204, 0.15);
+    border-color: #00ffcc;
     transform: translateY(-2px);
-    filter: invert(1) drop-shadow(0 0 10px #00ffcc);
 }
-.banner-right { display: flex; align-items: center; gap: 10px; position: relative; right: 40px; }
-.banner-right img { height: 40px; }
 
-#map { width: 100%; height: 60vh; margin-top: 100px; position: relative; z-index: 1; }
+#map {
+    margin-top: 100px; /* Sopiva väli leijuvaan banneriin */
+}
 
 #info {
     position: absolute; top: 190px; left: 10px; z-index: 500;
@@ -182,14 +172,11 @@ header.banner::before {
 #locate-btn:hover { background: #1565c0; }
 
 #menu-btn {
-    position: static;
-    font-size: 32px;
-    color: #fff;
+    position: static; /* Ei enää irrallaan */
+    color: #00ffcc;
+    font-size: 24px;
+    margin-right: 15px;
     cursor: pointer;
-    transition: 0.3s;
-    margin-right: 25px;
-    display: flex;
-    align-items: center;
 }
 #menu {
     display: none; position: fixed; top: 100px; left: 0;
