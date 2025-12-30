@@ -69,13 +69,31 @@
   
 <div id="info" class="loading">⏳ Loading northern lights forecast...</div>
 <script>
-  async function fetchKPData() {
-            try {
-                const res = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json');
-                const data = await res.json();
-                document.getElementById('kpVal').innerText = data[data.length-1][1];
-            } catch(e) {}
+ async function fetchKPData() {
+    try {
+        const res = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json');
+        if (!res.ok) throw new Error("Yhteysvirhe");
+        
+        const data = await res.json();
+        
+        // Varmistetaan, että dataa on (vähintään otsikko + yksi rivi)
+        if (data && data.length > 1) {
+            const lastEntry = data[data.length - 1];
+            const kpRaw = lastEntry[1]; // Kp-arvo on toisessa sarakkeessa
+            
+            // Päivitetään tekstiksi (pyöristettynä tai sellaisenaan)
+            document.getElementById('kpVal').innerText = parseFloat(kpRaw).toFixed(1);
+            
+            // Valinnainen: Vaihda väriä Kp-arvon mukaan
+            const kp = parseFloat(kpRaw);
+            const color = kp >= 5 ? '#ff4444' : (kp >= 3 ? '#ffbb33' : '#00ffcc');
+            document.getElementById('kpVal').style.color = color;
         }
+    } catch(e) {
+        console.error("Kp-datan haku epäonnistui:", e);
+        document.getElementById('kpVal').innerText = "?";
+    }
+}
 </script>
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
