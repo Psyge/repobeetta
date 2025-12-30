@@ -125,9 +125,16 @@ header.banner::before {
     position: relative;
 }
 .banner-left .logo {
-    height: 45px; /* Napakampi koko */
-    filter: drop-shadow(0 0 10px rgba(0, 255, 204, 0.5));
-    transition: 0.4s;
+    height: 120px; /* Reilusti isompi logo */
+    width: auto;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 60px; /* Jätetään tilaa menu-napille */
+    filter: drop-shadow(0 0 15px rgba(0, 255, 204, 0.4));
+    transition: all 0.4s ease;
+    z-index: 10001;
+    pointer-events: none; /* Logo ei estä klikkauksia sen alta */
 }
 .banner-left .logo:hover {
     filter: drop-shadow(0 0 20px #00ffcc);
@@ -139,20 +146,20 @@ header.banner::before {
     gap: 15px;
 }
 .banner-right img, .banner-right .icon {
-    height: 30px;
+    height: 35px;
     width: auto;
     padding: 8px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: 0.3s;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    border: 1px solid rgba(0, 255, 204, 0.2);
+    transition: all 0.3s ease;
     cursor: pointer;
 }
 
-.banner-right img:hover, .banner-right .icon:hover {
-    background: rgba(0, 255, 204, 0.15);
+.banner-right img:hover {
+    background: rgba(0, 255, 204, 0.2);
     border-color: #00ffcc;
-    transform: translateY(-2px);
+    box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
 }
 
 #map {
@@ -176,11 +183,16 @@ header.banner::before {
 #locate-btn:hover { background: #1565c0; }
 
 #menu-btn {
-    position: static; /* Ei enää irrallaan */
+    position: relative; 
+    z-index: 10002 !important; /* Varmistetaan, että on logon ja bannerin päällä */
     color: #00ffcc;
-    font-size: 24px;
-    margin-right: 15px;
-    cursor: pointer;
+    font-size: 35px; /* Hieman isompi */
+    cursor: pointer !important;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    user-select: none;
+    transition: 0.3s;
 }
 #menu {
     display: none; position: fixed; top: 100px; left: 0;
@@ -188,8 +200,9 @@ header.banner::before {
     box-shadow: 2px 4px 8px rgba(0,0,0,0.4); flex-direction: column; padding: 10px 0; z-index: 7000;
 }
 #menu-btn:hover {
-    color: #00ffcc;
+    color: #fff;
     text-shadow: 0 0 15px #00ffcc;
+    transform: scale(1.1);
 }
 #menu a { display: block; padding: 12px 20px; color: white; text-decoration: none; font-family: Arial, sans-serif; }
 #menu a:hover { background: rgba(255,255,255,0.15); }
