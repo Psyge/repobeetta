@@ -65,7 +65,15 @@
 
   
 <div id="info" class="loading">⏳ Loading northern lights forecast...</div>
-
+<script>
+  async function fetchKPData() {
+            try {
+                const res = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json');
+                const data = await res.json();
+                document.getElementById('kpVal').innerText = data[data.length-1][1];
+            } catch(e) {}
+        }
+</script>
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <section id="aurora-info" class="aurora-section">
