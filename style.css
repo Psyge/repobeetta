@@ -276,20 +276,51 @@ header.banner::before {
 /* MOBIILI */
 @media (max-width: 768px) {
     header.banner {
-        height: 70px;
-        padding: 0 15px;
+        top: 10px;
+        width: 94%;
+        height: 60px; /* Matalampi banneri */
+        padding: 0 10px;
+        border-radius: 16px;
     }
+
     .banner-left .logo {
-        height: 45px;
+        height: 70px; /* Kohtuullisen kokoinen mobiilissa, ei täytä ruutua */
+        left: 45px; /* Tilaa menu-napille */
+        top: 55%; /* Hienosäätö keskitykseen */
     }
-    .banner-right .icon {
-        width: 22px;
-        height: 22px;
+
+    #menu-btn {
+        font-size: 28px;
+        padding: 5px;
     }
+
+    /* Oikean puolen ikonit mobiilissa */
+    .banner-right {
+        gap: 8px;
+    }
+
+    .banner-right img, .banner-right .icon {
+        height: 28px; /* Pienemmät napit */
+        padding: 6px;
+        border-radius: 10px;
+    }
+
+    /* Säädetään valikon (menu) paikkaa mobiilissa */
+    #menu {
+        top: 80px !important;
+        left: 3% !important;
+        width: 180px;
+    }
+}
     #info { position: fixed; bottom: 10px; left: 10px; font-size: 12px; height: 60px; }
     #locate-btn {
         bottom: 80px; right: 20px; width: 50px; height: 50px; border-radius: 50%; font-size: 0;
         display: flex; align-items: center; justify-content: center;
     }
     #locate-btn::before { content: "🧭"; font-size: 24px; }
+#forecast-btn {
+        top: auto;
+        bottom: 20px;
+        right: 85px; /* Vierekkäin Locate-napin kanssa */
+    }
 }
