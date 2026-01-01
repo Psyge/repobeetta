@@ -110,7 +110,19 @@ The colors on the map indicate the probability and intensity of the northern lig
 
 // FUNKTIO: Hakee datan ja päivittää UI:n
 let kpHideTimeout = null;
-
+function setupMobilePanels() {
+    ['actions', 'social'].forEach(id => {
+        const panel = document.getElementById(id + '-panel');
+        const tab = document.getElementById(id + '-tab');
+        if (panel && tab) {
+            tab.addEventListener('click', (e) => {
+                e.stopPropagation();
+                panel.classList.toggle('closed');
+            });
+        }
+    });
+}
+setupMobilePanels(); // Muista kutsua funktiota!
 function handleKpVisibility() {
     // TÄRKEÄÄ: Varmista että ID on täsmälleen sama kuin HTML:ssä
     const kpBox = document.getElementById('kp-info-box'); 
