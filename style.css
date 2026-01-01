@@ -491,7 +491,7 @@ header.banner .logo, .banner-right {
         right: 0 !important;
         width: 60px !important;
         background: rgba(10, 15, 25, 0.95) !important;
-        border: 1px solid #00ffcc !important;
+        
         border-right: none !important;
         border-radius: 15px 0 0 15px !important;
         z-index: 20000 !important;
@@ -520,7 +520,7 @@ header.banner .logo, .banner-right {
         width: 40px !important;
         height: 50px !important;
         background: rgba(10, 15, 25, 0.95) !important;
-        border: 1px solid #00ffcc !important;
+       
         border-right: none !important;
         border-radius: 10px 0 0 10px !important;
         display: flex !important;
