@@ -199,23 +199,46 @@ async function fetchKPData() {
 
 // Alustus
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Haetaan Kp-data heti latauksessa
     fetchKPData();
+
     // 2. Splash Screen -logiikka
     const splash = document.getElementById('mobile-splash');
     if (splash) {
-        // Pidetään logo näkyvissä 3 sekuntia (3000ms)
         setTimeout(() => {
             splash.classList.add('hidden');
-            
-            // Valinnainen: Poistetaan elementti kokonaan DOMista 1s häivytyksen jälkeen, 
-            // jotta se ei vie turhaan muistia tai estä klikkauksia taustalla.
             setTimeout(() => {
                 splash.remove();
             }, 1000); 
         }, 3000);
     }
-    // Tuodaan takaisin näkyviin mobiilissa kun ruutua kosketetaan
-    document.addEventListener('touchstart', () => {
+
+    // 3. KP-laatikon palautusnappi (MOBIILI)
+    const restoreBtn = document.getElementById('kp-restore-btn');
+    if (restoreBtn) {
+        // TÄRKEÄÄ: Estetään klikkauksen vuotaminen alla olevaan karttaan
+        // Käytetään Leafletin omaa työkalua, jos L (Leaflet) on ladattu
+        if (typeof L !== 'undefined' && L.DomEvent) {
+            L.DomEvent.disableClickPropagation(restoreBtn);
+            L.DomEvent.disableScrollPropagation(restoreBtn);
+        }
+
+        restoreBtn.addEventListener('click', (e) => {
+            // Estetään perus-eventit varmuuden vuoksi
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log("Palautetaan Kp-laatikko...");
+            handleKpVisibility(); 
+        });
+    }
+
+    // 4. Tuodaan laatikko näkyviin kun ruutua kosketetaan (yleinen)
+    document.addEventListener('touchstart', (e) => {
+        // Jos kosketus osuu palautusnappiin, annetaan yllä olevan klikkaus-eventin hoitaa homma
+        if (e.target.id === 'kp-restore-btn' || e.target.closest('#kp-restore-btn')) {
+            return;
+        }
         handleKpVisibility();
     });
 });
