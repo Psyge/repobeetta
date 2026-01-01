@@ -357,25 +357,59 @@ function initButtons() {
   // 6) Geolokaatio
   if (locateBtn) {
     locateBtn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (!navigator.geolocation) {
-        alert('Geolocation not supported in this browser.');
-        return;
-      }
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          const lat = pos.coords.latitude;
-          const lon = pos.coords.longitude;
-          map.setView([lat, lon], 6);
-          if (!userMarker) userMarker = L.marker([lat, lon]).addTo(map);
-          await showAuroraPopup(lat, lon, userMarker, false);
-        },
-        (err) => alert('Location failed: ' + err.message),
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
-      );
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!navigator.geolocation) {
+            alert('Geolocation not supported in this browser.');
+            return;
+        }
+
+        // Lisätään visuaalinen palaute, että jotain tapahtuu
+        const originalText = locateBtn.innerText;
+        if (window.innerWidth <= 768) {
+            locateBtn.innerText = "⏳"; // Vaihdetaan ikoni lataukseksi mobiilissa
+        } else {
+            locateBtn.innerText = "Locating...";
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+                // Palautetaan nappi normaaliksi
+                locateBtn.innerText = window.innerWidth <= 768 ? "" : originalText;
+                
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                map.setView([lat, lon], 6);
+                
+                if (!userMarker) {
+                    userMarker = L.marker([lat, lon]).addTo(map);
+                } else {
+                    userMarker.setLatLng([lat, lon]);
+                }
+                
+                await showAuroraPopup(lat, lon, userMarker, false);
+            },
+            (err) => {
+                // Palautetaan nappi virheen sattuessa
+                locateBtn.innerText = window.innerWidth <= 768 ? "" : originalText;
+                
+                if (err.code === 1) {
+                    alert('Salli paikannus selaimen asetuksista.');
+                } else if (err.code === 3) {
+                    alert('Paikannus aikakatkaistiin. Yritä uudelleen, laite herää yleensä toisella kerralla.');
+                } else {
+                    alert('Location failed: ' + err.message);
+                }
+            },
+            { 
+                enableHighAccuracy: false, // NOPEAMPI: käyttää WiFi/mobiiliverkkoa GPS:n sijaan
+                timeout: 15000,            // Hieman enemmän pelivaraa (15s)
+                maximumAge: 60000          // Käyttää max 1min vanhaa sijaintia (erittäin nopea!)
+            }
+        );
     });
-  }
+}
 }
 
 
