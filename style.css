@@ -362,7 +362,7 @@ header.banner .logo, .banner-right {
 #forecast-btn::before { content: "📊"; font-size: 24px; }  
 .info-panel { min-width: auto; }    
 #kpDesc { display: none; }
-#idesc::before [ content: "KP-Ind";}    
+#idesc::before { content: "KP-Ind";}    
 #kp-info-box {
         top: 170px !important; /* Lasketaan zoom-nappien alle mobiilissa */
         opacity: 1;
