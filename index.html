@@ -164,7 +164,7 @@ async function fetchKPData() {
             const lastRow = data[data.length - 1];
             const kpVal = parseFloat(lastRow[1]);
             const badge = document.getElementById('kpVal');
-            
+            const desc = document.getElementById('kpDesc');
             if (badge) {
                 badge.innerText = isNaN(kpVal) ? "--" : kpVal.toFixed(1);
                 // (Värikoodit tähän väliin...)
