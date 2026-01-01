@@ -185,7 +185,7 @@ header.banner::before {
 
 #map {
      width: 100%;
-    height: 60vh;   /* kartta vie 45% sivusta */
+    height: 75vh;   /* kartta vie 45% sivusta */
     
     position: relative;
     z-index: 1; /* Sopiva väli leijuvaan banneriin */
