@@ -279,19 +279,27 @@ header.banner::before {
 /* MOBIILI */
 @media (max-width: 768px) {
   header.banner {
-        background: transparent; /* Tehdään bannerista näkymätön mobiilissa */
-        border: none;
-        padding: 10px;
-    }
-header.banner .logo, 
-    header.banner .other-icons { 
-        display: none; /* Piilotetaan logo ja muut ikonit mobiilissa */
-    }
-    .menu-btn {
-        position: fixed;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        width: auto !important; /* Ei vie koko leveyttä */
+        height: auto !important;
         top: 15px;
         left: 15px;
-        z-index: 2000;
+    }
+header.banner .logo, .banner-right {
+        display: none !important; /* Piilotetaan logo ja muut ikonit */
+    }
+    #menu-btn {
+        background: rgba(5, 12, 24, 0.8);
+        border: 1px solid rgba(0, 255, 204, 0.4);
+        border-radius: 12px;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(10px);
     }
 
     /* Oikean puolen ikonit mobiilissa */
@@ -333,21 +341,21 @@ header.banner .logo,
 #kpDesc { display: none; }
 #idesc::before [ content: "KP-Ind";}    
 #kp-container {
-        top: 160px; /* Säädä tätä zoom-nappien koon mukaan */
-        left: 15px;
-        bottom: auto; /* Poistetaan aiempi alareuna-asettelu */
         position: fixed;
+        top: 175px; /* Sijoitetaan pystysuoraan valikon ja zoomin alle */
+        left: 10px;
+        bottom: auto;
     }
 
-    /* Tyylit piilotus-animaatiolle */
-    #kp-info-box {
-        transition: opacity 0.5s ease, transform 0.5s ease;
-        opacity: 1;
+    .info-panel {
+        min-width: 60px;
+        transition: opacity 0.8s ease, transform 0.8s ease;
     }
 
-    #kp-info-box.fade-out {
-        opacity: 0;
-        transform: translateX(-20px); /* Liukuu kevyesti pois vasemmalle */
+    /* Piilotusluokka */
+    .fade-out {
+        opacity: 0 !important;
+        transform: translateX(-20px);
         pointer-events: none;
     }
 }
