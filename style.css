@@ -493,6 +493,9 @@ header.banner .logo, .banner-right {
         right: 0;
         /* ... muut paneelityylit ... */
     }
+    .side-panel.closed {
+        transform: translateX(100%); /* Oikea reuna liukuu pois */
+    }
 }
 @media (min-width: 769px) {
     #kp-restore-btn { display: none !important; }
