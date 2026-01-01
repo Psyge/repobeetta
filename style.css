@@ -13,7 +13,9 @@
     text-align: left;
     
     /* Lisätään transition tässä, jotta se on olemassa piilotusta varten */
-    transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s;
+    transition: opacity 1s ease-in-out, transform 1s ease-in-out, visibility 1s !important;
+    opacity: 1;
+    visibility: visible;
 }
 
 .kp-badge { 
@@ -371,7 +373,7 @@ header.banner .logo, .banner-right {
     #kp-info-box.fade-out {
         opacity: 0 !important;
         visibility: hidden !important;
-        transform: translateX(-15px) !important; /* Liukuu hieman sivuun */
+        transform: translateX(-20px) !important;
         pointer-events: none !important;
     }
 }
