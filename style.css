@@ -279,15 +279,19 @@ header.banner::before {
 /* MOBIILI */
 @media (max-width: 768px) {
   header.banner {
-    justify-content: flex-start; /* Logo ja menu vierekkäin vasemmalle */
-    gap: 20px;
-    width: 350px;  
-}
-.banner-right { display: none; } /* Piilotetaan turhat ikonit bannerista */
-
-    #menu-btn {
-        font-size: 28px;
-        padding: 5px;
+        background: transparent; /* Tehdään bannerista näkymätön mobiilissa */
+        border: none;
+        padding: 10px;
+    }
+header.banner .logo, 
+    header.banner .other-icons { 
+        display: none; /* Piilotetaan logo ja muut ikonit mobiilissa */
+    }
+    .menu-btn {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 2000;
     }
 
     /* Oikean puolen ikonit mobiilissa */
@@ -309,9 +313,10 @@ header.banner::before {
     }
 
     #info { position: fixed; bottom: 10px; left: 10px; font-size: 12px; height: 60px; }
-    .leaflet-top .leaflet-control
- {
-    margin-top: 100px;
+ .leaflet-top.leaflet-left {
+        top: 70px !important; /* Lasketaan valikon alapuolelle */
+        left: 10px !important;
+    }
 }
     #locate-btn {
         top: 100px; right: 3px; width: 50px; height: 50px; border-radius: 50%; font-size: 0;
@@ -327,4 +332,22 @@ header.banner::before {
 .info-panel { min-width: auto; }    
 #kpDesc { display: none; }
 #idesc::before [ content: "KP-Ind";}    
+#kp-container {
+        top: 160px; /* Säädä tätä zoom-nappien koon mukaan */
+        left: 15px;
+        bottom: auto; /* Poistetaan aiempi alareuna-asettelu */
+        position: fixed;
+    }
+
+    /* Tyylit piilotus-animaatiolle */
+    #kp-info-box {
+        transition: opacity 0.5s ease, transform 0.5s ease;
+        opacity: 1;
+    }
+
+    #kp-info-box.fade-out {
+        opacity: 0;
+        transform: translateX(-20px); /* Liukuu kevyesti pois vasemmalle */
+        pointer-events: none;
+    }
 }
