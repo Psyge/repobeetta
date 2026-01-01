@@ -1,4 +1,12 @@
 /* --- PC-NÄKYMÄ (Oletus) --- */
+.mobile-only {
+    display: none;
+}
+
+/* PC-ohjeiden tyyli */
+.desktop-only {
+    display: block;
+}
 .mobile-only-panels, #kp-restore-btn { display: none; }
 /* --- KP-INFO PANEELI --- */
 .info-panel {
@@ -553,7 +561,12 @@ header.banner .logo, .banner-right {
         align-items: center;
         justify-content: center;
     }
-
+.desktop-only {
+        display: none !important;
+    }
+    .mobile-only {
+        display: block !important;
+    }
 }
 @media (min-width: 769px) {
     #kp-restore-btn { display: none !important; }
