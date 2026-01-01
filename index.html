@@ -216,14 +216,14 @@ document.addEventListener('DOMContentLoaded', () => {
 if (window.innerWidth <= 768) {
     const actionsContent = document.getElementById('actions-content');
     const locateBtn = document.getElementById('locate-btn');
-    const markersBtn = document.getElementById('markers-btn');
+    
     const forecastBtn = document.getElementById('forecast-btn');
 
     // Siirretään napit kartan päältä paneelin sisään
     if (actionsContent) {
         actionsContent.appendChild(locateBtn);
         actionsContent.appendChild(forecastBtn);
-        actionsContent.appendChild(markersBtn);
+        
     }
 }
     // 2. Splash Screen -logiikka
