@@ -295,8 +295,8 @@ header.banner .logo, .banner-right {
     }
     #menu-btn {
         position: fixed !important;
-        top: 15px !important;
-        left: 15px !important;
+        top: 5px !important;
+        left: 5px !important;
         width: 50px;
         height: 50px;
         background: rgba(5, 12, 24, 0.9);
@@ -329,17 +329,17 @@ header.banner .logo, .banner-right {
 
     #info { position: fixed; bottom: 10px; left: 10px; font-size: 12px; height: 60px; }
  .leaflet-top.leaflet-left {
-        top: 70px !important; /* Lasketaan valikon alapuolelle */
-        left: 10px !important;
+        top: -35px !important; /* Lasketaan valikon alapuolelle */
+     left: 5px;
     }
 }
     #locate-btn {
-        top: 100px; right: 3px; width: 50px; height: 50px; border-radius: 50%; font-size: 0;
+        top: 5px; right: 5px; width: 50px; height: 50px; border-radius: 50%; font-size: 0;
         display: flex; align-items: center; justify-content: center;
     }
     #locate-btn::before { content: "🧭"; font-size: 24px; }
 #forecast-btn {
-        top: 160px;; right: 3px; width: 50px; height: 50px; border-radius: 50%; font-size: 0;
+        top: 65px;; right: 5px; width: 50px; height: 50px; border-radius: 50%; font-size: 0;
         display: flex; align-items: center; justify-content: center;
         
     }
