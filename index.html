@@ -138,6 +138,37 @@ function handleKpVisibility() {
 }
 
 // FUNKTIO: Hakee datan ja päivittää UI:n
+let kpHideTimeout = null;
+
+function handleKpVisibility() {
+    // TÄRKEÄÄ: Varmista että ID on täsmälleen sama kuin HTML:ssä
+    const kpBox = document.getElementById('kp-info-box'); 
+    
+    if (!kpBox) {
+        console.error("Virhe: Elementtiä 'kp-info-box' ei löytynyt!");
+        return;
+    }
+
+    // Työpöydällä (yli 768px) ei piiloteta mitään
+    if (window.innerWidth > 768) {
+        kpBox.classList.remove('fade-out');
+        return;
+    }
+
+    // Nollataan vanha ajastin
+    if (kpHideTimeout) clearTimeout(kpHideTimeout);
+
+    // Poistetaan piilotusluokka, jotta laatikko näkyy
+    kpBox.classList.remove('fade-out');
+
+    // Asetetaan uusi piilotus 10 sekunnin päähän
+    kpHideTimeout = setTimeout(() => {
+        console.log("Piilotetaan Kp-laatikko...");
+        kpBox.classList.add('fade-out');
+    }, 10000); 
+}
+
+// Päivitetty fetchKPData
 async function fetchKPData() {
     try {
         const res = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json');
@@ -146,48 +177,28 @@ async function fetchKPData() {
         if (data && data.length > 1) {
             const lastRow = data[data.length - 1];
             const kpVal = parseFloat(lastRow[1]);
-            
             const badge = document.getElementById('kpVal');
-            const desc = document.getElementById('kpDesc');
             
             if (badge) {
                 badge.innerText = isNaN(kpVal) ? "--" : kpVal.toFixed(1);
-                
-                if (kpVal >= 5) {
-                    badge.style.color = "#ff3366";
-                    desc.innerText = "● Widely visible";
-                    desc.style.color = "#ff3366";
-                } else if (kpVal >= 3) {
-                    badge.style.color = "#ffcc00";
-                    desc.innerText = "● Chance to see";
-                    desc.style.color = "#ffcc00";
-                } else {
-                    badge.style.color = "#00ffcc";
-                    desc.innerText = "● No northern lights";
-                    desc.style.color = "#00ffcc";
-                }
+                // (Värikoodit tähän väliin...)
             }
-            // Kun data on ladattu, tarkistetaan näkyvyys (piilotusajastin)
+            
+            // AKTIVOIDAAN PIILOTUS
             handleKpVisibility();
         }
     } catch(e) {
-        console.error("Kp-haku epäonnistui:", e);
-        const desc = document.getElementById('kpDesc');
-        if(desc) desc.innerText = "Data ei saatavilla";
+        console.error("Haku epäonnistui", e);
     }
 }
 
-// ALUSTUS
+// Alustus
 document.addEventListener('DOMContentLoaded', () => {
     fetchKPData();
-    setInterval(fetchKPData, 5000);
-
-    // Palauta näkyviin mobiilissa kun ruutua kosketetaan
+    
+    // Tuodaan takaisin näkyviin mobiilissa kun ruutua kosketetaan
     document.addEventListener('touchstart', () => {
-        const kpBox = document.getElementById('kp-info-box');
-        if (kpBox && kpBox.classList.contains('fade-out')) {
-            handleKpVisibility();
-        }
+        handleKpVisibility();
     });
 });
   
