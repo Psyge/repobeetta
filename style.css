@@ -1,3 +1,7 @@
+/* --- PC-NÄKYMÄ (Oletus) --- */
+.mobile-only-panels {
+    display: none; /* Ei näytetä PC:llä ollenkaan */
+}
 /* --- KP-INFO PANEELI --- */
 .info-panel {
     position: fixed; /* Käytetään fixed, jotta pysyy paikoillaan suhteessa ruutuun */
