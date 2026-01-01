@@ -10,138 +10,69 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="mobile-splash">
+    <div id="mobile-splash">
         <img src="repo-neon.png" alt="RepoTracker Logo">
     </div>
-<header class="banner">
-  <h1 style="position:absolute; left:-9999px;">RepoTracker – Track the Northern Lights in real time</h1>
-  <div id="menu-btn">☰</div>
 
-  <div class="banner-left">
-    <img src="repo-neon.png" alt="RepoTracker Logo" class="logo">
-  </div>
+    <header class="banner">
+        <div id="menu-btn">☰</div>
+        <div class="banner-left">
+            <img src="repo-neon.png" alt="RepoTracker Logo" class="logo">
+        </div>
+        <div class="banner-right">
+            <a href="https://instagram.com/repotracker_" target="_blank" class="social-btn"><img src="ig-icon.png" class="icon"></a>
+            <a href="https://www.tiktok.com/@repotracker" target="_blank" class="social-btn"><img src="tiktok.png" class="icon"></a>
+        </div>
+        <nav id="menu">
+            <a href="index.html">Front page</a>
+            <a href="/faq/">FAQ</a>
+            <a href="/contact/">Contact</a>
+        </nav>
+    </header>
 
-  <div class="banner-right">
-
-    <a href="https://instagram.com/repotracker_" target="_blank" class="social-btn instagram">
-      <img src="ig-icon.png" alt="Instagram" class="icon">
-    </a>
-    <a href="https://www.tiktok.com/@repotracker" target="_blank">
-    <img src="tiktok.png" alt="Seuraa TikTokissa" class="icon">
-    </a>
-
- <a href="https://www.buymeacoffee.com/repotracker" target="_blank">
-    <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" style="height: 50px; width: auto;"></a>
-
-  </div>
-  
-<nav id="menu">
-  <a href="index.html">Front page</a>
-  <a href="/faq/">FAQ</a>
-  <a href="/contact/">Contact / Feedback</a>
- </nav>
-
-</header>
-
-<div id="container">
-  <div id="map">
-  <button id="locate-btn">Can I See Northern Lights now?</button>
-  <button id="markers-btn">Show markers</button>  
-  <button id="forecast-btn">3 Day Forecast</button>  
-  </div>
-</div>
-<div class="info-panel" id="kp-info-box">
-    <div id="kp-restore-btn">KP</div>
-    
-    <div id="idesc" style="font-size: 10px; color: #00ffcc; opacity: 0.8; margin-bottom: 2px;">KP-INDEX</div>
-    <div class="kp-badge" id="kpVal">--</div>
-    <div id="kpDesc" style="font-size: 11px; color: #fff; margin-top: 5px; opacity: 0.9;">Loading...</div>
-</div>
-
-<div id="forecast-popup">
-    <div class="forecast-card">
-      <span id="close-forecast">&times;</span>
-      
-      <div class="forecast-header">
-        <h2>3-Päivän Kp-Ennuste</h2>
-      </div>
-
-      <div class="chart-container">
-        <canvas id="kpChart"></canvas>
-      </div>
-
-      <div class="forecast-info">
-        <div class="info-item"><span class="dot low"></span> Matala (0-3)</div>
-        <div class="info-item"><span class="dot mod"></span> Kohtalainen (4)</div>
-        <div class="info-item"><span class="dot high"></span> Korkea (5+)</div>
-      </div>
-
-      <div id="errorMessage"></div>
-    </div>
-  </div>
-
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<section id="aurora-info" class="aurora-section">
-
-    <div id="aurora-default">
-    <h2>Northern Lights forecast and real-time aurora map – RepoTracker</h2>
-
-    <p>
-        RepoTracker shows the Northern Lights in real time in Finland and the Nordic countries.
-        The map shows where the Northern Lights are visible right now and in the coming hours.
-</p>
-  <p>Click anywhere on the map or use the "Can i see the Northern Lights" -button to see the aurora forecast for that location.<br>
-  Note: Cloud cover can affect visibility even if aurora activity is strong.
-  </p>
-
-<h2>How does the RepoTracker forecast work?</h2>
-<p>
-RepoTracker combines geomagnetic measurements, solar wind speed,
-        the Kp index, and cloud cover data into one clear view.
-</p>
-
-<h2>How to read the aurora map</h2>
-<p>
-The colors on the map indicate the probability and intensity of the northern lights:
-        red (weak), yellow/orange (good chance), and green
-        (very strong activity) and indicate a higher probability.
-        Cloud cover may obstruct visibility.
-    </p>
-
-    <h2>Best time to see the Northern Lights</h2>
-    <p>
-        The Northern Lights occur most often from September to March, especially between 9 p.m. and 2 a.m.
-        Clear skies, high solar wind speeds, and low light pollution significantly improve
-        the chances of seeing them.
-</p>
-    </div>      
-<div id="place-info" style="display:none;"></div>
-</section>
-<div id="container">
-    <div id="map">
-        <button id="locate-btn">Can I See Northern Lights now?</button>
-        <button id="markers-btn">Show markers</button>  
-        <button id="forecast-btn">3 Day Forecast</button>  
-    </div>
-</div>
-
-<div class="mobile-only-panels">
-    <div class="side-panel right-panel" id="actions-panel">
-        <div class="panel-tab" id="actions-tab">⚙️</div>
-        <div class="panel-content" id="actions-content">
-            </div>
-    </div>
-    
-    <div class="side-panel right-panel" id="social-panel">
-        <div class="panel-tab" id="social-tab">📱</div>
-        <div class="panel-content">
-            <a href="https://instagram.com/repotracker_" target="_blank" class="soc-icon"><img src="ig-icon.png"></a>
-            <a href="https://www.tiktok.com/@repotracker" target="_blank" class="soc-icon"><img src="tiktok.png"></a>
-            <a href="https://www.buymeacoffee.com/repotracker" target="_blank" class="soc-icon">☕</a>
+    <div id="container">
+        <div id="map">
+            <button id="locate-btn">Can I See Northern Lights now?</button>
+            <button id="markers-btn">Show markers</button>  
+            <button id="forecast-btn">3 Day Forecast</button>  
         </div>
     </div>
-</div>
+
+    <div class="info-panel" id="kp-info-box">
+        <div id="kp-restore-btn">KP</div>
+        <div id="idesc">KP-INDEX</div>
+        <div class="kp-badge" id="kpVal">--</div>
+        <div id="kpDesc">Loading...</div>
+    </div>
+
+    <div class="mobile-only-panels">
+        <div class="side-panel right-panel" id="actions-panel">
+            <div class="panel-tab" id="actions-tab">⚙️</div>
+            <div class="panel-content" id="actions-content">
+                </div>
+        </div>
+        
+        <div class="side-panel right-panel" id="social-panel">
+            <div class="panel-tab" id="social-tab">📱</div>
+            <div class="panel-content">
+                <a href="https://instagram.com/repotracker_" target="_blank" class="soc-icon"><img src="ig-icon.png"></a>
+                <a href="https://www.tiktok.com/@repotracker" target="_blank" class="soc-icon"><img src="tiktok.png"></a>
+                <a href="https://www.buymeacoffee.com/repotracker" target="_blank" class="soc-icon">☕</a>
+            </div>
+        </div>
+    </div>
+
+    <section id="aurora-info" class="aurora-section">
+        <div id="aurora-default">
+            <h2>Northern Lights forecast</h2>
+            <p>RepoTracker shows the Northern Lights in real time...</p>
+        </div>
+    </section>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+    <script src="markers.js"></script>
+    
 
 <!-- Kartta ja NOAA-data -->
 <script src="script.js"></script>
