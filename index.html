@@ -165,46 +165,53 @@ The colors on the map indicate the probability and intensity of the northern lig
 <!-- Markerit -->
 <script src="markers.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', async () => {
-    // Muut alustukset...
-    fetchKPData(); // <--- LISÄÄ TÄMÄ RIVI
-    
-    // Voit myös laittaa sen päivittymään automaattisesti tunnin välein
-    setInterval(fetchKPData, 3600000); 
-});
-  </script>
-<script>
-function initKpMobileLogic() {
+// Globaali muuttuja ajastimelle, jotta voimme nollata sen tarvittaessa
+let kpHideTimeout = null;
+
+function handleKpVisibility() {
     const kpBox = document.getElementById('kp-info-box');
-    
-    // Jos elementtiä ei löydy, poistutaan hiljaa ilman erroria
-    if (!kpBox) return;
+    if (!kpBox || window.innerWidth > 768) return;
 
-    if (window.innerWidth <= 768) {
-        // Tuodaan näkyviin alussa
-        kpBox.classList.remove('fade-out');
+    // Nollataan edellinen ajastin jos sellainen oli käynnissä
+    if (kpHideTimeout) clearTimeout(kpHideTimeout);
 
-        // Piilotetaan 10 sekunnin kuluttua
-        setTimeout(() => {
-            if (kpBox) kpBox.classList.add('fade-out');
-        }, 10000);
+    // Tuodaan laatikko näkyviin (poistetaan fade-out)
+    kpBox.classList.remove('fade-out');
+
+    // Asetetaan uusi piilotus 10 sekunnin päähän
+    kpHideTimeout = setTimeout(() => {
+        if (kpBox) kpBox.classList.add('fade-out');
+    }, 10000);
+}
+
+// Muokattu fetchKPData (tai se funktio joka hakee datan)
+// Kutsu handleKpVisibility() funktion lopussa aina kun data on ladattu!
+async function fetchKPData() {
+    try {
+        // ... (tässä on nykyinen haku-logiikkasi) ...
+        
+        // Päivityksen jälkeen käynnistetään näkyvyyslogiikka
+        handleKpVisibility();
+    } catch (e) {
+        console.error("Kp-haku epäonnistui", e);
     }
 }
 
-// Käytetään 'load' eventtiä 'DOMContentLoaded' sijaan varmuuden vuoksi
-window.addEventListener('load', initKpMobileLogic);
+// Alustus kun sivu on valmis
+document.addEventListener('DOMContentLoaded', () => {
+    // Haetaan data heti
+    fetchKPData();
+    
+    // Päivitys tunnin välein
+    setInterval(fetchKPData, 3600000);
 
-// Tuodaan takaisin kosketuksesta
-document.addEventListener('touchstart', function() {
-    const kpBox = document.getElementById('kp-info-box');
-    if (kpBox && kpBox.classList.contains('fade-out')) {
-        kpBox.classList.remove('fade-out');
-        
-        // Uusi piilotus
-        setTimeout(() => {
-            if (kpBox) kpBox.classList.add('fade-out');
-        }, 10000);
-    }
+    // Tuodaan takaisin näkyviin jos ruutua kosketetaan
+    document.addEventListener('touchstart', () => {
+        const kpBox = document.getElementById('kp-info-box');
+        if (kpBox && kpBox.classList.contains('fade-out')) {
+            handleKpVisibility();
+        }
+    });
 });
   
 </script>
