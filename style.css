@@ -1,13 +1,27 @@
 /* --- KP-INFO PANEELI --- */
 .info-panel {
-    position: absolute; top: 195px; left: 10px;
-    background: rgba(10, 15, 25, 0.8); padding: 12px; border-radius: 12px;
-    border: 1px solid rgba(0, 255, 204, 0.2); z-index: 1000;
-    backdrop-filter: blur(5px);
+    position: fixed; /* Käytetään fixed, jotta pysyy paikoillaan suhteessa ruutuun */
+    top: 195px; 
+    left: 10px;
+    background: rgba(10, 15, 25, 0.85); 
+    padding: 12px; 
+    border-radius: 12px;
+    border: 1px solid rgba(0, 255, 204, 0.2); 
+    z-index: 9999;
+    backdrop-filter: blur(10px);
     min-width: 120px;
     text-align: left;
+    
+    /* Lisätään transition tässä, jotta se on olemassa piilotusta varten */
+    transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s;
 }
-.kp-badge { font-size: 1.4rem; font-weight: 800; color: #00ffcc; }
+
+.kp-badge { 
+    font-size: 1.4rem; 
+    font-weight: 800; 
+    color: #00ffcc; 
+}
+
 #kpDesc {
     font-family: sans-serif;
     font-weight: 300;
@@ -348,23 +362,16 @@ header.banner .logo, .banner-right {
 #kpDesc { display: none; }
 #idesc::before [ content: "KP-Ind";}    
 #kp-info-box {
-        position: fixed !important;
-        top: 170px !important; /* Valikon ja zoom-nappien alapuolelle */
-        left: 15px !important;
-        bottom: auto !important;
-        z-index: 9999;
-        
-        /* Varmistetaan näkyvyys ja pehmeä siirtymä */
+        top: 170px !important; /* Lasketaan zoom-nappien alle mobiilissa */
         opacity: 1;
         visibility: visible;
-        transition: opacity 1s ease, transform 1s ease, visibility 1s;
     }
 
-    /* Piilotusluokka, jota JavaScript käyttää */
+    /* TÄMÄ ON TÄRKEIN: Piilotusluokka */
     #kp-info-box.fade-out {
         opacity: 0 !important;
-        visibility: hidden !important; /* Estää myös klikkaukset kokonaan */
-        transform: translateX(-10px); /* Pieni liike vasemmalle tehostaa efektiä */
+        visibility: hidden !important;
+        transform: translateX(-15px) !important; /* Liukuu hieman sivuun */
         pointer-events: none !important;
     }
 }
