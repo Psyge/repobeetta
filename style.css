@@ -465,6 +465,34 @@ header.banner .logo, .banner-right {
     opacity: 0;
     visibility: hidden;
 }
+    .mobile-only-panels {
+        display: block; /* Aktivoituu mobiilissa */
+    }
+
+    /* Muutetaan alkuperäiset napit mobiilipalloiksi */
+    #locate-btn, #markers-btn, #forecast-btn {
+        position: static !important; /* Poistaa PC-paikoituksen */
+        width: 45px !important;
+        height: 45px !important;
+        border-radius: 50% !important;
+        font-size: 0 !important; /* Piilottaa tekstin */
+        margin: 5px auto;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Lisätään ikonit mobiilissa */
+    #locate-btn::before { content: "🧭"; font-size: 20px; }
+    #markers-btn::before { content: "📍"; font-size: 20px; }
+    #forecast-btn::before { content: "📊"; font-size: 20px; }
+
+    /* Paneelin tyylit (kuten aiemmin sovittiin) */
+    .side-panel {
+        position: fixed;
+        right: 0;
+        /* ... muut paneelityylit ... */
+    }
 }
 @media (min-width: 769px) {
     #kp-restore-btn { display: none !important; }
