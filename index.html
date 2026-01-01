@@ -174,14 +174,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
   </script>
 <script>
-function manageKpVisibility() {
+function initKpMobileLogic() {
     const kpBox = document.getElementById('kp-info-box');
     
-    // Tarkistetaan löytyykö elementtiä, jotta vältetään null-error
+    // Jos elementtiä ei löydy, poistutaan hiljaa ilman erroria
     if (!kpBox) return;
 
     if (window.innerWidth <= 768) {
-        // Otetaan piilotus pois päältä aluksi
+        // Tuodaan näkyviin alussa
         kpBox.classList.remove('fade-out');
 
         // Piilotetaan 10 sekunnin kuluttua
@@ -191,16 +191,16 @@ function manageKpVisibility() {
     }
 }
 
-// Suoritetaan vasta kun koko sivu on ladattu
-window.addEventListener('load', manageKpVisibility);
+// Käytetään 'load' eventtiä 'DOMContentLoaded' sijaan varmuuden vuoksi
+window.addEventListener('load', initKpMobileLogic);
 
-// Tuodaan takaisin näkyviin napauttamalla näyttöä
+// Tuodaan takaisin kosketuksesta
 document.addEventListener('touchstart', function() {
     const kpBox = document.getElementById('kp-info-box');
     if (kpBox && kpBox.classList.contains('fade-out')) {
         kpBox.classList.remove('fade-out');
         
-        // Asetetaan uusi piilotus 10 sekunnin päästä
+        // Uusi piilotus
         setTimeout(() => {
             if (kpBox) kpBox.classList.add('fade-out');
         }, 10000);
