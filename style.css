@@ -402,12 +402,14 @@ header.banner .logo, .banner-right {
         opacity: 0; /* Piilossa kun paneeli on esillä */
         visibility: hidden;
         transition: opacity 0.3s;
+    pointer-events: auto !important;
     }
     /* TÄMÄ ON TÄRKEIN: Piilotusluokka */
    div#kp-info-box.fade-out {
       transform: translateX(calc(-100% - 10px)) !important; /* Liukuu kokonaan reunan yli */
         opacity: 1 !important; /* Pidetään näkyvissä, jotta kieleke näkyy */
         visibility: visible !important;
+       pointer-events: none !important;
     }
     #kp-info-box.fade-out #kp-restore-btn {
         opacity: 1;
