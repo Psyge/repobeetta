@@ -121,21 +121,7 @@ The colors on the map indicate the probability and intensity of the northern lig
 <!-- Markerit -->
 <script src="markers.js"></script>
 <script>
-let kpHideTimeout = null;
 
-// FUNKTIO: Hallitsee paneelin näkyvyyttä mobiilissa
-function handleKpVisibility() {
-    const kpBox = document.getElementById('kp-info-box');
-    if (!kpBox || window.innerWidth > 768) return;
-
-    if (kpHideTimeout) clearTimeout(kpHideTimeout);
-
-    kpBox.classList.remove('fade-out');
-
-    kpHideTimeout = setTimeout(() => {
-        if (kpBox) kpBox.classList.add('fade-out');
-    }, 10000);
-}
 
 // FUNKTIO: Hakee datan ja päivittää UI:n
 let kpHideTimeout = null;
