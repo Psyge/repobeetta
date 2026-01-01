@@ -370,7 +370,7 @@ header.banner .logo, .banner-right {
     }
 
     /* TÄMÄ ON TÄRKEIN: Piilotusluokka */
-    #kp-info-box.fade-out {
+   div#kp-info-box.fade-out {
         opacity: 0 !important;
         visibility: hidden !important;
         transform: translateX(-20px) !important;
