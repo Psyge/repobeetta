@@ -180,7 +180,7 @@ async function fetchKPData() {
 // ALUSTUS
 document.addEventListener('DOMContentLoaded', () => {
     fetchKPData();
-    setInterval(fetchKPData, 3600000);
+    setInterval(fetchKPData, 20000);
 
     // Palauta näkyviin mobiilissa kun ruutua kosketetaan
     document.addEventListener('touchstart', () => {
