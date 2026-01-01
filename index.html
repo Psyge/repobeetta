@@ -128,50 +128,47 @@ The colors on the map indicate the probability and intensity of the northern lig
 <script>
 
 
-// FUNKTIO: Hakee datan ja päivittää UI:n
 let kpHideTimeout = null;
+
+// 1. Paneelien hallinta
 function setupMobilePanels() {
     ['actions', 'social'].forEach(id => {
         const panel = document.getElementById(id + '-panel');
         const tab = document.getElementById(id + '-tab');
         if (panel && tab) {
+            // Estetään klikkauksen meneminen karttaan
+            if (typeof L !== 'undefined' && L.DomEvent) {
+                L.DomEvent.disableClickPropagation(panel);
+            }
             tab.addEventListener('click', (e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 panel.classList.toggle('closed');
+                console.log(id + " paneeli klikattu");
             });
         }
     });
 }
-setupMobilePanels(); // Muista kutsua funktiota!
-function handleKpVisibility() {
-    // TÄRKEÄÄ: Varmista että ID on täsmälleen sama kuin HTML:ssä
-    const kpBox = document.getElementById('kp-info-box'); 
-    
-    if (!kpBox) {
-        console.error("Virhe: Elementtiä 'kp-info-box' ei löytynyt!");
-        return;
-    }
 
-    // Työpöydällä (yli 768px) ei piiloteta mitään
+// 2. KP-laatikon näkyvyys
+function handleKpVisibility() {
+    const kpBox = document.getElementById('kp-info-box'); 
+    if (!kpBox) return;
+
     if (window.innerWidth > 768) {
         kpBox.classList.remove('fade-out');
         return;
     }
 
-    // Nollataan vanha ajastin
     if (kpHideTimeout) clearTimeout(kpHideTimeout);
-
-    // Poistetaan piilotusluokka, jotta laatikko näkyy
     kpBox.classList.remove('fade-out');
 
-    // Asetetaan uusi piilotus 10 sekunnin päähän
     kpHideTimeout = setTimeout(() => {
-        console.log("Piilotetaan Kp-laatikko...");
         kpBox.classList.add('fade-out');
     }, 8000); 
 }
 
-// Päivitetty fetchKPData
+// 3. KP-datan haku
 async function fetchKPData() {
     try {
         const res = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json');
@@ -184,8 +181,7 @@ async function fetchKPData() {
             const desc = document.getElementById('kpDesc');
             if (badge) {
                 badge.innerText = isNaN(kpVal) ? "--" : kpVal.toFixed(1);
-                // (Värikoodit tähän väliin...)
-              if (kpVal >= 5) {
+                if (kpVal >= 5) {
                     badge.style.color = "#ff3366";
                     desc.innerText = "● Widely visible";
                     desc.style.color = "#ff3366";
@@ -199,9 +195,6 @@ async function fetchKPData() {
                     desc.style.color = "#00ffcc";
                 }
             }
-            
-            
-            // AKTIVOIDAAN PIILOTUS
             handleKpVisibility();
         }
     } catch(e) {
@@ -209,64 +202,71 @@ async function fetchKPData() {
     }
 }
 
-// Alustus
+// 4. ALUSTUS (Kaikki tapahtuu tässä)
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Haetaan Kp-data heti latauksessa
-    fetchKPData();
-if (window.innerWidth <= 768) {
-    const actionsContent = document.getElementById('actions-content');
-    const locateBtn = document.getElementById('locate-btn');
+    // Käynnistetään paneelit
+    setupMobilePanels();
     
-    const forecastBtn = document.getElementById('forecast-btn');
+    // Haetaan KP-data
+    fetchKPData();
 
-    // Siirretään napit kartan päältä paneelin sisään
-    if (actionsContent) {
-        actionsContent.appendChild(locateBtn);
-        actionsContent.appendChild(forecastBtn);
-        
+    // Mobiilinappien siirto
+    if (window.innerWidth <= 768) {
+        const actionsContent = document.getElementById('actions-content');
+        const locateBtn = document.getElementById('locate-btn');
+        const forecastBtn = document.getElementById('forecast-btn');
+
+        if (actionsContent) {
+            if (locateBtn) actionsContent.appendChild(locateBtn);
+            if (forecastBtn) actionsContent.appendChild(forecastBtn);
+            // Markers-nappi jää nyt kartalle (tai minne se on HTML:ssä laitettu)
+        }
     }
-}
-    // 2. Splash Screen -logiikka
+
+    // Ennuste-popupin toiminta
+    const forecastBtn = document.getElementById('forecast-btn');
+    const forecastPopup = document.getElementById('forecast-popup');
+    const closeForecast = document.getElementById('close-forecast');
+
+    if (forecastBtn && forecastPopup) {
+        forecastBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            forecastPopup.style.display = 'flex';
+            // Jos updateKpChart on markers.js tai script.js tiedostossa:
+            if (typeof updateKpChart === 'function') updateKpChart();
+        });
+    }
+
+    if (closeForecast) {
+        closeForecast.addEventListener('click', () => {
+            forecastPopup.style.display = 'none';
+        });
+    }
+
+    // Splash screen
     const splash = document.getElementById('mobile-splash');
     if (splash) {
         setTimeout(() => {
             splash.classList.add('hidden');
-            setTimeout(() => {
-                splash.remove();
-            }, 1000); 
+            setTimeout(() => splash.remove(), 1000); 
         }, 3000);
     }
 
-    // 3. KP-laatikon palautusnappi (MOBIILI)
+    // KP palautus
     const restoreBtn = document.getElementById('kp-restore-btn');
     if (restoreBtn) {
-        // TÄRKEÄÄ: Estetään klikkauksen vuotaminen alla olevaan karttaan
-        // Käytetään Leafletin omaa työkalua, jos L (Leaflet) on ladattu
-        if (typeof L !== 'undefined' && L.DomEvent) {
-            L.DomEvent.disableClickPropagation(restoreBtn);
-            L.DomEvent.disableScrollPropagation(restoreBtn);
-        }
-
         restoreBtn.addEventListener('click', (e) => {
-            // Estetään perus-eventit varmuuden vuoksi
             e.preventDefault();
             e.stopPropagation();
-            
-            console.log("Palautetaan Kp-laatikko...");
             handleKpVisibility(); 
         });
     }
 
-    // 4. Tuodaan laatikko näkyviin kun ruutua kosketetaan (yleinen)
     document.addEventListener('touchstart', (e) => {
-        // Jos kosketus osuu palautusnappiin, annetaan yllä olevan klikkaus-eventin hoitaa homma
-        if (e.target.id === 'kp-restore-btn' || e.target.closest('#kp-restore-btn')) {
-            return;
-        }
+        if (e.target.closest('#kp-restore-btn') || e.target.closest('.side-panel')) return;
         handleKpVisibility();
     });
 });
-  
 </script>
 
 </body>
