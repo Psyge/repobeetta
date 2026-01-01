@@ -199,7 +199,7 @@ header.banner::before {
 }
 #menu {
     display: none; position: fixed; top: 100px; left: 0;
-    background: rgba(30,136,229,0.95); width: 220px;
+    background: rgba(5, 12, 24, 0.9); width: 220px;
     box-shadow: 2px 4px 8px rgba(0,0,0,0.4); flex-direction: column; padding: 10px 0; z-index: 7000;
 }
 #menu-btn:hover {
