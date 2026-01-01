@@ -505,7 +505,7 @@ header.banner .logo, .banner-right {
         /* Oletuksena paneeli on kokonaan piilossa oikealla */
         transform: translateX(100%); 
     }
-    #actions-panel { top: 140px !important; height: auto !important; }
+    #actions-panel { top: 10px !important; height: auto !important; }
     #social-panel { top: 320px !important; height: auto !important; }
     .side-panel.closed {
         transform: translateX(100%) !important;
@@ -516,7 +516,7 @@ header.banner .logo, .banner-right {
  .panel-tab {
         position: absolute !important;
         left: -40px !important; /* Kieleke näkyy aina paneelin vasemmalla puolella */
-        top: 0 !important;
+        top: 10px !important;
         width: 40px !important;
         height: 50px !important;
         background: rgba(10, 15, 25, 0.95) !important;
