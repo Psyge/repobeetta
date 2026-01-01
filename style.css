@@ -329,8 +329,8 @@ header.banner .logo, .banner-right {
 
     #info { position: fixed; bottom: 10px; left: 10px; font-size: 12px; height: 60px; }
  .leaflet-top.leaflet-left {
-        top: -35px !important; /* Lasketaan valikon alapuolelle */
-     left: 5px;
+        top: -25px !important; /* Lasketaan valikon alapuolelle */
+     
     }
 
     #locate-btn {
