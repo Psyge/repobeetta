@@ -496,4 +496,7 @@ header.banner .logo, .banner-right {
 }
 @media (min-width: 769px) {
     #kp-restore-btn { display: none !important; }
+    .side-panel, #kp-restore-btn, #actions-panel, #social-panel {
+        display: none !important;
+    }
 }
