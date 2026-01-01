@@ -198,7 +198,20 @@ async function fetchKPData() {
 // Alustus
 document.addEventListener('DOMContentLoaded', () => {
     fetchKPData();
-    
+    // 2. Splash Screen -logiikka
+    const splash = document.getElementById('mobile-splash');
+    if (splash) {
+        // Pidetään logo näkyvissä 3 sekuntia (3000ms)
+        setTimeout(() => {
+            splash.classList.add('hidden');
+            
+            // Valinnainen: Poistetaan elementti kokonaan DOMista 1s häivytyksen jälkeen, 
+            // jotta se ei vie turhaan muistia tai estä klikkauksia taustalla.
+            setTimeout(() => {
+                splash.remove();
+            }, 1000); 
+        }, 3000);
+    }
     // Tuodaan takaisin näkyviin mobiilissa kun ruutua kosketetaan
     document.addEventListener('touchstart', () => {
         handleKpVisibility();
