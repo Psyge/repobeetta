@@ -342,7 +342,20 @@ header.banner .logo, .banner-right {
         left: 3% !important;
         width: 180px;
     }
+    #map {
+        height: 80vh !important; /* Nostettu 60vh -> 80vh */
+        width: 100%;
+        margin-top: 0;
+    }
 
+    /* Varmistetaan, että infoteksti alkaa heti kartan jälkeen */
+    .aurora-section {
+        margin-top: 20px;
+        padding-bottom: 50px; /* Lisätilaa loppuun, jotta rullaus tuntuu hyvältä */
+    }
+#container {
+    overflow: hidden;
+}
     #info { position: fixed; bottom: 10px; left: 10px; font-size: 12px; height: 60px; }
  .leaflet-top.leaflet-left {
         top: -25px !important; /* Lasketaan valikon alapuolelle */
