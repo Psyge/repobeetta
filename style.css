@@ -489,27 +489,33 @@ header.banner .logo, .banner-right {
 .side-panel {
         position: fixed !important;
         right: 0 !important;
-        width: 60px !important; /* Kiinteä leveys auki ollessa */
+        width: 60px !important;
         background: rgba(10, 15, 25, 0.95) !important;
         border: 1px solid #00ffcc !important;
         border-right: none !important;
         border-radius: 15px 0 0 15px !important;
         z-index: 20000 !important;
-        transition: transform 0.4s ease-in-out !important;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
         padding: 10px 5px !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         box-sizing: border-box !important;
+        
+        /* Oletuksena paneeli on kokonaan piilossa oikealla */
+        transform: translateX(100%); 
     }
     #actions-panel { top: 140px !important; height: auto !important; }
     #social-panel { top: 320px !important; height: auto !important; }
     .side-panel.closed {
         transform: translateX(100%) !important;
     }
-  .panel-tab {
+    .side-panel:not(.closed) {
+        transform: translateX(0) !important;
+    }
+ .panel-tab {
         position: absolute !important;
-        left: -40px !important; /* Pakotetaan kieleke paneelin vasemmalle puolelle */
+        left: -40px !important; /* Kieleke näkyy aina paneelin vasemmalla puolella */
         top: 0 !important;
         width: 40px !important;
         height: 50px !important;
