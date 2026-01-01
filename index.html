@@ -84,17 +84,35 @@
     </div>
   </div>      
 <section id="aurora-info" class="aurora-section">
- <div id="aurora-default">
     <h2>Northern Lights forecast and real-time aurora map – RepoTracker</h2>
+    <p></p>RepoTracker shows the Northern Lights in real time in Finland and the Nordic countries.
+        The map shows where the Northern Lights are visible right now and in the coming hours.</p>
+ <div class="mobile-only" id="aurora-mobile-instructions">
+    <h2>How to track Auroras on Mobile</h2>
+    
+    <p><strong>Explore the Map:</strong> Tap any location on the map to see a detailed real-time aurora and cloud cover forecast for that spot.</p>
 
-    <p>
-        RepoTracker shows the Northern Lights in real time in Finland and the Nordic countries.
-        The map shows where the Northern Lights are visible right now and in the coming hours.
+    <div class="instruction-box" style="background: rgba(0, 255, 204, 0.1); border-left: 3px solid #00ffcc; padding: 10px; margin: 15px 0; border-radius: 0 8px 8px 0;">
+        <p style="margin: 0;"><strong>Quick Tools (⚙️):</strong> Tap the settings icon on the right to open your toolkit:</p>
+        <ul style="margin: 10px 0 0 20px; padding: 0;">
+            <li><strong>🧭 Locate:</strong> Find auroras at your current position.</li>
+            <li><strong>📊 Forecast:</strong> View the 3-day geomagnetic (Kp) outlook.</li>
+        </ul>
+    </div>
+
+    <p><strong>Stay Connected (📱):</strong> Tap the phone icon to follow our real-time updates on Instagram and TikTok or support the project with a coffee.</p>
+
+    <p style="font-size: 0.9em; opacity: 0.8;"><em>Note: The KP-index (bottom left) updates automatically. If it disappears, tap the small "KP" tab to bring it back.</em></p>
+</div>
+    
+    <div class="desktop-only" id="aurora-desktop-instructions">
+        <h2>Northern Lights forecast – PC Instructions</h2>
+        
 </p>
   <p>Click anywhere on the map or use the "Can i see the Northern Lights" -button to see the aurora forecast for that location.<br>
   Note: Cloud cover can affect visibility even if aurora activity is strong.
-  </p>
-
+  </p></div>
+<div id="place-info" style="display:none;"></div>
 <h2>How does the RepoTracker forecast work?</h2>
 <p>
 RepoTracker combines geomagnetic measurements, solar wind speed,
