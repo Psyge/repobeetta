@@ -506,7 +506,7 @@ header.banner .logo, .banner-right {
         transform: translateX(100%); 
     }
     #actions-panel { top: 10px !important; height: auto !important; }
-    #social-panel { top: 320px !important; height: auto !important; }
+    #social-panel { top: 170px !important; height: auto !important; }
     .side-panel.closed {
         transform: translateX(100%) !important;
     }
