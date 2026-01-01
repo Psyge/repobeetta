@@ -177,28 +177,32 @@ document.addEventListener('DOMContentLoaded', async () => {
 function manageKpVisibility() {
     const kpBox = document.getElementById('kp-info-box');
     
-    if (window.innerWidth <= 768) { // Vain mobiilissa
-        // 1. Varmistetaan että laatikko on aluksi näkyvissä
+    // Tarkistetaan löytyykö elementtiä, jotta vältetään null-error
+    if (!kpBox) return;
+
+    if (window.innerWidth <= 768) {
+        // Otetaan piilotus pois päältä aluksi
         kpBox.classList.remove('fade-out');
 
-        // 2. Asetetaan ajastin piilotukselle (esim. 10 sekuntia)
+        // Piilotetaan 10 sekunnin kuluttua
         setTimeout(() => {
-            kpBox.classList.add('fade-out');
-        }, 10000); // 10000ms = 10s
+            if (kpBox) kpBox.classList.add('fade-out');
+        }, 10000);
     }
 }
 
-// Suoritetaan kun sivu on ladattu
-document.addEventListener('DOMContentLoaded', manageKpVisibility);
+// Suoritetaan vasta kun koko sivu on ladattu
+window.addEventListener('load', manageKpVisibility);
 
-// Jos haluat, että laatikko tulee takaisin näkyviin kun klikkaat karttaa tai jotain muuta:
+// Tuodaan takaisin näkyviin napauttamalla näyttöä
 document.addEventListener('touchstart', function() {
     const kpBox = document.getElementById('kp-info-box');
-    if (kpBox.classList.contains('fade-out')) {
+    if (kpBox && kpBox.classList.contains('fade-out')) {
         kpBox.classList.remove('fade-out');
-        // Asetetaan uusi piilotusajastin
+        
+        // Asetetaan uusi piilotus 10 sekunnin päästä
         setTimeout(() => {
-            kpBox.classList.add('fade-out');
+            if (kpBox) kpBox.classList.add('fade-out');
         }, 10000);
     }
 });
