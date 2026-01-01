@@ -362,7 +362,18 @@ header.banner .logo, .banner-right {
 #forecast-btn::before { content: "📊"; font-size: 24px; }  
 .info-panel { min-width: auto; }    
 #kpDesc { display: none; }
-#idesc { content: "KP-Ind";}    
+#idesc {
+        font-size: 0 !important;
+    }
+
+    /* Lisätään uusi teksti tilalle */
+    #idesc::after {
+        content: "KP-IND";
+        font-size: 10px; /* Palautetaan haluttu koko */
+        color: #00ffcc;
+        opacity: 0.8;
+        display: block;
+    } 
 #kp-info-box {
         top: 170px !important; /* Lasketaan zoom-nappien alle mobiilissa */
         opacity: 1;
