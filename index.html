@@ -168,7 +168,21 @@ async function fetchKPData() {
             if (badge) {
                 badge.innerText = isNaN(kpVal) ? "--" : kpVal.toFixed(1);
                 // (Värikoodit tähän väliin...)
+              if (kpVal >= 5) {
+                    badge.style.color = "#ff3366";
+                    desc.innerText = "● Widely visible";
+                    desc.style.color = "#ff3366";
+                } else if (kpVal >= 3) {
+                    badge.style.color = "#ffcc00";
+                    desc.innerText = "● Chance to see";
+                    desc.style.color = "#ffcc00";
+                } else {
+                    badge.style.color = "#00ffcc";
+                    desc.innerText = "● No northern lights";
+                    desc.style.color = "#00ffcc";
+                }
             }
+            
             
             // AKTIVOIDAAN PIILOTUS
             handleKpVisibility();
