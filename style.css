@@ -486,7 +486,7 @@ header.banner .logo, .banner-right {
     #forecast-btn::before { content: "📊"; font-size: 20px; }
 
     /* Paneelin tyylit (kuten aiemmin sovittiin) */
-    side-panel {
+    .side-panel {
         position: fixed;
         right: 0;
         top: 150px;
