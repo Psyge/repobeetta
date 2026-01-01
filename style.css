@@ -279,27 +279,34 @@ header.banner::before {
 /* MOBIILI */
 @media (max-width: 768px) {
   header.banner {
-        background: transparent !important;
+        background: none !important;
         border: none !important;
         box-shadow: none !important;
-        width: auto !important; /* Ei vie koko leveyttä */
+        width: auto !important;
         height: auto !important;
-        top: 15px;
-        left: 15px;
+        top: 0 !important;
+        left: 0 !important;
+        padding: 0 !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
     }
 header.banner .logo, .banner-right {
         display: none !important; /* Piilotetaan logo ja muut ikonit */
     }
     #menu-btn {
-        background: rgba(5, 12, 24, 0.8);
-        border: 1px solid rgba(0, 255, 204, 0.4);
-        border-radius: 12px;
+        position: fixed !important;
+        top: 15px !important;
+        left: 15px !important;
         width: 50px;
         height: 50px;
+        background: rgba(5, 12, 24, 0.9);
+        border: 1px solid rgba(0, 255, 204, 0.4);
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        backdrop-filter: blur(10px);
+        z-index: 99999 !important; /* Varmasti kaiken päällä */
+        margin: 0 !important;
     }
 
     /* Oikean puolen ikonit mobiilissa */
@@ -341,21 +348,21 @@ header.banner .logo, .banner-right {
 #kpDesc { display: none; }
 #idesc::before [ content: "KP-Ind";}    
 #kp-container {
-        position: fixed;
-        top: 175px; /* Sijoitetaan pystysuoraan valikon ja zoomin alle */
-        left: 10px;
-        bottom: auto;
+        position: fixed !important;
+        top: 170px !important; /* Laskettu menu + zoom mukaan */
+        left: 15px !important;
+        bottom: auto !important;
+        z-index: 9999;
     }
 
     .info-panel {
-        min-width: 60px;
-        transition: opacity 0.8s ease, transform 0.8s ease;
+        opacity: 1;
+        transition: opacity 1s ease;
     }
 
-    /* Piilotusluokka */
+    /* Luokka piilotusta varten */
     .fade-out {
         opacity: 0 !important;
-        transform: translateX(-20px);
         pointer-events: none;
     }
 }
