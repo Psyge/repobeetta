@@ -387,4 +387,37 @@ header.banner .logo, .banner-right {
         transform: translateX(-20px) !important;
         pointer-events: none !important;
     }
+    #mobile-splash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #050c18; /* Sama tumma väri kuin bannerissa */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999999; /* Kaiken päällä */
+    transition: opacity 1s ease-in-out, visibility 1s;
+}
+
+#mobile-splash img {
+    width: 200px; /* Säädä logon kokoa tästä */
+    height: auto;
+    filter: drop-shadow(0 0 15px rgba(0, 255, 204, 0.5));
+    animation: pulse 2s infinite ease-in-out;
+}
+
+/* Pieni syke-efekti logoon */
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.8; }
+}
+
+/* Luokka jolla logo poistetaan */
+#mobile-splash.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
 }
