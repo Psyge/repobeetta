@@ -62,7 +62,27 @@
             </div>
         </div>
     </div>
-        
+  <div id="forecast-popup">
+    <div class="forecast-card">
+      <span id="close-forecast">&times;</span>
+
+      <div class="forecast-header">
+        <h2>3-Päivän Kp-Ennuste</h2>
+      </div>
+
+      <div class="chart-container">
+        <canvas id="kpChart"></canvas>
+      </div>
+
+      <div class="forecast-info">
+        <div class="info-item"><span class="dot low"></span> Matala (0-3)</div>
+        <div class="info-item"><span class="dot mod"></span> Kohtalainen (4)</div>
+        <div class="info-item"><span class="dot high"></span> Korkea (5+)</div>
+      </div>
+
+      <div id="errorMessage"></div>
+    </div>
+  </div>      
 <section id="aurora-info" class="aurora-section">
  <div id="aurora-default">
     <h2>Northern Lights forecast and real-time aurora map – RepoTracker</h2>
