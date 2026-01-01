@@ -173,7 +173,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     setInterval(fetchKPData, 3600000); 
 });
   </script>
+<script>
+function manageKpVisibility() {
+    const kpBox = document.getElementById('kp-info-box');
+    
+    if (window.innerWidth <= 768) { // Vain mobiilissa
+        // 1. Varmistetaan että laatikko on aluksi näkyvissä
+        kpBox.classList.remove('fade-out');
 
+        // 2. Asetetaan ajastin piilotukselle (esim. 10 sekuntia)
+        setTimeout(() => {
+            kpBox.classList.add('fade-out');
+        }, 10000); // 10000ms = 10s
+    }
+}
+
+// Suoritetaan kun sivu on ladattu
+document.addEventListener('DOMContentLoaded', manageKpVisibility);
+
+// Jos haluat, että laatikko tulee takaisin näkyviin kun klikkaat karttaa tai jotain muuta:
+document.addEventListener('touchstart', function() {
+    const kpBox = document.getElementById('kp-info-box');
+    if (kpBox.classList.contains('fade-out')) {
+        kpBox.classList.remove('fade-out');
+        // Asetetaan uusi piilotusajastin
+        setTimeout(() => {
+            kpBox.classList.add('fade-out');
+        }, 10000);
+    }
+});
+  
+</script>
 
 </body>
 </html>
