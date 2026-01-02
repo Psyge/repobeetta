@@ -1,4 +1,9 @@
 /* --- PC-NÄKYMÄ (Oletus) --- */
+ads-img {
+    width: 650px; 
+    height: 60px; 
+    border: 0;
+}
 .mobile-only {
     display: none;
 }
