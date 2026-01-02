@@ -504,7 +504,7 @@ function drawAuroraOverlay(points) {
 
     // Säädetään sädettä ja piirto-tiheyttä zoomin mukaan
     let radius = zoom * 12;
-    let step = 4; // Piirretään oletuksena vain joka 4. piste (säästää 75% tehoja!)
+    let step = 4; 
 
     if (zoom > 7) { radius = zoom * 55; step = 2; }
     if (zoom > 10) { radius = zoom * 110; step = 1; } 
@@ -512,23 +512,24 @@ function drawAuroraOverlay(points) {
     createSprites(radius);
     ctx.globalCompositeOperation = 'screen';
 
-    // Käytetään perinteistä for-looppia, jotta voimme hypätä pisteiden yli (step)
     for (let i = 0; i < points.length; i += step) {
         const p = points[i];
         const lat = p[1];
         const intensity = p[2];
 
-        if (lat < 45 || intensity < 5) continue; // Suodatetaan heikot heti
+        if (lat < 45 || intensity < 5) continue; 
 
         let lon = p[0];
         if (lon > 180) lon -= 360;
 
-        // Optimointi: Älä laske aaltoilua, jos piste on kaukana ruudun ulkopuolella
+        // Lasketaan perusasema
         const pos = map.latLngToContainerPoint([lat, lon]);
-        if (pos.x < -radius || pos.x > auroraCanvas.width + radius || 
-            pos.y < -radius || pos.y > auroraCanvas.height + radius) continue;
+        
+        // Optimointi: tarkistetaan näkyvyys ruudulla ennen laskentaa
+        if (pos.x < -radius * 2 || pos.x > auroraCanvas.width + radius * 2 || 
+            pos.y < -radius * 2 || pos.y > auroraCanvas.height + radius * 2) continue;
 
-        // Lisätään aaltoilu vasta kun tiedetään että piste näkyy
+        // Lisätään aaltoilu (käytetään 'i' indeksiä)
         const offsetLat = Math.sin(time + i) * 0.15;
         const finalPos = map.latLngToContainerPoint([lat + offsetLat, lon]);
 
@@ -539,18 +540,20 @@ function drawAuroraOverlay(points) {
         ctx.globalAlpha = Math.min(zoom > 8 ? 0.5 : 0.3, (intensity / 100));
         ctx.drawImage(sprite, finalPos.x - sprite.width / 2, finalPos.y - sprite.height / 2);
 
-        // Lisäkerros syvyyttä varten
+        // Lisäkerros syvyyttä varten (vain kun zoomattu lähelle)
         if (zoom > 8) {
             ctx.globalAlpha *= 0.4;
-            const pulse = Math.sin(time * 2 + index) * 0.1 + 1; // Pieni sykintä
-            ctx.drawImage(sprite, 
-                pos.x - (sprite.width * 1.8 * pulse) / 2, 
-                pos.y - (sprite.height * 1.8 * pulse) / 2, 
+            // Korjattu: muutettu 'index' -> 'i'
+            const pulse = Math.sin(time * 2 + i) * 0.1 + 1; 
+            ctx.drawImage(
+                sprite, 
+                finalPos.x - (sprite.width * 1.8 * pulse) / 2, 
+                finalPos.y - (sprite.height * 1.8 * pulse) / 2, 
                 sprite.width * 1.8 * pulse, 
                 sprite.height * 1.8 * pulse
             );
         }
-    });
+    }
 }
 
 async function fetchAuroraData() {
