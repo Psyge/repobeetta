@@ -309,6 +309,41 @@ document.addEventListener('DOMContentLoaded', () => {
         handleKpVisibility();
     });
 });
+    // Lähetä ilmoitus napista
+function sendAuroraReport() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+            const formData = new FormData();
+            formData.append('lat', pos.coords.latitude);
+            formData.append('lon', pos.coords.longitude);
+
+            fetch('report.php', { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(data => updatePawMarkers(data));
+        });
+    }
+}
+
+let pawLayerGroup = L.layerGroup().addTo(map);
+
+function updatePawMarkers(reports) {
+    pawLayerGroup.clearLayers(); // Tyhjennetään vanhat ja piirretään tuoreet
+    
+    reports.forEach(r => {
+        const marker = L.marker([r.lat, r.lon], { 
+            icon: pawIcon // Käytetään aiemmin luotua hohtavaa ikonia
+        });
+        marker.bindPopup("Fresh aurora sighting!");
+        pawLayerGroup.addLayer(marker);
+    });
+}
+
+// Päivitetään tilanne automaattisesti minuutin välein
+setInterval(() => {
+    fetch('report.php')
+        .then(res => res.json())
+        .then(data => updatePawMarkers(data));
+}, 60000);
 </script>
 
 </body>
