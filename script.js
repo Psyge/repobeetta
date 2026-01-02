@@ -154,16 +154,17 @@ async function initAppMap() {
   map = L.map('map', { 
     center: [65, 25], 
     zoom: 4, 
-    minZoom: 2, 
-    maxZoom: 15,
-    fadeAnimation: true // Leafletin oma pehmeä animaatio
-  });
+    minZoom: 3, // Estää liiallisen uloszoomauksen, joka näyttää tyhjää
+    maxZoom: 12, // Estää "pikselöitymisen" liian syvälle mennessä
+    worldCopyJump: true, // Kartta jatkuu saumattomasti idässä/lännessä
+    maxBoundsViscosity: 1.0, // Pitää kartan tiukasti rajojen sisällä
+    bounceAtZoomLimits: false
+});
 
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '© CARTO',
-    subdomains: 'abcd',
-    maxZoom: 19
-  }).addTo(map);
+    noWrap: false, // Sallii maailman toistumisen
+    bounds: [[-90, -180], [90, 180]]
+}).addTo(map);
 
   // --- KORJAUS TÖKSÄHDYKSEEN ---
   // Odotetaan hetki, että DOM on varmasti asettunut
@@ -439,19 +440,31 @@ const AuroraLayer = L.Layer.extend({
         cancelAnimationFrame(animationFrameId);
     },
     _startAnimation: function() {
-        const render = () => {
+    let lastFrameTime = 0;
+    const fps = 25; // Rajoitetaan FPS
+    const interval = 1000 / fps;
+
+    const render = (now) => {
+        if (!lastFrameTime) lastFrameTime = now;
+        const delta = now - lastFrameTime;
+
+        if (delta > interval) {
             if (currentData) drawAuroraOverlay(currentData.coordinates);
-            animationFrameId = requestAnimationFrame(render);
-        };
-        render();
-    },
+            lastFrameTime = now - (delta % interval);
+        }
+        animationFrameId = requestAnimationFrame(render);
+    };
+    requestAnimationFrame(render);
+},
     _update: function() {
-        const size = map.getSize();
-        const topLeft = map.containerPointToLayerPoint([0, 0]);
-        L.DomUtil.setPosition(this._canvas, topLeft);
-        auroraCanvas.width = size.x;
-        auroraCanvas.height = size.y;
-        
+    const size = map.getSize();
+    // Lisätään pieni "bufferi" kankaan reunoille (esim. 100px)
+    const topLeft = map.containerPointToLayerPoint([-100, -100]);
+    L.DomUtil.setPosition(this._canvas, topLeft);
+    
+    auroraCanvas.width = size.x + 200;
+    auroraCanvas.height = size.y + 200;
+ 
         const zoom = map.getZoom();
         const blurValue = zoom > 8 ? 20 : Math.max(12, zoom * 3.5);
         this._canvas.style.filter = `blur(${blurValue}px)`;
@@ -487,43 +500,44 @@ function drawAuroraOverlay(points) {
     ctx.clearRect(0, 0, auroraCanvas.width, auroraCanvas.height);
     
     const zoom = map.getZoom();
-    const time = Date.now() * 0.001; // Aika sekunteina animaatiota varten
+    const time = Date.now() * 0.001;
 
-    // JÄTTIKOKO LÄHELLÄ:
-    let radius = zoom * 10;
-    if (zoom > 7) radius = zoom * 50; 
-    if (zoom > 10) radius = zoom * 100; // Massiivinen peitto
+    // Säädetään sädettä ja piirto-tiheyttä zoomin mukaan
+    let radius = zoom * 12;
+    let step = 4; // Piirretään oletuksena vain joka 4. piste (säästää 75% tehoja!)
+
+    if (zoom > 7) { radius = zoom * 55; step = 2; }
+    if (zoom > 10) { radius = zoom * 110; step = 1; } 
 
     createSprites(radius);
     ctx.globalCompositeOperation = 'screen';
 
-    points.forEach((p, index) => {
+    // Käytetään perinteistä for-looppia, jotta voimme hypätä pisteiden yli (step)
+    for (let i = 0; i < points.length; i += step) {
+        const p = points[i];
         const lat = p[1];
         const intensity = p[2];
 
-        if (lat < 45 || intensity < 4) return;
+        if (lat < 45 || intensity < 5) continue; // Suodatetaan heikot heti
 
         let lon = p[0];
         if (lon > 180) lon -= 360;
 
-        // LIIKE: Lisätään pieni aaltoilu sijaintiin
-        const offsetLat = Math.sin(time + index) * 0.2; 
-        const offsetLon = Math.cos(time * 0.8 + index) * 0.2;
+        // Optimointi: Älä laske aaltoilua, jos piste on kaukana ruudun ulkopuolella
+        const pos = map.latLngToContainerPoint([lat, lon]);
+        if (pos.x < -radius || pos.x > auroraCanvas.width + radius || 
+            pos.y < -radius || pos.y > auroraCanvas.height + radius) continue;
 
-        const pos = map.latLngToContainerPoint([lat + offsetLat, lon + offsetLon]);
-
-        if (pos.x < -radius * 2 || pos.x > auroraCanvas.width + radius * 2 || 
-            pos.y < -radius * 2 || pos.y > auroraCanvas.height + radius * 2) return;
+        // Lisätään aaltoilu vasta kun tiedetään että piste näkyy
+        const offsetLat = Math.sin(time + i) * 0.15;
+        const finalPos = map.latLngToContainerPoint([lat + offsetLat, lon]);
 
         let sprite = spriteGreen;
         if (intensity > 35) sprite = spriteYellow;
         if (intensity > 70) sprite = spriteRed;
 
-        // KIRKKAUS: Nostettu alpha, jotta värit loistavat
-        const zoomAlpha = zoom > 8 ? 0.6 : 0.4;
-        ctx.globalAlpha = Math.min(zoomAlpha, (intensity / 100));
-        
-        ctx.drawImage(sprite, pos.x - sprite.width / 2, pos.y - sprite.height / 2);
+        ctx.globalAlpha = Math.min(zoom > 8 ? 0.5 : 0.3, (intensity / 100));
+        ctx.drawImage(sprite, finalPos.x - sprite.width / 2, finalPos.y - sprite.height / 2);
 
         // Lisäkerros syvyyttä varten
         if (zoom > 8) {
