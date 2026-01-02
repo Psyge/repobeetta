@@ -28,15 +28,19 @@
 }
 
 /* Kartalla olevan käpälän hohto ja animaatio */
+/* Muokattu CSS */
 .paw-icon {
     filter: drop-shadow(0 0 10px #00ffcc) brightness(1.3);
-    animation: paw-pulse 2s infinite ease-in-out;
+    animation: paw-glow 2s infinite ease-in-out;
+    /* Varmistetaan, ettei mikään siirrä kuvaa */
+    margin-top: 0 !important;
+    margin-left: 0 !important;
 }
 
-@keyframes paw-pulse {
-    0% { transform: scale(1); opacity: 0.7; }
-    50% { transform: scale(1.25); opacity: 1; }
-    100% { transform: scale(1); opacity: 0.7; }
+@keyframes paw-glow {
+    0% { filter: drop-shadow(0 0 5px #00ffcc) brightness(1.1); opacity: 0.7; }
+    50% { filter: drop-shadow(0 0 15px #00ffcc) brightness(1.5); opacity: 1; }
+    100% { filter: drop-shadow(0 0 5px #00ffcc) brightness(1.1); opacity: 0.7; }
 }
 .leaflet-aurora-layer {
     pointer-events: none; /* Estää kerrosta häiritsemästä klikkausia */
