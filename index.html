@@ -316,30 +316,85 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
     // Lähetä ilmoitus napista
-const WORKER_URL = 'https://report.masto84.workers.dev/'; // Cloudflaresta saatava osoite
+// 1. Määritellään ikoni ja ryhmä globaalisti heti skriptin alussa
+const pawIcon = L.icon({
+    iconUrl: 'fox-paw.png', 
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+    className: 'paw-icon'
+});
 
+const WORKER_URL = 'https://report.masto84.workers.dev/';
+let pawLayerGroup;
+
+// 2. Määritellään funktio, jonka puuttumisesta virhe tuli
+function updatePawMarkers(reports) {
+    console.log("Päivitetään käpälät kartalle:", reports);
+    if (!pawLayerGroup) {
+        if (typeof map !== 'undefined' && map) {
+            pawLayerGroup = L.layerGroup().addTo(map);
+        } else {
+            console.error("Karttaa ei ole vielä alustettu!");
+            return;
+        }
+    }
+    
+    pawLayerGroup.clearLayers();
+    
+    reports.forEach(r => {
+        const marker = L.marker([r.lat, r.lon], { icon: pawIcon });
+        // Lasketaan aikaero
+        const minsAgo = Math.floor((Date.now() - r.time) / 60000);
+        const timeText = minsAgo < 1 ? "Just now" : `${minsAgo} min ago`;
+        
+        marker.bindPopup(`<b>Aurora spotted!</b><br>${timeText}`);
+        pawLayerGroup.addLayer(marker);
+    });
+}
+
+// 3. Raporttien latausfunktio
+async function loadReports() {
+    try {
+        const res = await fetch(WORKER_URL);
+        if (!res.ok) throw new Error("Worker-yhteysvirhe");
+        const data = await res.json();
+        // Nyt funktio on varmasti määritelty yläpuolella
+        updatePawMarkers(data);
+    } catch (err) {
+        console.error("Virhe ladattaessa raportteja:", err);
+    }
+}
+
+// 4. Ilmoituksen lähettäminen
 function sendAuroraReport() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(async pos => {
-            const response = await fetch(WORKER_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    lat: pos.coords.latitude,
-                    lon: pos.coords.longitude
-                }),
-                headers: { 'Content-Type': 'application/json' }
-            });
-            const data = await response.json();
-            loadReports(); // Päivitetään kartta
+            try {
+                const response = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        lat: pos.coords.latitude,
+                        lon: pos.coords.longitude
+                    }),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                await response.json();
+                console.log("Ilmoitus lähetetty onnistuneesti!");
+                loadReports(); // Päivitetään heti lähetyksen jälkeen
+            } catch (err) {
+                console.error("Lähetys epäonnistui:", err);
+            }
+        }, err => {
+            alert("Sijainnin haku epäonnistui. Salli sijainti ilmoittaaksesi revontulet.");
         });
     }
 }
 
-async function loadReports() {
-    const res = await fetch(WORKER_URL);
-    const data = await res.json();
-    updatePawMarkers(data);
-}
+// 5. Alustus
+document.addEventListener('DOMContentLoaded', () => {
+    // Haetaan raportit 2 sekunnin kuluttua, jotta kartta ehtii varmasti latautua
+    setTimeout(loadReports, 2000);
+});
 </script>
 
 </body>
