@@ -319,9 +319,9 @@ document.addEventListener('DOMContentLoaded', () => {
 // 1. Määritellään ikoni ja ryhmä globaalisti heti skriptin alussa
 const pawIcon = L.icon({
     iconUrl: 'fox-paw.png',
-    iconSize: [40, 39],      // Leveys 40, korkeus suhteessa (40 * 0.98 = 39.2)
-    iconAnchor: [20, 19.5],  // Tarkka keskipiste (100/2=50 -> 40/2=20, 98/2=49 -> 39/2=19.5)
-    popupAnchor: [0, -20],
+    iconSize: [50, 50],      // Kuvan koko kartalla
+    iconAnchor: [25, 25],    // TÄRKEÄ: Puolet koosta (50/2 = 25), keskipiste
+    popupAnchor: [0, -25],   // Popup aukeaa 25px ankkurin yläpuolelle (käpälän yläreunasta)
     className: 'paw-icon'
 });
 
