@@ -512,6 +512,12 @@ header.banner .logo, .banner-right {
     justify-content: center;
     z-index: 999999; /* Kaiken päällä */
     transition: opacity 1s ease-in-out, visibility 1s;
+    display: flex;
+    flex-direction: column; /* Pakottaa sisällön allekkain */
+    align-items: center;    /* Keskittää kuvat vaakasuunnassa */
+    justify-content: center; /* Keskittää kuvat pystysuunnassa */
+    height: 100vh;          /* Koko näytön korkeus */
+    text-align: center;    
 }
 
 #mobile-splash img {
@@ -519,6 +525,10 @@ header.banner .logo, .banner-right {
     height: auto;
     filter: drop-shadow(0 0 15px rgba(0, 255, 204, 0.5));
     animation: pulse 2s infinite ease-in-out;
+    display: block;         /* Varmistaa, että kuva vie koko rivin */
+    margin: 10px 0;         /* Lisää hieman väliä kuvien väliin */
+    max-width: 80%;         /* Estää kuvia menemästä ruudun yli */
+    height: auto;
 }
 
 /* Pieni syke-efekti logoon */
