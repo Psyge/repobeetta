@@ -318,10 +318,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Lähetä ilmoitus napista
 // 1. Määritellään ikoni ja ryhmä globaalisti heti skriptin alussa
 const pawIcon = L.icon({
-    iconUrl: 'fox-paw.png', 
-    iconSize: [40, 40],     // Kuvan koko (leveys, korkeus)
-    iconAnchor: [20, 20],   // TÄMÄ ON TÄRKEÄ: Puolet koosta, jolloin keskipiste lukittuu
-    popupAnchor: [0, -20],  // Popup ilmestyy käpälän yläpuolelle, ei päälle
+    iconUrl: 'fox-paw.png',
+    iconSize: [40, 39],      // Leveys 40, korkeus suhteessa (40 * 0.98 = 39.2)
+    iconAnchor: [20, 19.5],  // Tarkka keskipiste (100/2=50 -> 40/2=20, 98/2=49 -> 39/2=19.5)
+    popupAnchor: [0, -20],
     className: 'paw-icon'
 });
 
