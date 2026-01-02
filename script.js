@@ -153,7 +153,20 @@ async function initAppMap() {
     return;
   }
 
-  map = L.map('map', { center: [65, 25], zoom: 4, minZoom: 2, maxZoom: 15 });
+  // 1. Alustetaan kartta heti Suomen kohdalle
+  map = L.map('map', { 
+    center: [64.5, 26.0], // Hieman keskitetympi Suomi-näkymä
+    zoom: 5,              // Sopiva zoom-taso mobiilille ja desktopille
+    minZoom: 2, 
+    maxZoom: 15,
+    zoomControl: false    // Poistetaan oletusnapit, jos ne häiritsevät UI:ta
+  });
+
+  // 2. Pakotetaan kartta tunnistamaan säiliön koko heti
+  // Tämä korjaa "hyppäyksen" ja harmaat ruudut reunoilla
+  setTimeout(() => {
+    map.invalidateSize();
+  }, 100);
 
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
     attribution: '© OpenStreetMap © CARTO',
@@ -161,19 +174,25 @@ async function initAppMap() {
     maxZoom: 19
   }).addTo(map);
 
-  // --- LISÄÄ TÄMÄ OSA ---
-  // Aktivoidaan revontulitaso
+  // 3. Aktivoidaan revontulitaso
   const auroraLayerInstance = new AuroraLayer();
   map.addLayer(auroraLayerInstance);
-  // ----------------------
 
   map.setMaxBounds([[-90, -180], [90, 180]]);
   map.on('click', onMapClick);
 
-  const places = await loadPlaces();
-  if (places.length > 0 && typeof initMarkers === 'function') {
-      initMarkers(map, getWeather, showPlaceInfo, places);
+  // 4. Ladataan paikat, mutta ei anneta niiden "hypäyttää" karttaa
+  try {
+    const places = await loadPlaces();
+    if (places.length > 0 && typeof initMarkers === 'function') {
+        initMarkers(map, getWeather, showPlaceInfo, places);
+        // Huom: Jos initMarkers sisältää koodia kuten map.fitBounds(), 
+        // se aiheuttaa hyppäyksen. Varmista ettei se tee sitä automaattisesti.
+    }
+  } catch (err) {
+    console.error("Virhe ladattaessa paikkoja:", err);
   }
+}
 
   // NOAA-data + päivitys
   fetchAuroraData();
