@@ -188,7 +188,7 @@ async function initAppMap() {
     } catch (e) {
         console.error("Paikkojen lataus epäonnistui:", e);
     }
-}
+
 
   // NOAA-data + päivitys
   fetchAuroraData();
