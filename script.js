@@ -148,50 +148,46 @@ const t = e.originalEvent?.target;
 // ---------------------
 
 async function initAppMap() {
-  if (typeof L === 'undefined') {
-    console.error('Leaflet not loaded');
-    return;
-  }
-
-  // 1. Alustetaan kartta heti Suomen kohdalle
-  map = L.map('map', { 
-    center: [64.5, 26.0], // Hieman keskitetympi Suomi-näkymä
-    zoom: 5,              // Sopiva zoom-taso mobiilille ja desktopille
-    minZoom: 2, 
-    maxZoom: 15,
-    zoomControl: false    // Poistetaan oletusnapit, jos ne häiritsevät UI:ta
-  });
-
-  // 2. Pakotetaan kartta tunnistamaan säiliön koko heti
-  // Tämä korjaa "hyppäyksen" ja harmaat ruudut reunoilla
-  setTimeout(() => {
-    map.invalidateSize();
-  }, 100);
-
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '© OpenStreetMap © CARTO',
-    subdomains: 'abcd',
-    maxZoom: 19
-  }).addTo(map);
-
-  // 3. Aktivoidaan revontulitaso
-  const auroraLayerInstance = new AuroraLayer();
-  map.addLayer(auroraLayerInstance);
-
-  map.setMaxBounds([[-90, -180], [90, 180]]);
-  map.on('click', onMapClick);
-
-  // 4. Ladataan paikat, mutta ei anneta niiden "hypäyttää" karttaa
-  try {
-    const places = await loadPlaces();
-    if (places.length > 0 && typeof initMarkers === 'function') {
-        initMarkers(map, getWeather, showPlaceInfo, places);
-        // Huom: Jos initMarkers sisältää koodia kuten map.fitBounds(), 
-        // se aiheuttaa hyppäyksen. Varmista ettei se tee sitä automaattisesti.
+    if (typeof L === 'undefined') {
+        console.error('Leaflet not loaded');
+        return;
     }
-  } catch (err) {
-    console.error("Virhe ladattaessa paikkoja:", err);
-  }
+
+    // Alustetaan kartta
+    map = L.map('map', { 
+        center: [64.5, 26.0], 
+        zoom: 5, 
+        minZoom: 2, 
+        maxZoom: 15 
+    });
+
+    // Lisätään karttataso
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '© OpenStreetMap © CARTO',
+        subdomains: 'abcd',
+        maxZoom: 19
+    }).addTo(map);
+
+    // Pakotetaan koon tunnistus
+    setTimeout(() => { map.invalidateSize(); }, 200);
+
+    // Lisätään revontulet
+    if (typeof AuroraLayer !== 'undefined') {
+        const auroraLayerInstance = new AuroraLayer();
+        map.addLayer(auroraLayerInstance);
+    }
+
+    map.on('click', onMapClick);
+
+    // TÄMÄ OLI VIRHEEN SYY: await pitää olla async-funktion sisällä
+    try {
+        const places = await loadPlaces(); 
+        if (places && places.length > 0 && typeof initMarkers === 'function') {
+            initMarkers(map, getWeather, showPlaceInfo, places);
+        }
+    } catch (e) {
+        console.error("Paikkojen lataus epäonnistui:", e);
+    }
 }
 
   // NOAA-data + päivitys
