@@ -171,7 +171,7 @@ async function initAppMap() {
   setTimeout(() => {
     map.invalidateSize(); // Pakottaa kartan täyttämään tilan oikein
     document.getElementById('map').classList.add('map-ready');
-  }, 200);
+  }, 50);
 
   const auroraLayerInstance = new AuroraLayer();
   map.addLayer(auroraLayerInstance);
