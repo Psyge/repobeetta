@@ -1,3 +1,7 @@
+.leaflet-aurora-layer {
+    pointer-events: none; /* Estää kerrosta häiritsemästä klikkausia */
+    will-change: transform; /* Kertoo selaimelle että kerros liikkuu */
+}
 /* --- PC-NÄKYMÄ (Oletus) --- */
 .ads-img {
     width: 650px; 
