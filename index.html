@@ -316,40 +316,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
     // Lähetä ilmoitus napista
+const WORKER_URL = 'report.masto84.workers.dev'; // Cloudflaresta saatava osoite
+
 function sendAuroraReport() {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(pos => {
-            const formData = new FormData();
-            formData.append('lat', pos.coords.latitude);
-            formData.append('lon', pos.coords.longitude);
-
-            fetch('report.php', { method: 'POST', body: formData })
-                .then(res => res.json())
-                .then(data => updatePawMarkers(data));
+        navigator.geolocation.getCurrentPosition(async pos => {
+            const response = await fetch(WORKER_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    lat: pos.coords.latitude,
+                    lon: pos.coords.longitude
+                }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await response.json();
+            loadReports(); // Päivitetään kartta
         });
     }
 }
 
-let pawLayerGroup = L.layerGroup().addTo(map);
-
-function updatePawMarkers(reports) {
-    pawLayerGroup.clearLayers(); // Tyhjennetään vanhat ja piirretään tuoreet
-    
-    reports.forEach(r => {
-        const marker = L.marker([r.lat, r.lon], { 
-            icon: pawIcon // Käytetään aiemmin luotua hohtavaa ikonia
-        });
-        marker.bindPopup("Fresh aurora sighting!");
-        pawLayerGroup.addLayer(marker);
-    });
+async function loadReports() {
+    const res = await fetch(WORKER_URL);
+    const data = await res.json();
+    updatePawMarkers(data);
 }
-
-// Päivitetään tilanne automaattisesti minuutin välein
-setInterval(() => {
-    fetch('report.php')
-        .then(res => res.json())
-        .then(data => updatePawMarkers(data));
-}, 60000);
 </script>
 
 </body>
