@@ -331,25 +331,41 @@ let pawLayerGroup;
 // 2. Määritellään funktio, jonka puuttumisesta virhe tuli
 function updatePawMarkers(reports) {
     console.log("Päivitetään käpälät kartalle:", reports);
+    
+    // Varmistetaan, että map on olemassa
+    if (typeof map === 'undefined' || !map) {
+        console.error("Map-oliota ei löydy vielä!");
+        return;
+    }
+
+    // Luodaan tai haetaan kerrosryhmä
     if (!pawLayerGroup) {
-        if (typeof map !== 'undefined' && map) {
-            pawLayerGroup = L.layerGroup().addTo(map);
-        } else {
-            console.error("Karttaa ei ole vielä alustettu!");
-            return;
-        }
+        pawLayerGroup = L.layerGroup().addTo(map);
     }
     
+    // Tyhjennetään vanhat käpälät
     pawLayerGroup.clearLayers();
     
     reports.forEach(r => {
-        const marker = L.marker([r.lat, r.lon], { icon: pawIcon });
-        // Lasketaan aikaero
-        const minsAgo = Math.floor((Date.now() - r.time) / 60000);
-        const timeText = minsAgo < 1 ? "Just now" : `${minsAgo} min ago`;
-        
-        marker.bindPopup(`<b>Aurora spotted!</b><br>${timeText}`);
-        pawLayerGroup.addLayer(marker);
+        // Varmistetaan, että lat ja lon ovat numeroita
+        const lat = parseFloat(r.lat);
+        const lon = parseFloat(r.lon);
+
+        if (!isNaN(lat) && !isNaN(lon)) {
+            // Luodaan merkki suoraan koordinaatteihin
+            const marker = L.marker([lat, lon], { 
+                icon: pawIcon,
+                pane: 'markerPane' // Pakotetaan Leafletin standardikerrokseen
+            });
+            
+            const minsAgo = Math.floor((Date.now() - r.time) / 60000);
+            const timeText = minsAgo < 1 ? "Just now" : `${minsAgo} min ago`;
+            
+            marker.bindPopup(`<b>Aurora spotted!</b><br>${timeText}`);
+            
+            // Lisätään ryhmään
+            pawLayerGroup.addLayer(marker);
+        }
     });
 }
 
