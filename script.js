@@ -686,8 +686,29 @@ document.addEventListener('DOMContentLoaded', async () => {
   const leafletLoaded = (typeof L !== 'undefined');
 
   if (hasMap && leafletLoaded && typeof initAppMap === 'function') {
-    try { await initAppMap(); } catch (e) { console.error('initAppMap error:', e); }
+    try { 
+      await initAppMap(); 
+      
+      // --- LISÄTTY TÄMÄ OSA ---
+      // Kun kartta on alustettu (await valmis), pakotetaan koon tunnistus
+      // Tämä poistaa hyppimisen ja varmistaa, että kartta täyttää ruudun
+      setTimeout(() => {
+        if (typeof map !== 'undefined' && map) {
+          map.invalidateSize();
+          console.log("Kartan koko vakautettu latauksen jälkeen.");
+        }
+      }, 300);
+      // -------------------------
+
+    } catch (e) { console.error('initAppMap error:', e); }
   }
+
+  // 3) Globaali koonmuutos-kuuntelija (varmistus mobiilikääntöihin)
+  window.addEventListener('resize', () => {
+    if (typeof map !== 'undefined' && map) {
+      map.invalidateSize();
+    }
+  });
 });
 
 
