@@ -157,7 +157,8 @@ async function initAppMap() {
     minZoom: 3, // Estää liiallisen uloszoomauksen, joka näyttää tyhjää
     maxZoom: 22, // Estää "pikselöitymisen" liian syvälle mennessä
     worldCopyJump: true, // Kartta jatkuu saumattomasti idässä/lännessä
-   
+    maxBoundsViscosity: 1.0, // Pitää kartan tiukasti rajojen sisällä
+    bounceAtZoomLimits: false
 });
 
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
