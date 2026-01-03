@@ -40,6 +40,9 @@
 .faq-item a:hover {
     color: #003d80;
 }
+img.faq-img {
+    height: 300px;
+}
 a:link {
     color: #4486b3;
 }/* Painikkeen tyyli */
