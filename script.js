@@ -150,31 +150,28 @@ const t = e.originalEvent?.target;
 async function initAppMap() {
   if (typeof L === 'undefined') return;
 
-  // 1. Alustetaan kartta tiukoilla rajoilla
+  // 1. Alustetaan kartta
   map = L.map('map', { 
     center: [65, 25], 
     zoom: 4, 
-    minZoom: 2, 
+    minZoom: 3, // NOSTETTU: Estää karttaa näkymästä liian pienenä (poistaa valkoiset reunat)
     maxZoom: 18, 
-    // POISTA worldCopyJump, jotta kartta ei yritä hypätä "seuraavaan" maailmaan
     worldCopyJump: false, 
     maxBoundsViscosity: 1.0, 
     bounceAtZoomLimits: true
   });
 
-  // 2. Lisätään tiilet ja estetään niiden toistuminen (noWrap: true)
+  // 2. Taustaväri Leaflet-konttiin (viimeinen lukko valkoista vastaan)
+  document.getElementById('map').style.background = '#000000';
+
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    noWrap: true, // TÄRKEÄ: Estää karttapalojen toistumisen sivuilla
+    noWrap: true, // Karttaa näkyy vain yksi kappale
     bounds: [[-90, -180], [90, 180]],
     maxZoom: 22
   }).addTo(map);
 
-  // 3. Lukitaan selaus tiukasti vain yhdelle maailmankartalle
-  // Asetetaan rajat täsmälleen pituusasteille -180 ja 180
-  const southWest = L.latLng(-85, -180);
-  const northEast = L.latLng(85, 180);
-  const bounds = L.latLngBounds(southWest, northEast);
-  
+  // 3. Tiukat rajat, jotka estävät selaamisen tyhjyyteen
+  const bounds = [[-85, -180], [85, 180]];
   map.setMaxBounds(bounds);
 
   // --- KORJAUS TÖKSÄHDYKSEEN ---
@@ -524,21 +521,24 @@ function drawAuroraOverlay(points) {
     ctx.globalCompositeOperation = 'screen';
 
     for (let i = 0; i < points.length; i += step) {
-        const p = points[i];
-        const lat = p[1];
-        const intensity = p[2];
+    const p = points[i];
+    const lat = p[1];
+    const intensity = p[2];
 
-        if (lat < 45 || intensity < 5) continue; 
+    if (lat < 45 || intensity < 5) continue; 
 
-        let lon = p[0];
-        if (lon > 180) lon -= 360;
+    let lon = p[0];
+    // KORJAUS: Pakotetaan pituusaste välille -180...180
+    if (lon > 180) lon -= 360; 
 
-        // Lasketaan perusasema
-        const pos = map.latLngToContainerPoint([lat, lon]);
-        
-        // Optimointi: tarkistetaan näkyvyys ruudulla ennen laskentaa
-        if (pos.x < -radius * 2 || pos.x > auroraCanvas.width + radius * 2 || 
-            pos.y < -radius * 2 || pos.y > auroraCanvas.height + radius * 2) continue;
+    // Tarkistetaan, onko piste kartan rajojen sisällä (ei piirretä "valkoiselle" alueelle)
+    if (lon < -180 || lon > 180) continue; 
+
+    const pos = map.latLngToContainerPoint([lat, lon]);
+    
+    // Optimointi: piirretään vain jos piste on kankaan alueella
+    if (pos.x < -radius || pos.x > auroraCanvas.width + radius || 
+        pos.y < -radius || pos.y > auroraCanvas.height + radius) continue;
 
         // Lisätään aaltoilu (käytetään 'i' indeksiä)
         const offsetLat = Math.sin(time + i) * 0.15;
