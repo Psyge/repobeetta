@@ -1,4 +1,6 @@
-/* Painikkeen tyyli */
+a {
+    color: #4486b3;
+}/* Painikkeen tyyli */
 .report-btn {
     background: rgba(0, 255, 200, 0.2);
     border: 2px solid #00ffcc;
