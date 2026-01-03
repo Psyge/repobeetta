@@ -1,12 +1,10 @@
-faq-item {
-position: absolute; 
-    top: 190px; 
-    left: 10px; 
-    z-index: 500;
-    color: white; 
-    background: rgba(255,255,255,0.40); 
-    padding: 5px 10px; 
-    border-radius: 5px;
+.faq-item {
+color: white; 
+    background: rgba(255,255,255,0.05); /* FAQ-sivulla oli 0.05, tässä 0.40 - valitse mieluinen */
+    padding: 15px 20px; 
+    border-radius: 8px;
+    margin-bottom: 20px; /* Lisää väliä laatikoiden väliin */
+    display: block; /* Varmistaa että laatikot ovat allekkain */
 }
 a:link {
     color: #4486b3;
