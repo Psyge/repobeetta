@@ -8,7 +8,7 @@
 }
 
 /* Laatikoiden tyyli - vaaleampi tausta ja musta teksti */
-.faq-itemcon {
+.con-item {
     /* Poistetaan aiempi absolute-sijainti, jos se on vielä siellä */
     position: relative !important; 
     top: auto !important;
