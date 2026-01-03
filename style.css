@@ -397,7 +397,7 @@ header.banner::before {
     max-width: 800px; margin: 120px auto 40px auto; padding: 20px;
     background: rgba(0, 0, 0, 0.8); color: #fff; border-radius: 8px;
 }
-.faq-item { margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 6px; }
+.faq-item { margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.35); border-radius: 6px; }
 
 .aurora-section {
     max-width: 900px; margin: 40px auto; padding: 20px;
