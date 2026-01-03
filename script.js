@@ -150,22 +150,32 @@ const t = e.originalEvent?.target;
 async function initAppMap() {
   if (typeof L === 'undefined') return;
 
-  // Alustetaan kartta
+  // 1. Alustetaan kartta tiukoilla rajoilla
   map = L.map('map', { 
     center: [65, 25], 
-    zoom: 5, 
-    minZoom: 3, // Estää liiallisen uloszoomauksen, joka näyttää tyhjää
-    maxZoom: 18, // Estää "pikselöitymisen" liian syvälle mennessä
-    worldCopyJump: true, // Kartta jatkuu saumattomasti idässä/lännessä
-    maxBoundsViscosity: 0.5, // Pitää kartan tiukasti rajojen sisällä
-    bounceAtZoomLimits: false
-});
+    zoom: 4, 
+    minZoom: 2, 
+    maxZoom: 18, 
+    // POISTA worldCopyJump, jotta kartta ei yritä hypätä "seuraavaan" maailmaan
+    worldCopyJump: false, 
+    maxBoundsViscosity: 1.0, 
+    bounceAtZoomLimits: true
+  });
 
+  // 2. Lisätään tiilet ja estetään niiden toistuminen (noWrap: true)
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    noWrap: false, // Sallii maailman toistumisen
-    bounds: [[-90, -210], [90, 210]],
-    
-}).addTo(map);
+    noWrap: true, // TÄRKEÄ: Estää karttapalojen toistumisen sivuilla
+    bounds: [[-90, -180], [90, 180]],
+    maxZoom: 22
+  }).addTo(map);
+
+  // 3. Lukitaan selaus tiukasti vain yhdelle maailmankartalle
+  // Asetetaan rajat täsmälleen pituusasteille -180 ja 180
+  const southWest = L.latLng(-85, -180);
+  const northEast = L.latLng(85, 180);
+  const bounds = L.latLngBounds(southWest, northEast);
+  
+  map.setMaxBounds(bounds);
 
   // --- KORJAUS TÖKSÄHDYKSEEN ---
   // Odotetaan hetki, että DOM on varmasti asettunut
