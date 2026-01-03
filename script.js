@@ -155,7 +155,7 @@ async function initAppMap() {
     center: [65, 25], 
     zoom: 4, 
     minZoom: 3, // Estää liiallisen uloszoomauksen, joka näyttää tyhjää
-    maxZoom: 12, // Estää "pikselöitymisen" liian syvälle mennessä
+    maxZoom: 15, // Estää "pikselöitymisen" liian syvälle mennessä
     worldCopyJump: true, // Kartta jatkuu saumattomasti idässä/lännessä
     maxBoundsViscosity: 1.0, // Pitää kartan tiukasti rajojen sisällä
     bounceAtZoomLimits: false
