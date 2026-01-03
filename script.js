@@ -153,7 +153,7 @@ async function initAppMap() {
   // Alustetaan kartta
   map = L.map('map', { 
     center: [65, 25], 
-    zoom: 4, 
+    zoom: 5, 
     minZoom: 3, // Estää liiallisen uloszoomauksen, joka näyttää tyhjää
     maxZoom: 22, // Estää "pikselöitymisen" liian syvälle mennessä
     worldCopyJump: true, // Kartta jatkuu saumattomasti idässä/lännessä
@@ -164,7 +164,7 @@ async function initAppMap() {
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
     noWrap: false, // Sallii maailman toistumisen
     bounds: [[-90, -180], [90, 180]],
-    maxZoom: 19
+    maxZoom: 22
 }).addTo(map);
 
   // --- KORJAUS TÖKSÄHDYKSEEN ---
