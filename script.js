@@ -163,7 +163,8 @@ async function initAppMap() {
 
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
     noWrap: false, // Sallii maailman toistumisen
-    bounds: [[-90, -180], [90, 180]]
+    bounds: [[-90, -180], [90, 180]],
+    maxZoom: 19
 }).addTo(map);
 
   // --- KORJAUS TÖKSÄHDYKSEEN ---
