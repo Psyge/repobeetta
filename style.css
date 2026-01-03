@@ -26,8 +26,11 @@
 
 /* Varmistetaan, että myös otsikot laatikon sisällä ovat mustia */
 .faq-item h3 {
-    color: #000000;
-    margin-top: 0;
+    color: #000000 !important;
+    border-bottom: 2px solid #00ffcc; /* Lisää pienen neon-viivan kysymyksen alle */
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
 }
 
 /* Linkit laatikon sisällä - säädetään väriä jotta ne erottuvat vaalealta pohjalta */
