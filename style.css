@@ -5,7 +5,7 @@
     width: 254px; 
     height: 287px;
     /* animaation-nimi | kesto | askellustapa | toisto */
-    animation: nuku-kettu 2s steps(3) infinite;
+    animation: nuku-kettu 8s steps(3) infinite;
 }
 
 @keyframes nuku-kettu {
