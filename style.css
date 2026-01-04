@@ -2,8 +2,8 @@
     background-image: url('spritesheet.png');
     background-repeat: no-repeat;
     display: block;
-    width: 254px; 
-    height: 287px;
+    width: 50px; 
+    height: 56px;
     /* animaation-nimi | kesto | askellustapa | toisto */
     animation: nuku-kettu 8s steps(3) infinite;
 }
