@@ -6,7 +6,7 @@
     height: 68px;
     background-size: 323px auto;
     /* animaation-nimi | kesto | askellustapa | toisto */
-    animation: nuku-kettu 8s steps(3) infinite;
+    animation: nuku-kettu 8s steps(5) infinite;
     
 }
 
