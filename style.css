@@ -7,8 +7,7 @@
     background-size: 381px auto;
     /* animaation-nimi | kesto | askellustapa | toisto */
     animation: nuku-kettu 8s steps(3) infinite;
-    transform: scale(0.5);
-    transform-origin: top left;
+    
 }
 
 @keyframes nuku-kettu {
