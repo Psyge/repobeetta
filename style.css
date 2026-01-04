@@ -1,10 +1,10 @@
 .fox-animation {
-    background-image: url('spritesheet2.png');
+    background-image: url('spritesheet3.png');
     background-repeat: no-repeat;
     display: block;
-    width: 64.6px; 
-    height: 68px;
-    background-size: 323px auto;
+    width: 39.68px; 
+    height: 55.2px;
+    background-size: 198.4px auto;
     /* animaation-nimi | kesto | askellustapa | toisto */
     animation: nuku-kettu 8s steps(5) infinite;
     
@@ -17,7 +17,7 @@
     to { 
         /* Siirrytään kolmannen ketun ohi: -256px * 3 = -768px */
         /* Säädä tätä lukua (-769px), jos kuva "heilahtaa" lopussa */
-        background-position: -323px -1px; 
+        background-position: -198.4px -1px; 
     }
 }
 /* Otsikon tyyli - pakotetaan valkoiseksi */
