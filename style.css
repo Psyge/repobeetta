@@ -4,6 +4,7 @@
     display: block;
     width: 127px; 
     height: 143px;
+    background-size: 381px auto;
     /* animaation-nimi | kesto | askellustapa | toisto */
     animation: nuku-kettu 8s steps(3) infinite;
     transform: scale(0.5);
@@ -17,7 +18,7 @@
     to { 
         /* Siirrytään kolmannen ketun ohi: -256px * 3 = -768px */
         /* Säädä tätä lukua (-769px), jos kuva "heilahtaa" lopussa */
-        background-position: -769px -1px; 
+        background-position: -381px -1px; 
     }
 }
 /* Otsikon tyyli - pakotetaan valkoiseksi */
