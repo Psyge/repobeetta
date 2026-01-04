@@ -1,3 +1,23 @@
+.fox-animation {
+    background-image: url('spritesheet.png');
+    background-repeat: no-repeat;
+    display: block;
+    width: 254px; 
+    height: 287px;
+    /* animaation-nimi | kesto | askellustapa | toisto */
+    animation: nuku-kettu 2s steps(3) infinite;
+}
+
+@keyframes nuku-kettu {
+    from { 
+        background-position: -1px -1px; 
+    }
+    to { 
+        /* Siirrytään kolmannen ketun ohi: -256px * 3 = -768px */
+        /* Säädä tätä lukua (-769px), jos kuva "heilahtaa" lopussa */
+        background-position: -769px -1px; 
+    }
+}
 /* Otsikon tyyli - pakotetaan valkoiseksi */
 #northern-lights-faq h2, 
 #contact-section h2 {
