@@ -2,9 +2,9 @@
     background-image: url('spritesheet.png');
     background-repeat: no-repeat;
     display: block;
-    width: 127px; 
-    height: 143px;
-    background-size: 381px auto;
+    width: 63px; 
+    height: 71px;
+    background-size: 190px auto;
     /* animaation-nimi | kesto | askellustapa | toisto */
     animation: nuku-kettu 8s steps(3) infinite;
     
@@ -17,7 +17,7 @@
     to { 
         /* Siirrytään kolmannen ketun ohi: -256px * 3 = -768px */
         /* Säädä tätä lukua (-769px), jos kuva "heilahtaa" lopussa */
-        background-position: -381px -1px; 
+        background-position: -190px -1px; 
     }
 }
 /* Otsikon tyyli - pakotetaan valkoiseksi */
