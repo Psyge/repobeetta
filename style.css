@@ -41,12 +41,12 @@
 
 @keyframes kettu-mid {
     from { background-position: 0px 0px; }
-    to { background-position: 258.4px auto; }
+    to { background-position: -258.4px auto; }
 }
 
 @keyframes kettu-high {
     from { background-position: 0px 0px; }
-    to { background-position: 187px auto; }
+    to { background-position: -187px auto; }
 }
 /* Otsikon tyyli - pakotetaan valkoiseksi */
 #northern-lights-faq h2, 
