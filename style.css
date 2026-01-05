@@ -7,46 +7,46 @@
 
 /* NUKKUVA (Low) */
 .fox-low {
-    width: 258.4px; 
-    height: 273px;
+    width: 51.2px; 
+    height: 54.6px;
     background-image: url('spritesheet.png');
-    background-size: 1292px 273px;
+    background-size: 256px auto;
     /* Animaatio: nimi | kesto | askeleet | toisto */
-    animation: kettu-low 6s steps(3) infinite;
+    animation: kettu-low 5s steps(3) infinite;
 }
 
 /* VALVEILLA (Mid) */
 .fox-mid {
-    width: 300px; /* Esimerkki: muuta oikeaksi */
-    height: 300px;
+    width: 51.62px; /* Esimerkki: muuta oikeaksi */
+    height: 54.6px;
     background-image: url('spritesheet2.png');
-    background-size: 1500px 300px;
-    animation: kettu-mid 4s steps(5) infinite;
+    background-size: 258.4px auto;
+    animation: kettu-mid 5s steps(5) infinite;
 }
 
 /* HYPPIVÄ (High) */
 .fox-high {
-    width: 500px; /* Esimerkki: muuta oikeaksi */
-    height: 400px;
+    width: 37.4px; /* Esimerkki: muuta oikeaksi */
+    height: 64.4px;
     background-image: url('spritesheet3.png');
-    background-size: 2000px 400px;
-    animation: kettu-high 2s steps(4) infinite;
+    background-size: 187px auto;
+    animation: kettu-high 5s steps(5) infinite;
 }
 
 /* OMAT KEYFRAMET JOKAISELLE (koska päätepiste on eri leveys) */
 @keyframes kettu-low {
     from { background-position: 0px 0px; }
-    to { background-position: -1292px 0px; }
+    to { background-position: -256px auto; }
 }
 
 @keyframes kettu-mid {
     from { background-position: 0px 0px; }
-    to { background-position: -1500px 0px; }
+    to { background-position: 258.4px auto; }
 }
 
 @keyframes kettu-high {
     from { background-position: 0px 0px; }
-    to { background-position: -2000px 0px; }
+    to { background-position: 187px auto; }
 }
 /* Otsikon tyyli - pakotetaan valkoiseksi */
 #northern-lights-faq h2, 
