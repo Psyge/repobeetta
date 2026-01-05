@@ -12,7 +12,7 @@
     background-image: url('spritesheet.png');
     background-size: 256px auto;
     /* Animaatio: nimi | kesto | askeleet | toisto */
-    animation: kettu-low 5s steps(5) infinite;
+    animation: kettu-low 8s steps(5) infinite;
 }
 
 /* VALVEILLA (Mid) */
@@ -21,7 +21,7 @@
     height: 54.6px;
     background-image: url('spritesheet2.png');
     background-size: 258.4px auto;
-    animation: kettu-mid 5s steps(5) infinite;
+    animation: kettu-mid 8s steps(5) infinite;
 }
 
 /* HYPPIVÄ (High) */
