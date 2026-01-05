@@ -209,27 +209,49 @@ async function fetchKPData() {
         const res = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json');
         const data = await res.json();
         
-       if (data && data.length > 1) {
+      if (data && data.length > 1) {
     const lastRow = data[data.length - 1];
     const kpVal = parseFloat(lastRow[1]);
     const badge = document.getElementById('kpVal');
     const desc = document.getElementById('kpDesc');
-    const kpFox = document.getElementById('kp-fox'); // Tämä on nyt <div> eikä <img>
+    const kpFox = document.getElementById('kp-fox'); // Varmista että HTML:ssä on id="kp-fox"
 
     if (badge) {
         badge.innerText = isNaN(kpVal) ? "--" : kpVal.toFixed(1);
         
-        if (kpFox) {
-            // Tyhjennetään vanhat luokat ja pidetään perus-animaatioluokka
-            kpFox.className = 'fox-animation';
+        // Määritetään värit ja tekstit muuttujiin
+        let color = "#00ffcc";
+        let text = "● No northern lights";
+        let foxClass = "fox-low";
 
-           if (kpVal >= 5) {
-    kpFox.className = 'fox-animation fox-high'; // CSS hoitaa loput
-} else if (kpVal >= 3) {
-    kpFox.className = 'fox-animation fox-mid';
-} else {
-    kpFox.className = 'fox-animation fox-low';
-}
+        if (kpVal >= 5) {
+            color = "#ff3366";
+            text = "● Widely visible";
+            foxClass = "fox-high";
+        } else if (kpVal >= 3) {
+            color = "#ffcc00";
+            text = "● Chance to see";
+            foxClass = "fox-mid";
+        }
+
+        // Päivitetään badge ja kuvausteksti
+        badge.style.color = color;
+        if (desc) {
+            desc.innerText = text;
+            desc.style.color = color;
+        }
+
+        // Päivitetään kettu (Sprite Sheet)
+        if (kpFox) {
+            // TÄRKEÄÄ: className vaihtaa molemmat luokat kerralla
+            kpFox.className = "fox-animation " + foxClass;
+            
+            // Lisätään hohde (glow)
+            if (kpVal >= 3) {
+                kpFox.style.filter = `drop-shadow(0 0 10px ${color})`;
+            } else {
+                kpFox.style.filter = "none";
+            }
         }
     }
     handleKpVisibility();
