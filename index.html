@@ -210,44 +210,31 @@ async function fetchKPData() {
         const res = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json');
         const data = await res.json();
         
-        if (data && data.length > 1) {
-            const lastRow = data[data.length - 1];
-            const kpVal = parseFloat(lastRow[1]);
-            const badge = document.getElementById('kpVal');
-            const desc = document.getElementById('kpDesc');
-            const kpFox = document.getElementById('kp-fox'); // Haetaan kettu-elementti
+       if (data && data.length > 1) {
+    const lastRow = data[data.length - 1];
+    const kpVal = parseFloat(lastRow[1]);
+    const badge = document.getElementById('kpVal');
+    const desc = document.getElementById('kpDesc');
+    const kpFox = document.getElementById('kp-fox'); // Tämä on nyt <div> eikä <img>
 
-            if (badge) {
-                badge.innerText = isNaN(kpVal) ? "--" : kpVal.toFixed(1);
-                
-                if (kpVal >= 5) {
-                    badge.style.color = "#ff3366";
-                    desc.innerText = "● Widely visible";
-                    desc.style.color = "#ff3366";
-                    if (kpFox) {
-                        kpFox.src = 'fox-active.png';
-                        kpFox.style.filter = "drop-shadow(0 0 8px #ff3366)";
-                    }
-                } else if (kpVal >= 3) {
-                    badge.style.color = "#ffcc00";
-                    desc.innerText = "● Chance to see";
-                    desc.style.color = "#ffcc00";
-                    if (kpFox) {
-                        kpFox.src = 'fox-sit.png';
-                        kpFox.style.filter = "drop-shadow(0 0 5px #ffcc00)";
-                    }
-                } else {
-                    badge.style.color = "#00ffcc";
-                    desc.innerText = "● No northern lights";
-                    desc.style.color = "#00ffcc";
-                    if (kpFox) {
-                        kpFox.src = 'fox-sleep.png';
-                        kpFox.style.filter = "none";
-                    }
-                }
-            }
-            handleKpVisibility();
+    if (badge) {
+        badge.innerText = isNaN(kpVal) ? "--" : kpVal.toFixed(1);
+        
+        if (kpFox) {
+            // Tyhjennetään vanhat luokat ja pidetään perus-animaatioluokka
+            kpFox.className = 'fox-animation';
+
+           if (kpVal >= 5) {
+    kpFox.className = 'fox-animation fox-high'; // CSS hoitaa loput
+} else if (kpVal >= 3) {
+    kpFox.className = 'fox-animation fox-mid';
+} else {
+    kpFox.className = 'fox-animation fox-low';
+}
         }
+    }
+    handleKpVisibility();
+}
     } catch(e) {
         console.error("Haku epäonnistui", e);
     }
