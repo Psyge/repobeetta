@@ -36,17 +36,17 @@
 /* OMAT KEYFRAMET JOKAISELLE (koska päätepiste on eri leveys) */
 @keyframes kettu-low {
     from { background-position: 0px 0px; }
-    to { background-position: -256px auto; }
+    to { background-position: -256px 0px; }
 }
 
 @keyframes kettu-mid {
     from { background-position: 0px 0px; }
-    to { background-position: -258.4px auto; }
+    to { background-position: -258.4px 0px; }
 }
 
 @keyframes kettu-high {
     from { background-position: 0px 0px; }
-    to { background-position: -187px auto; }
+    to { background-position: -187px 0px; }
 }
 /* Otsikon tyyli - pakotetaan valkoiseksi */
 #northern-lights-faq h2, 
