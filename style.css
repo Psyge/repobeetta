@@ -181,48 +181,54 @@ a:link {
     z-index: 9999;
     min-width: 120px;
     text-align: center;
-    /* TÄRKEÄ MUUTOS: */
-    overflow: visible; /* Sallii ketun näkyä laatikon ulkopuolella */
+    overflow: visible; /* TÄRKEÄ: Sallii ketun näkyä */
     background: transparent; 
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-/* KETUN SIJOITUS */
+/* KETTU */
 .peeking-fox {
     position: absolute;
-    top: -42px; /* Nostaa ketun pään laatikon yläpuolelle */
+    top: -42px; 
     left: 50%;
     transform: translateX(-50%);
-    z-index: 0; /* Kaikkein alimmaksi */
+    z-index: 0;
     pointer-events: none;
 }
 
-/* UUSI ELEMENTTI JOKA RAJAA VALON */
+/* SNAKE-VISUAL: Tämän pitää täyttää koko tausta */
 .snake-visual {
     position: absolute;
-    inset: 0; /* Täyttää koko paneelin */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     border-radius: 12px;
-    overflow: hidden; /* Tämä leikkaa valon, mutta ei vaikuta kettuun */
-    background: #071a20;
-    z-index: 1; /* Ketun yläpuolella, tekstien alapuolella */
+    overflow: hidden; /* Tämä rajaa käärmeen laatikon sisään */
+    background: #071a20; 
+    z-index: 1;
 }
 
-/* SIIRRETÄÄN NYKYISET SNAKE-TYYLIT TÄNNE */
+/* KIERTO */
 .snake-visual::before {
     content: '';
     position: absolute;
-    top: -150%; left: -150%; width: 400%; height: 400%;
+    top: -150%; 
+    left: -150%; 
+    width: 400%; 
+    height: 400%;
     background: conic-gradient(
         from 0deg,
         transparent 0%,
-        var(--glow-color, #00ffcc) 25%, 
-        transparent 35%
+        var(--glow-color, #00ffcc) 5%, 
+        transparent 10%
     );
     animation: rotate-border 15s linear infinite;
 }
 
+/* KESKI-PEITE */
 .snake-visual::after {
     content: '';
     position: absolute;
@@ -231,25 +237,35 @@ a:link {
     border-radius: 9px;
 }
 
-/* VARMISTETAAN TEKSTIEN NÄKYVYYS */
-.info-panel > .kp-badge, 
-.info-panel > #kpDesc, 
-.info-panel > .idesc{
+/* KP-ARVON HEHKU JA SYKE */
+.kp-badge {
     position: relative;
-    z-index: 5; /* Päällimmäiseksi */
-}
-/* Mobiilikohtainen säätö (jos tarpeen) */
-@media (max-width: 768px) {
-    .info-panel {
-        top: 170px !important;
-    }
+    z-index: 5;
+    font-size: 2.2rem;
+    font-weight: 900;
+    margin: 5px 0;
+    color: var(--glow-color, #00ffcc); /* Teksti saa valon värin */
+    animation: kp-pulse 3s infinite ease-in-out;
+    text-shadow: 0 0 15px var(--glow-color, #00ffcc); /* Hehku palautettu */
 }
 
-#kpDesc {
-    font-family: sans-serif;
-    font-weight: 300;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+/* MUUT TEKSTIT */
+#kp-restore-btn, #idesc, #kpDesc {
+    position: relative;
+    z-index: 5;
+    color: white;
+}
+
+/* ANIMAATIOT */
+@keyframes rotate-border {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes kp-pulse {
+    0% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.1); filter: brightness(1.3); }
+    100% { transform: scale(1); filter: brightness(1); }
 }
 
 /* --- 3-PÄIVÄN FORECAST POPUP (ERISTETTY) --- */
