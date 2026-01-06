@@ -203,28 +203,87 @@ a:link {
 .mobile-only-panels, #kp-restore-btn { display: none; }
 /* --- KP-INFO PANEELI --- */
 .info-panel {
-    position: fixed; /* Käytetään fixed, jotta pysyy paikoillaan suhteessa ruutuun */
+    position: fixed;
     top: 195px; 
     left: 10px;
-    background: rgba(10, 15, 25, 0.85); 
-    padding: 12px; 
+    padding: 15px; 
     border-radius: 12px;
-    border: 1px solid rgba(0, 255, 204, 0.2); 
     z-index: 9999;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     min-width: 120px;
-    text-align: left;
+    text-align: center;
     
-    /* Lisätään transition tässä, jotta se on olemassa piilotusta varten */
-    transition: opacity 1s ease-in-out, transform 1s ease-in-out, visibility 1s !important;
-    opacity: 1;
-    visibility: visible;
+    /* TÄRKEÄÄ: Taustaväri pitää olla kiinteä, jotta kiertävä valo näkyy vain reunoilla */
+    background: #071a20; 
+    overflow: hidden; /* Leikkaa kiertävän valon */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: none !important; /* Poistetaan vanha reunus */
 }
 
-.kp-badge { 
-    font-size: 1.4rem; 
-    font-weight: 800; 
-    color: #00ffcc; 
+/* KIERTÄVÄ VALO (The Snake) */
+.info-panel::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    /* Tämä luo kapean valokeilan joka kiertää */
+    background: conic-gradient(
+        transparent, 
+        #00ffcc, 
+        transparent 30%
+    );
+    animation: rotate-border 4s linear infinite;
+    z-index: 1;
+}
+
+/* SISÄPUOLEN PEITE (Tämä jättää vain reunan näkyviin) */
+.info-panel::after {
+    content: '';
+    position: absolute;
+    inset: 2px; /* Reunan paksuus (2px on tyylikäs) */
+    background: rgba(7, 26, 32, 0.9); /* Sama kuin sovelluksen teema */
+    border-radius: 10px;
+    z-index: 2;
+}
+
+/* VARMISTUS: Kaikki sisältö pitää nostaa valon yläpuolelle (z-index 3) */
+.info-panel > * {
+    position: relative;
+    z-index: 3;
+}
+
+/* KP-ARVON SYKE */
+.kp-badge {
+    font-size: 2.2rem;
+    font-weight: 900;
+    margin: 5px 0;
+    display: block;
+    animation: kp-pulse 3s infinite ease-in-out;
+    text-shadow: 0 0 15px currentColor;
+}
+
+/* ANIMAATIOT */
+@keyframes rotate-border {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes kp-pulse {
+    0% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.1); filter: brightness(1.4); }
+    100% { transform: scale(1); filter: brightness(1); }
+}
+
+/* Mobiilikohtainen säätö (jos tarpeen) */
+@media (max-width: 768px) {
+    .info-panel {
+        top: 170px !important;
+    }
 }
 
 #kpDesc {
