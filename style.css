@@ -205,7 +205,7 @@ a:link {
         transparent 10%,
         transparent 100%
     );
-    animation: rotate-border 4s linear infinite;
+    animation: rotate-border 15s linear infinite;
     z-index: 1;
 }
 
