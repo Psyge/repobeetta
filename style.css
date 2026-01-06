@@ -233,7 +233,8 @@ a:link {
 
 /* VARMISTETAAN TEKSTIEN NÄKYVYYS */
 .info-panel > .kp-badge, 
-.info-panel > #kpDesc {
+.info-panel > #kpDesc, 
+.info-panel > .idesc{
     position: relative;
     z-index: 5; /* Päällimmäiseksi */
 }
