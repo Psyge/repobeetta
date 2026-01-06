@@ -444,6 +444,11 @@ header.banner::before {
     transition: all 0.3s ease;
     box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
 }
+.forecast-btn:hover {
+    background: rgba(0, 255, 200, 0.4);
+    box-shadow: 0 0 25px rgba(0, 255, 204, 0.6);
+    transform: scale(1.05);
+}
 
 /* MARKERIT JA PINNIT */
 .marker-wrapper { position: relative; width: 32px; height: 48px; animation: float 2s infinite; }
