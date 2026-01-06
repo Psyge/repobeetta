@@ -247,7 +247,7 @@ a:link {
     color: var(--glow-color, #00ffcc); /* Teksti saa valon värin */
     animation: kp-pulse 3s infinite ease-in-out;
     text-shadow: 0 0 15px var(--glow-color, #00ffcc); /* Hehku palautettu */
-    text-transform: uppercase;
+    
 }
 
 /* MUUT TEKSTIT */
@@ -255,6 +255,7 @@ a:link {
     position: relative;
     z-index: 5;
     color: white;
+    text-transform: uppercase;
 }
 
 /* ANIMAATIOT */
