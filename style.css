@@ -367,6 +367,10 @@ header.banner::before {
 }
 
 #locate-btn {
+    position: absolute; 
+    top: 120px; 
+    right: 10px; 
+    z-index: 1001;
     background: rgba(0, 255, 200, 0.2);
     border: 2px solid #00ffcc;
     color: #fff;
@@ -430,6 +434,10 @@ header.banner::before {
 .circle-icon { border-radius: 50%; border: 2px solid #fff; }
 
 #forecast-btn {
+    position: absolute; 
+    top: 170px; 
+    right: 10px; 
+    
     background: rgba(0, 255, 200, 0.2);
     border: 2px solid #00ffcc;
     color: #fff;
