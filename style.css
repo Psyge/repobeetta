@@ -171,6 +171,7 @@ a:link {
 }
 .mobile-only-panels, #kp-restore-btn { display: none; }
 /* --- KP-INFO PANEELI --- */
+/* PÄÄPANEELI */
 .info-panel {
     position: fixed;
     top: 195px; 
@@ -180,75 +181,62 @@ a:link {
     z-index: 9999;
     min-width: 120px;
     text-align: center;
-    background: #071a20; /* Pohjaväri */
-    overflow: hidden;
+    /* TÄRKEÄ MUUTOS: */
+    overflow: visible; /* Sallii ketun näkyä laatikon ulkopuolella */
+    background: transparent; 
     display: flex;
     flex-direction: column;
     align-items: center;
-    border: none !important;
 }
 
-/* KIERTÄVÄ VALO (The Snake) */
-.info-panel::before {
+/* KETUN SIJOITUS */
+.peeking-fox {
+    position: absolute;
+    top: -42px; /* Nostaa ketun pään laatikon yläpuolelle */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 0; /* Kaikkein alimmaksi */
+    pointer-events: none;
+}
+
+/* UUSI ELEMENTTI JOKA RAJAA VALON */
+.snake-visual {
+    position: absolute;
+    inset: 0; /* Täyttää koko paneelin */
+    border-radius: 12px;
+    overflow: hidden; /* Tämä leikkaa valon, mutta ei vaikuta kettuun */
+    background: #071a20;
+    z-index: 1; /* Ketun yläpuolella, tekstien alapuolella */
+}
+
+/* SIIRRETÄÄN NYKYISET SNAKE-TYYLIT TÄNNE */
+.snake-visual::before {
     content: '';
     position: absolute;
-    /* Tehdään tästä reilusti isompi kuin laatikko, jotta "varsi" pysyy piilossa */
-    top: -150%; 
-    left: -150%;
-    width: 400%;
-    height: 400%;
-    /* Käytetään tarkempaa gradienttia, jossa on vain ohut "siivu" valoa */
+    top: -150%; left: -150%; width: 400%; height: 400%;
     background: conic-gradient(
         from 0deg,
         transparent 0%,
         var(--glow-color, #00ffcc) 25%, 
-        transparent 10%,
-        transparent 100%
+        transparent 35%
     );
     animation: rotate-border 15s linear infinite;
-    z-index: 1;
 }
 
-/* SISÄPUOLEN PEITE (Blokkaa valon keskeltä) */
-/* TÄMÄ ON TÄRKEIN: Tämän täytyy olla täysin peittävä (opacity 1) */
-.info-panel::after {
+.snake-visual::after {
     content: '';
     position: absolute;
-    inset: 3px; /* Reunan paksuus. Jos valoa näkyy läpi, kokeile 4px. */
-    background: #071a20; /* TÄYSIN sama väri kuin päälaatikossa, ei läpinäkyvyyttä tässä */
+    inset: 3px;
+    background: #071a20;
     border-radius: 9px;
-    z-index: 2;
 }
 
-/* NOSTETAAN SISÄLTÖ PINNALLE */
-.info-panel > * {
+/* VARMISTETAAN TEKSTIEN NÄKYVYYS */
+.info-panel > .kp-badge, 
+.info-panel > #kpDesc {
     position: relative;
-    z-index: 5; /* Selkeästi peitekerroksen (2) yläpuolella */
+    z-index: 5; /* Päällimmäiseksi */
 }
-
-/* ANIMAATIO */
-
-/* KP-ARVON SYKE */
-.kp-badge {
-    font-size: 2.2rem;
-    font-weight: 900;
-    margin: 5px 0;
-    display: block;
-    animation: kp-pulse 3s infinite ease-in-out;
-    text-shadow: 0 0 15px currentColor;
-}
-
-/* ANIMAATIOT */
-@keyframes rotate-border {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-@keyframes kp-pulse {
-    0% { transform: scale(1); filter: brightness(1); }
-    50% { transform: scale(1.1); filter: brightness(1.4); }
-    100% { transform: scale(1); filter: brightness(1); }
-}
-
 /* Mobiilikohtainen säätö (jos tarpeen) */
 @media (max-width: 768px) {
     .info-panel {
