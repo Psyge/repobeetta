@@ -201,7 +201,7 @@ a:link {
     background: conic-gradient(
         from 0deg,
         transparent 0%,
-        var(--glow-color, #00ffcc) 5%, 
+        var(--glow-color, #00ffcc) 25%, 
         transparent 10%,
         transparent 100%
     );
