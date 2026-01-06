@@ -178,53 +178,55 @@ a:link {
     padding: 15px; 
     border-radius: 12px;
     z-index: 9999;
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
     min-width: 120px;
     text-align: center;
-    
-    /* TÄRKEÄÄ: Taustaväri pitää olla kiinteä, jotta kiertävä valo näkyy vain reunoilla */
-    background: #071a20; 
-    overflow: hidden; /* Leikkaa kiertävän valon */
+    background: #071a20; /* Pohjaväri */
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
-    border: none !important; /* Poistetaan vanha reunus */
+    border: none !important;
 }
 
 /* KIERTÄVÄ VALO (The Snake) */
 .info-panel::before {
     content: '';
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    /* Tämä luo kapean valokeilan joka kiertää */
+    /* Tehdään tästä reilusti isompi kuin laatikko, jotta "varsi" pysyy piilossa */
+    top: -150%; 
+    left: -150%;
+    width: 400%;
+    height: 400%;
+    /* Käytetään tarkempaa gradienttia, jossa on vain ohut "siivu" valoa */
     background: conic-gradient(
-        transparent, 
-        #00ffcc, 
-        transparent 30%
+        from 0deg,
+        transparent 0%,
+        var(--glow-color, #00ffcc) 5%, 
+        transparent 10%,
+        transparent 100%
     );
-    animation: rotate-border 8s linear infinite;
+    animation: rotate-border 4s linear infinite;
     z-index: 1;
 }
 
-/* SISÄPUOLEN PEITE (Tämä jättää vain reunan näkyviin) */
+/* SISÄPUOLEN PEITE (Blokkaa valon keskeltä) */
+/* TÄMÄ ON TÄRKEIN: Tämän täytyy olla täysin peittävä (opacity 1) */
 .info-panel::after {
     content: '';
     position: absolute;
-    inset: 2px; /* Reunan paksuus (2px on tyylikäs) */
-    background: rgba(7, 26, 32, 0.9); /* Sama kuin sovelluksen teema */
-    border-radius: 10px;
+    inset: 3px; /* Reunan paksuus. Jos valoa näkyy läpi, kokeile 4px. */
+    background: #071a20; /* TÄYSIN sama väri kuin päälaatikossa, ei läpinäkyvyyttä tässä */
+    border-radius: 9px;
     z-index: 2;
 }
 
-/* VARMISTUS: Kaikki sisältö pitää nostaa valon yläpuolelle (z-index 3) */
+/* NOSTETAAN SISÄLTÖ PINNALLE */
 .info-panel > * {
     position: relative;
-    z-index: 3;
+    z-index: 5; /* Selkeästi peitekerroksen (2) yläpuolella */
 }
+
+/* ANIMAATIO */
 
 /* KP-ARVON SYKE */
 .kp-badge {
@@ -241,7 +243,6 @@ a:link {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
-
 @keyframes kp-pulse {
     0% { transform: scale(1); filter: brightness(1); }
     50% { transform: scale(1.1); filter: brightness(1.4); }
