@@ -176,7 +176,7 @@ a:link {
     position: fixed;
     top: 195px; 
     left: 10px;
-    padding: 15px; 
+    padding: 10px; 
     border-radius: 12px;
     z-index: 9999;
     min-width: 120px;
@@ -241,9 +241,9 @@ a:link {
 .kp-badge {
     position: relative;
     z-index: 5;
-    font-size: 2.2rem;
-    font-weight: 900;
-    margin: 5px 0;
+    font-size: 1.8rem;
+    font-weight: 1000;
+    margin: 2px 0;
     color: var(--glow-color, #00ffcc); /* Teksti saa valon värin */
     animation: kp-pulse 3s infinite ease-in-out;
     text-shadow: 0 0 15px var(--glow-color, #00ffcc); /* Hehku palautettu */
