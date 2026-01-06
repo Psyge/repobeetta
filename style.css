@@ -437,7 +437,7 @@ header.banner::before {
     position: absolute; 
     top: 170px; 
     right: 10px; 
-    z-index: 1000
+    z-index: 1000;
     background: rgba(0, 255, 200, 0.2);
     border: 2px solid #00ffcc;
     color: #fff;
