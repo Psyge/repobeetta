@@ -266,7 +266,7 @@ async function fetchKPData() {
                 // --- ONESIGNAL HÄLYTYSTAGI ---
                 // Jos OneSignal on ladattu ja KP on korkea (testissä > 0.1)
                 window.OneSignalDeferred.push(async function(OneSignal) {
-                    if (kpVal >= 0.1) { // Voit nostaa tämän esim. 4.0 myöhemmin
+                    if (kpVal >= 0.9) { // Voit nostaa tämän esim. 4.0 myöhemmin
                         await OneSignal.User.addTag("kp_index", kpVal.toString());
                         console.log("KP-tagi päivitetty OneSignaliin:", kpVal);
                     }
