@@ -180,8 +180,8 @@ window.OneSignalDeferred = window.OneSignalDeferred || [];
 OneSignalDeferred.push(async function(OneSignal) {
     await OneSignal.init({
         appId: "9e8ce42c-32bd-4495-9c29-f2fa9b1c955b",
-        serviceWorkerParam: { scope: "/repobeetta/" },
-        serviceWorkerPath: "OneSignalSDKWorker.js"
+        serviceWorkerParam: "OneSignalSDKWorker.js",
+        serviceWorkerPath: { scope: "/repobeetta/" }
     });
     console.log("OneSignal valmis.");
 });
