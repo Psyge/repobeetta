@@ -181,7 +181,7 @@ OneSignalDeferred.push(async function(OneSignal) {
     await OneSignal.init({
         appId: "7b4a4513-fcc3-4efb-a5a1-1903f0c3615e",
         // Huomaa lisätyt kauttaviivat polun alussa
-        serviceWorkerPath: "/repobeetta/OneSignalSDKWorker.js", 
+        serviceWorkerPath: "OneSignalSDKWorker.js", 
         serviceWorkerParam: { scope: "/repobeetta/" },
         allowLocalhostAsSecureOrigin: true // Auttaa joskus GitHubin uudelleenohjauksissa
     });
