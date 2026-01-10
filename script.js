@@ -512,7 +512,7 @@ function drawAuroraOverlay(points) {
     
     // 1. Asetukset
     const canvasBuffer = 100; // Täsmää _update-funktion siirtoon
-    const latShift = 1.8;      // Korjaus pohjois-suuntaan
+    const latShift = 1.4;      // Korjaus pohjois-suuntaan
     
     // 2. Määritellään radius tässä, jotta se on käytössä silmukan sisällä
     let radius = zoom * 10;
