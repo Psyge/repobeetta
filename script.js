@@ -512,7 +512,7 @@ function drawAuroraOverlay(points) {
 
     // SÄÄTÖ: Nostetaan hohdetta hieman pohjoisemmaksi, jotta se vastaa NOAA:n ennustetta
     // Jos hohde on edelleen liian alhaalla, kokeile 2.0 tai 2.2.
-    const latShift = 1.8; 
+    const latShift = 2.0; 
 
     // JÄTTIKOKO LÄHELLÄ:
     let radius = zoom * 10;
