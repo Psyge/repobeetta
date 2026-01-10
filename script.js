@@ -511,7 +511,7 @@ function drawAuroraOverlay(points) {
     const time = Date.now() * 0.001;
     
     // 1. Asetukset
-    const canvasBuffer = 100; // Täsmää _update-funktion siirtoon
+    const canvasBuffer = 75; // Täsmää _update-funktion siirtoon
     const latShift = 1.4;      // Korjaus pohjois-suuntaan
     
     // 2. Määritellään radius tässä, jotta se on käytössä silmukan sisällä
