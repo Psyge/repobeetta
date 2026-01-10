@@ -464,13 +464,13 @@ const AuroraLayer = L.Layer.extend({
     };
     requestAnimationFrame(render);
 },
-   _update: function() {
+_update: function() {
     const size = map.getSize();
-    // TÄRKEÄÄ: Tämä kohdistaa canvaksen kartan nollapisteeseen
+    // Kohdistetaan canvas kartan vasempaan ylänurkkaat (0,0)
     const topLeft = map.containerPointToLayerPoint([0, 0]); 
     L.DomUtil.setPosition(this._canvas, topLeft);
     
-    // Canvas on nyt täsmälleen näkyvän alueen kokoinen
+    // Asetetaan kankaan koko vastaamaan näkyvää aluetta
     this._canvas.width = size.x;
     this._canvas.height = size.y;
     
@@ -511,9 +511,9 @@ function drawAuroraOverlay(points) {
     const zoom = map.getZoom();
     const time = Date.now() * 0.001;
     
-    // Nyt tämä latShift (asteet) MUUTTAA revontulien paikkaa oikeasti
-    // Kokeile aluksi 2.0. Jos hohde hyppää liian ylös, pienennä (esim. 1.0).
-    const latShift = 2.0; 
+    // TÄMÄ ON SE KORJAUS: latShift siirtää hohdetta asteina (pohjoiseen)
+    // Kokeile arvoa 1.8 tai 2.0, se skaalautuu nyt oikein zoomatessa.
+    const latShift = 1.8; 
 
     let radius = zoom * 10;
     if (zoom > 7) radius = zoom * 50; 
@@ -523,24 +523,40 @@ function drawAuroraOverlay(points) {
     ctx.globalCompositeOperation = 'screen';
 
     points.forEach((p, index) => {
-        let lon = p[0];
         const lat = p[1];
         const intensity = p[2];
-
         if (lat < 45 || intensity < 4) return;
+
+        let lon = p[0];
         if (lon > 180) lon -= 360;
 
         const offsetLat = Math.sin(time + index) * 0.2; 
         const offsetLon = Math.cos(time * 0.8 + index) * 0.2;
 
-        // TÄMÄ RIVI on avain: Se kysyy Leafletilta, missä kohti RUUUTUA tämä 
-        // koordinaatti on juuri tällä sekunnilla ja tällä zoomilla.
+        // Lasketaan sijainti: lat + animaatio + manuaalinen korjaus
         const pos = map.latLngToContainerPoint([lat + offsetLat + latShift, lon + offsetLon]);
 
-        // Piirretään suoraan pos.x ja pos.y ilman mitään buffereita
-        ctx.drawImage(sprite, pos.x - sprite.width / 2, pos.y - sprite.height / 2);
+        // Määritellään sprite intensiteetin mukaan (Tämä puuttui aiemmin!)
+        let sprite = spriteGreen;
+        if (intensity > 35) sprite = spriteYellow;
+        if (intensity > 70) sprite = spriteRed;
+
+        const zoomAlpha = zoom > 8 ? 0.6 : 0.4;
+        ctx.globalAlpha = Math.min(zoomAlpha, (intensity / 100));
         
-        // (Lisäkerros zoom > 8 kohdassa käytä myös pos.x ja pos.y)
+        // Piirretään suoraan laskettuun pisteeseen
+        ctx.drawImage(sprite, pos.x - sprite.width / 2, pos.y - sprite.height / 2);
+
+        if (zoom > 8) {
+            ctx.globalAlpha *= 0.4;
+            const pulse = Math.sin(time * 2 + index) * 0.1 + 1;
+            ctx.drawImage(sprite, 
+                pos.x - (sprite.width * 1.8 * pulse) / 2, 
+                pos.y - (sprite.height * 1.8 * pulse) / 2, 
+                sprite.width * 1.8 * pulse, 
+                sprite.height * 1.8 * pulse
+            );
+        }
     });
 }
 async function fetchAuroraData() {
