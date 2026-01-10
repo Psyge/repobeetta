@@ -297,30 +297,39 @@ function updatePawMarkers(reports) {
         }
     });
 }
-    // Lisää tämä koodi kuuntelemaan kartan zoomia
-map.on('zoomend', function() {
-    const currentZoom = map.getZoom();
-    
-    // 1. Lasketaan uusi koko (esim. zoom 4 -> 16px, zoom 10 -> 40px)
-    let newSize = currentZoom * 4; 
-    if (newSize < 15) newSize = 15;
-    if (newSize > 50) newSize = 50;
+  function setupZoomListener() {
+    // Tarkistetaan onko map-muuttuja olemassa ja alustettu
+    if (typeof map !== 'undefined' && map) {
+        map.on('zoomend', function() {
+            const currentZoom = map.getZoom();
+            
+            // 1. Lasketaan uusi koko (esim. zoom 4 -> 16px, zoom 10 -> 40px)
+            let newSize = currentZoom * 4; 
+            if (newSize < 15) newSize = 15;
+            if (newSize > 50) newSize = 50;
 
-    // 2. Päivitetään ikonin asetukset muuttujaan
-    pawIcon.options.iconSize = [newSize, newSize];
-    pawIcon.options.iconAnchor = [newSize / 2, newSize / 2]; // Keskittää ikonin
-    pawIcon.options.popupAnchor = [0, -(newSize / 2)];
+            // 2. Päivitetään ikonin asetukset muuttujaan
+            pawIcon.options.iconSize = [newSize, newSize];
+            pawIcon.options.iconAnchor = [newSize / 2, newSize / 2]; 
+            pawIcon.options.popupAnchor = [0, -(newSize / 2)];
 
-    // 3. PAKOTETAAN päivitys kaikille jo kartalla oleville käpälille
-    if (pawLayerGroup) {
-        pawLayerGroup.eachLayer(function(layer) {
-            if (layer instanceof L.Marker) {
-                // Tämä komento pakottaa Leafletin piirtämään ikonin uudestaan oikeaan kohtaan
-                layer.setIcon(pawIcon); 
+            // 3. Päivitetään kaikki jo kartalla olevat käpälät
+            if (pawLayerGroup) {
+                pawLayerGroup.eachLayer(function(layer) {
+                    if (layer instanceof L.Marker) {
+                        layer.setIcon(pawIcon); 
+                    }
+                });
             }
         });
+        console.log("Zoom-kuuntelija aktivoitu.");
+    } else {
+        // Jos karttaa ei vielä löydy, yritetään 500ms päästä uudelleen
+        setTimeout(setupZoomListener, 500);
     }
-});
+}
+// Käynnistetään tarkistus
+setupZoomListener();
 
 async function loadReports() {
     try {
