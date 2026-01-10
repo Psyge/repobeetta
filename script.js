@@ -513,7 +513,7 @@ function drawAuroraOverlay(points) {
     
     // TÄMÄ ON SE KORJAUS: latShift siirtää hohdetta asteina (pohjoiseen)
     // Kokeile arvoa 1.8 tai 2.0, se skaalautuu nyt oikein zoomatessa.
-    const latShift = 1.8; 
+    const latShift = 1.4; 
 
     let radius = zoom * 10;
     if (zoom > 7) radius = zoom * 50; 
