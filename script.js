@@ -510,18 +510,22 @@ function drawAuroraOverlay(points) {
     const zoom = map.getZoom();
     const time = Date.now() * 0.001;
     
-    // 1. TÄMÄ ON SE KORJAUS: Koska canvas on siirretty -100px, 
-    // meidän on lisättävä 100px piirtoon, jotta se osuu kohdalleen.
-    const canvasBuffer = 100; 
+    // 1. Asetukset
+    const canvasBuffer = 100; // Täsmää _update-funktion siirtoon
+    const latShift = 1.8;      // Korjaus pohjois-suuntaan
     
-    // 2. Tämä on se aiempi pohjois-etelä -siirto
-    const latShift = 1.8; 
+    // 2. Määritellään radius tässä, jotta se on käytössä silmukan sisällä
+    let radius = zoom * 10;
+    if (zoom > 7) radius = zoom * 50; 
+    if (zoom > 10) radius = zoom * 100;
 
-    // ... (radius ja muut ennallaan) ...
+    createSprites(radius);
+    ctx.globalCompositeOperation = 'screen';
 
     points.forEach((p, index) => {
         const lat = p[1];
         const intensity = p[2];
+
         if (lat < 45 || intensity < 4) return;
 
         let lon = p[0];
@@ -530,23 +534,36 @@ function drawAuroraOverlay(points) {
         const offsetLat = Math.sin(time + index) * 0.2; 
         const offsetLon = Math.cos(time * 0.8 + index) * 0.2;
 
-        // Muutetaan latLatLngToContainerPoint palauttama sijainti vastaamaan canvaksen uutta nollapistettä
+        // Lasketaan sijainti kartalla
         const pos = map.latLngToContainerPoint([lat + offsetLat + latShift, lon + offsetLon]);
 
-        // LISÄTÄÄN bufferi piirtokoordinaatteihin:
+        // Korjataan sijainti canvaksella bufferin verran
         const drawX = pos.x + canvasBuffer;
         const drawY = pos.y + canvasBuffer;
 
-        // Tarkistetaan näkyvyys uusilla koordinaateilla
+        // Tarkistetaan näkyvyys (nyt radius on varmasti määritelty)
         if (drawX < -radius * 2 || drawX > auroraCanvas.width + radius * 2 || 
             drawY < -radius * 2 || drawY > auroraCanvas.height + radius * 2) return;
 
-        // ... (spritevalinta ennallaan) ...
+        let sprite = spriteGreen;
+        if (intensity > 35) sprite = spriteYellow;
+        if (intensity > 70) sprite = spriteRed;
 
-        // Käytetään drawX ja drawY piirtämiseen:
+        const zoomAlpha = zoom > 8 ? 0.6 : 0.4;
+        ctx.globalAlpha = Math.min(zoomAlpha, (intensity / 100));
+        
         ctx.drawImage(sprite, drawX - sprite.width / 2, drawY - sprite.height / 2);
 
-        // ... (syvyyskerros ennallaan, käytä siinäkin drawX/drawY) ...
+        if (zoom > 8) {
+            ctx.globalAlpha *= 0.4;
+            const pulse = Math.sin(time * 2 + index) * 0.1 + 1;
+            ctx.drawImage(sprite, 
+                drawX - (sprite.width * 1.8 * pulse) / 2, 
+                drawY - (sprite.height * 1.8 * pulse) / 2, 
+                sprite.width * 1.8 * pulse, 
+                sprite.height * 1.8 * pulse
+            );
+        }
     });
 }
 async function fetchAuroraData() {
