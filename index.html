@@ -297,6 +297,33 @@ function updatePawMarkers(reports) {
         }
     });
 }
+    // Lisää tämä koodi kuuntelemaan kartan zoomia
+if (typeof map !== 'undefined' && map) {
+    map.on('zoomend', function() {
+        const currentZoom = map.getZoom();
+        
+        // Lasketaan uusi koko: esim. zoom 3 -> 12px, zoom 10 -> 40px
+        let newSize = currentZoom * 4; 
+        
+        // Rajataan koko järkeviin raameihin
+        if (newSize < 15) newSize = 15;
+        if (newSize > 50) newSize = 50;
+
+        // Päivitetään ikonin asetukset lennosta
+        pawIcon.options.iconSize = [newSize, newSize];
+        pawIcon.options.iconAnchor = [newSize / 2, newSize / 2];
+        pawIcon.options.popupAnchor = [0, -(newSize / 2)];
+
+        // Päivitetään kaikki jo kartalla olevat käpälät käyttämään uutta kokoa
+        if (pawLayerGroup) {
+            pawLayerGroup.eachLayer(function(layer) {
+                if (layer instanceof L.Marker) {
+                    layer.setIcon(pawIcon);
+                }
+            });
+        }
+    });
+}
 
 async function loadReports() {
     try {
