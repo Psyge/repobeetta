@@ -155,7 +155,9 @@ The colors on the map indicate the probability and intensity of the northern lig
 </section>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
     <script src="markers.js"></script>
     <script src="script.js"></script>
 
@@ -282,39 +284,48 @@ async function fetchKPData() {
 // Raporttien hallinta (Käpälät kartalla)
 function updatePawMarkers(reports) {
     if (typeof map === 'undefined' || !map) return;
-    if (!pawLayerGroup) pawLayerGroup = L.layerGroup().addTo(map);
+
+    // Jos ryhmää ei ole vielä luotu, luodaan se cluster-ominaisuudella
+    if (!pawLayerGroup) {
+        pawLayerGroup = L.markerClusterGroup({
+            showCoverageOnHover: false,
+            spiderfyOnMaxZoom: true,
+            zoomToBoundsOnClick: true,
+            maxClusterRadius: 50 // Kuinka lähekkäin olevat ikonit ryhmitellään (pikseleinä)
+        }).addTo(map);
+    }
+
+    // Tyhjennetään vanhat ilmoitukset
     pawLayerGroup.clearLayers();
     
     reports.forEach(r => {
         const lat = parseFloat(r.lat);
         const lon = parseFloat(r.lon);
         if (!isNaN(lat) && !isNaN(lon)) {
-            const marker = L.marker([lat, lon], { icon: pawIcon, pane: 'markerPane' });
+            const marker = L.marker([lat, lon], { icon: pawIcon });
             const minsAgo = Math.floor((Date.now() - r.time) / 60000);
             const timeText = minsAgo < 1 ? "Just now" : `${minsAgo} min ago`;
             marker.bindPopup(`<b>Aurora spotted!</b><br>${timeText}`);
+            
+            // Lisätään marker ryhmään
             pawLayerGroup.addLayer(marker);
         }
     });
 }
   function setupZoomListener() {
-    // Tarkistetaan onko map-muuttuja olemassa ja alustettu
     if (typeof map !== 'undefined' && map) {
         map.on('zoomend', function() {
             const currentZoom = map.getZoom();
-            
-            // 1. Lasketaan uusi koko (esim. zoom 4 -> 16px, zoom 10 -> 40px)
             let newSize = currentZoom * 4; 
             if (newSize < 15) newSize = 15;
             if (newSize > 50) newSize = 50;
 
-            // 2. Päivitetään ikonin asetukset muuttujaan
             pawIcon.options.iconSize = [newSize, newSize];
             pawIcon.options.iconAnchor = [newSize / 2, newSize / 2]; 
             pawIcon.options.popupAnchor = [0, -(newSize / 2)];
 
-            // 3. Päivitetään kaikki jo kartalla olevat käpälät
             if (pawLayerGroup) {
+                // Käydään läpi kaikki ryhmän sisällä olevat markerit
                 pawLayerGroup.eachLayer(function(layer) {
                     if (layer instanceof L.Marker) {
                         layer.setIcon(pawIcon); 
@@ -322,9 +333,7 @@ function updatePawMarkers(reports) {
                 });
             }
         });
-        console.log("Zoom-kuuntelija aktivoitu.");
     } else {
-        // Jos karttaa ei vielä löydy, yritetään 500ms päästä uudelleen
         setTimeout(setupZoomListener, 500);
     }
 }
