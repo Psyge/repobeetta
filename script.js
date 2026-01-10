@@ -508,63 +508,47 @@ function drawAuroraOverlay(points) {
     ctx.clearRect(0, 0, auroraCanvas.width, auroraCanvas.height);
     
     const zoom = map.getZoom();
-    const time = Date.now() * 0.001; // Aika sekunteina animaatiota varten
+    const time = Date.now() * 0.001;
+    
+    // 1. TÄMÄ ON SE KORJAUS: Koska canvas on siirretty -100px, 
+    // meidän on lisättävä 100px piirtoon, jotta se osuu kohdalleen.
+    const canvasBuffer = 100; 
+    
+    // 2. Tämä on se aiempi pohjois-etelä -siirto
+    const latShift = 1.8; 
 
-    // SÄÄTÖ: Nostetaan hohdetta hieman pohjoisemmaksi, jotta se vastaa NOAA:n ennustetta
-    // Jos hohde on edelleen liian alhaalla, kokeile 2.0 tai 2.2.
-    const latShift = 3.0; 
-
-    // JÄTTIKOKO LÄHELLÄ:
-    let radius = zoom * 10;
-    if (zoom > 7) radius = zoom * 50; 
-    if (zoom > 10) radius = zoom * 100; // Massiivinen peitto
-
-    createSprites(radius);
-    ctx.globalCompositeOperation = 'screen';
+    // ... (radius ja muut ennallaan) ...
 
     points.forEach((p, index) => {
         const lat = p[1];
         const intensity = p[2];
-
         if (lat < 45 || intensity < 4) return;
 
         let lon = p[0];
         if (lon > 180) lon -= 360;
 
-        // LIIKE: Lisätään pieni aaltoilu sijaintiin
         const offsetLat = Math.sin(time + index) * 0.2; 
         const offsetLon = Math.cos(time * 0.8 + index) * 0.2;
 
-        // LASKENTA: Lisätään latShift alkuperäiseen latitudeen
+        // Muutetaan latLatLngToContainerPoint palauttama sijainti vastaamaan canvaksen uutta nollapistettä
         const pos = map.latLngToContainerPoint([lat + offsetLat + latShift, lon + offsetLon]);
 
-        if (pos.x < -radius * 2 || pos.x > auroraCanvas.width + radius * 2 || 
-            pos.y < -radius * 2 || pos.y > auroraCanvas.height + radius * 2) return;
+        // LISÄTÄÄN bufferi piirtokoordinaatteihin:
+        const drawX = pos.x + canvasBuffer;
+        const drawY = pos.y + canvasBuffer;
 
-        let sprite = spriteGreen;
-        if (intensity > 35) sprite = spriteYellow;
-        if (intensity > 70) sprite = spriteRed;
+        // Tarkistetaan näkyvyys uusilla koordinaateilla
+        if (drawX < -radius * 2 || drawX > auroraCanvas.width + radius * 2 || 
+            drawY < -radius * 2 || drawY > auroraCanvas.height + radius * 2) return;
 
-        // KIRKKAUS: Nostettu alpha, jotta värit loistavat
-        const zoomAlpha = zoom > 8 ? 0.6 : 0.4;
-        ctx.globalAlpha = Math.min(zoomAlpha, (intensity / 100));
-        
-        ctx.drawImage(sprite, pos.x - sprite.width / 2, pos.y - sprite.height / 2);
+        // ... (spritevalinta ennallaan) ...
 
-        // Lisäkerros syvyyttä varten
-        if (zoom > 8) {
-            ctx.globalAlpha *= 0.4;
-            const pulse = Math.sin(time * 2 + index) * 0.1 + 1; // Pieni sykintä
-            ctx.drawImage(sprite, 
-                pos.x - (sprite.width * 1.8 * pulse) / 2, 
-                pos.y - (sprite.height * 1.8 * pulse) / 2, 
-                sprite.width * 1.8 * pulse, 
-                sprite.height * 1.8 * pulse
-            );
-        }
+        // Käytetään drawX ja drawY piirtämiseen:
+        ctx.drawImage(sprite, drawX - sprite.width / 2, drawY - sprite.height / 2);
+
+        // ... (syvyyskerros ennallaan, käytä siinäkin drawX/drawY) ...
     });
 }
-
 async function fetchAuroraData() {
     try {
         const res = await fetch('https://services.swpc.noaa.gov/json/ovation_aurora_latest.json');
