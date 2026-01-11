@@ -137,6 +137,17 @@
     }
   }
 
-  // Vie julkinen API vain yhtenä nimenä
+ function togglePlaces(visible, map) {
+    if (!markersLayer || !map) return;
+    
+    if (visible) {
+      markersLayer.addTo(map);
+    } else {
+      map.removeLayer(markersLayer);
+    }
+  }
+
+  // Vie julkinen API: lisätään togglePlaces jo olemassa olevan initMarkersin kaveriksi
   window.initMarkers = initMarkers;
+  window.togglePlaces = togglePlaces; // Tämä on uusi rivi
 })();
