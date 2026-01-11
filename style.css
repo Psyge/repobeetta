@@ -640,7 +640,8 @@ header.banner::before {
 }
 /* MOBIILI */
 @media (max-width: 768px) {
-  header.banner {
+    /* Bannerin ja valikon nollaus mobiilissa */
+    header.banner {
         background: none !important;
         border: none !important;
         box-shadow: none !important;
@@ -649,103 +650,146 @@ header.banner::before {
         top: 0 !important;
         left: 0 !important;
         padding: 0 !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
     }
-header.banner .logo, .banner-right {
-        display: none !important; /* Piilotetaan logo ja muut ikonit */
+
+    header.banner .logo, .banner-right {
+        display: none !important;
     }
+
     #menu-btn {
         position: fixed !important;
-        top: 5px !important;
-        left: 5px !important;
+        top: 10px !important;
+        left: 10px !important;
         width: 50px;
         height: 50px;
-        background: rgba(5, 12, 24, 0.9);
+        background: rgba(5, 12, 24, 0.95);
         border: 1px solid rgba(0, 255, 204, 0.4);
         border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 99999 !important; /* Varmasti kaiken päällä */
-        margin: 0 !important;
+        z-index: 99999 !important;
     }
 
-    /* Oikean puolen ikonit mobiilissa */
-    .banner-right {
-        gap: 8px;
-    }
-
-    .banner-right img, .banner-right .icon {
-        height: 28px; /* Pienemmät napit */
-        padding: 6px;
-        border-radius: 10px;
-    }
-
-    /* Säädetään valikon (menu) paikkaa mobiilissa */
     #menu {
-        top: 80px !important;
-        left: 3% !important;
+        top: 70px !important;
+        left: 10px !important;
         width: 180px;
     }
+
     #map {
-        height: 80vh !important; /* Nostettu 60vh -> 80vh */
+        height: 80vh !important;
         width: 100%;
         margin-top: 0;
     }
 
-    /* Varmistetaan, että infoteksti alkaa heti kartan jälkeen */
-    .aurora-section {
-        margin-top: 20px;
-        padding-bottom: 50px; /* Lisätilaa loppuun, jotta rullaus tuntuu hyvältä */
-    }
-#container {
-    overflow: hidden;
-}
-    #info { position: fixed; bottom: 10px; left: 10px; font-size: 12px; height: 60px; }
- .leaflet-top.leaflet-left {
-        top: -25px !important; /* Lasketaan valikon alapuolelle */
-     
+    /* --- UUSI YHDISTETTY PANEELI (Unified Panel) --- */
+    .unified-panel {
+        position: fixed;
+        right: 0;
+        top: 20%;
+        z-index: 20000;
+        display: flex;
+        align-items: flex-start;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        pointer-events: auto;
     }
 
-    #locate-btn {
-        top: 5px; right: 5px; width: 50px; height: 50px; border-radius: 50%; font-size: 0;
-        display: flex; align-items: center; justify-content: center;
+    /* Kun paneeli on suljettu, vain välilehdet näkyvät */
+    .unified-panel.closed {
+        transform: translateX(70px); /* Tämän on oltava sama kuin .panel-content leveys */
     }
-    #locate-btn::before { content: "🧭"; font-size: 24px; }
-#forecast-btn {
-        top: 65px;; right: 5px; width: 50px; height: 50px; border-radius: 50%; font-size: 0;
-        display: flex; align-items: center; justify-content: center;
-        
+
+    .panel-tabs {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
     }
-#forecast-btn::before { content: "📊"; font-size: 24px; }  
-.info-panel { min-width: auto; }    
-#kpDesc { display: none; }
-#idesc {
+
+    .tab {
+        width: 45px;
+        height: 50px;
+        background: rgba(10, 15, 25, 0.95);
+        border: 1px solid rgba(0, 255, 204, 0.3);
+        border-right: none;
+        border-radius: 12px 0 0 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        cursor: pointer;
+        box-shadow: -2px 0 10px rgba(0,0,0,0.5);
+    }
+
+    .panel-content {
+        width: 70px;
+        background: rgba(10, 15, 25, 0.95);
+        border: 1px solid rgba(0, 255, 204, 0.2);
+        border-right: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 15px 0;
+        min-height: 120px;
+        border-radius: 0 0 0 15px;
+    }
+
+    .content-section {
+        display: none; /* Oletuksena piilossa */
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+        align-items: center;
+    }
+
+    .content-section.active {
+        display: flex; /* Aktiivinen osio näkyviin */
+    }
+
+    /* --- NAPPIEN TYYLIT PANEELIN SISÄLLÄ --- */
+    #locate-btn, #markers-btn, #forecast-btn {
+        position: static !important;
+        width: 45px !important;
+        height: 45px !important;
+        border-radius: 50% !important;
         font-size: 0 !important;
+        background: #1a2639 !important;
+        border: 1px solid #00ffcc !important;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        margin: 0 !important;
     }
 
-    /* Lisätään uusi teksti tilalle */
-    #idesc::after {
-        content: "KP-IND";
-        font-size: 10px; /* Palautetaan haluttu koko */
-        color: #00ffcc;
-        opacity: 0.8;
-        display: block;
-    } 
-#kp-info-box {
-        top: 170px !important; /* Lasketaan zoom-nappien alle mobiilissa */
-        opacity: 1;
-        visibility: visible;
-    left: 10px;
-        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s !important;
-        z-index: 9999;
+    #locate-btn::before { content: "🧭"; font-size: 20px; }
+    #markers-btn::before { content: "📍"; font-size: 20px; }
+    #forecast-btn::before { content: "📊"; font-size: 20px; }
+
+    /* Some-ikonit paneelissa */
+    .soc-icon img {
+        width: 32px !important;
+        height: 32px !important;
+        object-fit: contain;
     }
-#kp-restore-btn {
-        display: flex; /* Aktivoituu mobiilissa */
+
+    /* --- KP-INFO BOX MOBIILISSA --- */
+    #kp-info-box {
+        top: 170px !important;
+        left: 10px;
+        z-index: 9999;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s;
+    }
+
+    div#kp-info-box.fade-out {
+        transform: translateX(calc(-100% - 10px)) !important;
+        pointer-events: none !important;
+    }
+
+    #kp-restore-btn {
+        display: flex;
         position: absolute;
         top: 0;
-        left: 100%; /* Siirtyy laatikon oikealle puolelle */
+        left: 100%;
         width: 30px;
         height: 100%;
         background: rgba(10, 15, 25, 0.9);
@@ -757,180 +801,30 @@ header.banner .logo, .banner-right {
         font-weight: bold;
         align-items: center;
         justify-content: center;
-        cursor: pointer;
-        opacity: 0; /* Piilossa kun paneeli on esillä */
-        visibility: hidden;
-        transition: opacity 0.3s;
-    pointer-events: auto !important;
+        pointer-events: auto !important;
     }
-    /* TÄMÄ ON TÄRKEIN: Piilotusluokka */
-   div#kp-info-box.fade-out {
-      transform: translateX(calc(-100% - 10px)) !important; /* Liukuu kokonaan reunan yli */
-        opacity: 1 !important; /* Pidetään näkyvissä, jotta kieleke näkyy */
-        visibility: visible !important;
-       pointer-events: none !important;
-    }
-    #kp-info-box.fade-out #kp-restore-btn {
-        opacity: 1;
-        visibility: visible;
-    }
+
+    /* --- MUUT --- */
+    .desktop-only { display: none !important; }
+    .mobile-only { display: block !important; }
+
     #mobile-splash {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #050c18; /* Sama tumma väri kuin bannerissa */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 999999; /* Kaiken päällä */
-    transition: opacity 1s ease-in-out, visibility 1s;
-    display: flex;
-    flex-direction: column; /* Pakottaa sisällön allekkain */
-    align-items: center;    /* Keskittää kuvat vaakasuunnassa */
-    justify-content: center; /* Keskittää kuvat pystysuunnassa */
-    height: 100vh;          /* Koko näytön korkeus */
-    text-align: center;    
-}
-
-#mobile-splash img {
-    width: 200px; /* Säädä logon kokoa tästä */
-    height: auto;
-    filter: drop-shadow(0 0 15px rgba(0, 255, 204, 0.5));
-    animation: pulse 2s infinite ease-in-out;
-    display: block;         /* Varmistaa, että kuva vie koko rivin */
-    margin: 10px 0;         /* Lisää hieman väliä kuvien väliin */
-    max-width: 80%;         /* Estää kuvia menemästä ruudun yli */
-    height: auto;
-}
-
-/* Pieni syke-efekti logoon */
-@keyframes pulse {
-    0% { transform: scale(1); opacity: 0.8; }
-    50% { transform: scale(1.05); opacity: 1; }
-    100% { transform: scale(1); opacity: 0.8; }
-}
-
-/* Luokka jolla logo poistetaan */
-#mobile-splash.hidden {
-    opacity: 0;
-    visibility: hidden;
-}
-    .mobile-only-panels {
-        display: block; /* Aktivoituu mobiilissa */
-    }
-
-    /* Muutetaan alkuperäiset napit mobiilipalloiksi */
-    #locate-btn, #markers-btn, #forecast-btn {
-        position: static !important; /* Poistaa PC-paikoituksen */
-        width: 45px !important;
-        height: 45px !important;
-        border-radius: 50% !important;
-        font-size: 0 !important; /* Piilottaa tekstin */
-        margin: 5px auto;
-        display: flex !important;
-        align-items: center;
-        justify-content: center;
-    }
-
-    /* Lisätään ikonit mobiilissa */
-    #locate-btn::before { content: "🧭"; font-size: 20px; }
-    #markers-btn::before { content: "📍"; font-size: 20px; }
-    #forecast-btn::before { content: "📊"; font-size: 20px; }
-
-    /* Paneelin tyylit (kuten aiemmin sovittiin) */
-.side-panel {
-        position: fixed !important;
-        right: 0 !important;
-        width: 60px !important;
-        background: rgba(10, 15, 25, 0.95) !important;
-        
-        border-right: none !important;
-        border-radius: 15px 0 0 15px !important;
-        z-index: 20000 !important;
-        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        padding: 10px 5px !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        box-sizing: border-box !important;
-        
-        /* Oletuksena paneeli on kokonaan piilossa oikealla */
-        transform: translateX(100%); 
-    }
-    #actions-panel { top: 10px !important; height: auto !important; }
-    #social-panel { top: 170px !important; height: auto !important; }
-    .side-panel.closed {
-        transform: translateX(100%) !important;
-    }
-    .side-panel:not(.closed) {
-        transform: translateX(0) !important;
-    }
- .panel-tab {
-        position: absolute !important;
-        left: -40px !important; /* Kieleke näkyy aina paneelin vasemmalla puolella */
-        top: 10px !important;
-        width: 40px !important;
-        height: 50px !important;
-        background: rgba(10, 15, 25, 0.95) !important;
-       
-        border-right: none !important;
-        border-radius: 10px 0 0 10px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        font-size: 20px !important;
-        cursor: pointer !important;
-    }
-    .panel-content {
-        width: 100% !important;
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 15px !important;
-        align-items: center !important;
-    }
-    .soc-icon img, .social-btn img {
-        width: 35px !important; /* Pakotetaan ikonit pieneen kokoon */
-        height: 35px !important;
-        object-fit: contain !important;
-    }
-    #actions-content button {
-        width: 45px !important;
-        height: 45px !important;
-        border-radius: 50% !important;
-        font-size: 0 !important;
-        background: #1a2639 !important;
-        border: 1px solid #00ffcc !important;
-        margin-bottom: 10px;
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: #050c18;
+        z-index: 999999;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
+        transition: opacity 1s, visibility 1s;
     }
-.desktop-only {
-        display: none !important;
-    }
-    .mobile-only {
-        display: block !important;
-    }
-    .ads-img {
-    width: 340px; 
-    height: 32px; 
-    border: 0;
-    overflow: hidden; /* Varmistaa ettei kuva tule yli reunojen */
-    margin: 20px auto; /* Keskittää mainoksen sivulla */
+
+    #mobile-splash.hidden { opacity: 0; visibility: hidden; }
 }
 
-.ads-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain; /* Pitää kuvan suhteet oikeana laatikon sisällä */
-    display: block;
-}
-}
+/* Piilotetaan uusi paneeli PC-näkymässä */
 @media (min-width: 769px) {
-    #kp-restore-btn { display: none !important; }
-    .side-panel, #kp-restore-btn, #actions-panel, #social-panel {
-        display: none !important;
-    }
+    .unified-panel { display: none !important; }
+    .mobile-only { display: none !important; }
 }
