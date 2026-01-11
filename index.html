@@ -392,21 +392,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 // Lisää tämä DOMContentLoaded-funktion sisälle:
 const toggleWrapper = document.getElementById('places-toggle-wrapper');
-const placesToggle = document.getElementById('toggle-places');
+    const actionsContent = document.getElementById('actions-content');
+    const placesToggle = document.getElementById('toggle-places');
 
-if (toggleWrapper) {
-    // TÄMÄ ESTÄÄ KLIKKAUKSEN MENEMISEN KARTALLE
-    L.DomEvent.disableClickPropagation(toggleWrapper);
-    L.DomEvent.disableScrollPropagation(toggleWrapper);
-}
+    // Estä klikkauksen läpimeno kartalle
+    if (toggleWrapper) {
+        L.DomEvent.disableClickPropagation(toggleWrapper);
+    }
 
-if (placesToggle) {
-    placesToggle.addEventListener('change', function() {
-        if (typeof window.togglePlaces === 'function') {
-            window.togglePlaces(this.checked, map);
-        }
-    });
-}
+    // MOBIILI: Siirretään kytkin ⚙️-paneeliin
+    if (window.innerWidth <= 768 && actionsContent && toggleWrapper) {
+        actionsContent.appendChild(toggleWrapper);
+    }
+
+    // Toiminto
+    if (placesToggle) {
+        placesToggle.addEventListener('change', function() {
+            if (typeof window.togglePlaces === 'function') {
+                window.togglePlaces(this.checked, map);
+            }
+        });
+    }
     // Popupit
     const forecastBtn = document.getElementById('forecast-btn');
     const forecastPopup = document.getElementById('forecast-popup');
