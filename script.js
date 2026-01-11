@@ -253,9 +253,18 @@ async function showAuroraPopup(lat, lon, marker = null, showGoogleMapsLink = tru
 
   // Liikennevalostatus
   let statusEmoji = '🔴', statusText = 'Low chance';
-  if (score >= 3) { statusEmoji = '🟢'; statusText = 'High chance!'; }
-  else if (score === 2) { statusEmoji = '🟡'; statusText = 'Moderate chance'; }
+    let statusColor = '#ff3366'; // Oletus: Punainen
 
+    if (score >= 3) { 
+        statusEmoji = '🟢'; 
+        statusText = 'High chance!'; 
+        statusColor = '#00ffcc'; 
+    } else if (score === 2) { 
+        statusEmoji = '🟡'; 
+        statusText = 'Moderate chance'; 
+        statusColor = '#ffcc00'; 
+    }
+let probability = Math.min((score / 4) * 100, 100);
   let popupContent = `
     <div style="text-align: center; font-family: 'Arial', sans-serif; min-width: 200px; padding: 5px;">
     <div style="font-size: 10px; text-transform: uppercase; color: #888; letter-spacing: 1px; margin-bottom: 2px;">Chance now</div>
