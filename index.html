@@ -391,10 +391,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 // Lisää tämä DOMContentLoaded-funktion sisälle:
+const toggleWrapper = document.getElementById('places-toggle-wrapper');
 const placesToggle = document.getElementById('toggle-places');
+
+if (toggleWrapper) {
+    // TÄMÄ ESTÄÄ KLIKKAUKSEN MENEMISEN KARTALLE
+    L.DomEvent.disableClickPropagation(toggleWrapper);
+    L.DomEvent.disableScrollPropagation(toggleWrapper);
+}
+
 if (placesToggle) {
     placesToggle.addEventListener('change', function() {
-        // Kutsutaan marker.js:stä löytyvää funktiota
         if (typeof window.togglePlaces === 'function') {
             window.togglePlaces(this.checked, map);
         }
