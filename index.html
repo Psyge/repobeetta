@@ -38,16 +38,18 @@
             <button id="locate-btn">Can I See Northern Lights now?</button>
             <button id="markers-btn">Show markers</button>  
             <button id="forecast-btn">3 Day Forecast</button>  
+             <div class="map-controls">
+    <div class="map-toggle-wrapper" id="places-toggle-wrapper">
+        <div class="toggle-container">
+            <span class="toggle-label">Show Places</span>
+            <label class="switch">
+                <input type="checkbox" id="toggle-places" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
         </div>
     </div>
-    <div class="map-controls">
-    <div class="toggle-container">
-        <span class="toggle-label">Show Places</span>
-        <label class="switch">
-            <input type="checkbox" id="toggle-places" checked>
-            <span class="slider"></span>
-        </label>
-    </div>
+   
 </div>
 <div id="aurora-notifier">
     <button onclick="sendAuroraReport()" class="report-btn">
