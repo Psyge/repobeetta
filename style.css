@@ -1,51 +1,34 @@
-.map-controls {
-    margin-top: 15px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 5px;
-}
-
-.toggle-container {
+/* Lisää nämä style.css tiedostoon */
+.banner-toggle {
     display: flex;
     align-items: center;
-    gap: 10px;
-    background: rgba(0, 0, 0, 0.6); /* Puoliläpinäkyvä tausta */
-    padding: 8px 15px;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(5px); /* Sumentaa kartan takana hienosti */
+    gap: 8px;
+    margin: 0 10px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 5px 10px;
+    border-radius: 15px;
 }
 
 .toggle-label {
     color: white;
-    font-size: 14px;
+    font-size: 11px;
     font-weight: bold;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
 
-/* Itse kytkimen mekaniikka */
 .switch {
     position: relative;
     display: inline-block;
-    width: 40px;
-    height: 22px;
+    width: 34px;
+    height: 18px;
 }
 
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
+.switch input { opacity: 0; width: 0; height: 0; }
 
 .slider {
     position: absolute;
     cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     background-color: #444;
     transition: .4s;
     border-radius: 34px;
@@ -54,8 +37,8 @@
 .slider:before {
     position: absolute;
     content: "";
-    height: 16px;
-    width: 16px;
+    height: 12px;
+    width: 12px;
     left: 3px;
     bottom: 3px;
     background-color: white;
@@ -63,13 +46,8 @@
     border-radius: 50%;
 }
 
-input:checked + .slider {
-    background-color: #2ecc71; /* Vihreä väri kun päällä */
-}
-
-input:checked + .slider:before {
-    transform: translateX(18px);
-}
+input:checked + .slider { background-color: #00ffcc; }
+input:checked + .slider:before { transform: translateX(16px); }
 .fox-animation {
     background-repeat: no-repeat;
     display: block;
