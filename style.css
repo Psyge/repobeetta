@@ -767,7 +767,7 @@ header.banner::before {
     .unified-panel {
         position: fixed !important;
         right: 0 !important;
-        top: 20% !important;
+        top: 3% !important;
         z-index: 20000 !important;
         display: flex !important;
         align-items: flex-start !important;
