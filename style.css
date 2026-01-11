@@ -846,24 +846,19 @@ header.banner::before {
 
     /* SHOW PLACES -KYTKIN PANEELISSA */
   .places-toggle-wrapper {
-        position: absolute !important;
-        top: 130px !important; /* Laskettu zoom-nappien (+ / -) alapuolelle */
-        right: 10px !important;
-        z-index: 1000 !important;
-        background: rgba(10, 15, 25, 0.9);
-        padding: 8px 12px;
-        border-radius: 8px;
-        border: 1px solid rgba(0, 255, 204, 0.3);
-        display: block !important;
-        width: auto !important;
+      position: static !important; /* Pakottaa kytkimen paneelin listaan */
+        margin: 10px 0 !important;
+        display: flex !important;
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+        width: 100% !important;
     }
 
     .toggle-container {
-        background: none !important;
-        border: none !important;
-        padding: 0 !important;
-        box-shadow: none !important;
-        flex-direction: column-reverse !important; /* Teksti säätimen alle */
+      display: flex !important;
+        flex-direction: column-reverse !important; 
+        align-items: center !important;
         gap: 4px !important;
     }
 
