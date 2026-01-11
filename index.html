@@ -197,11 +197,19 @@ async function fetchKPData() {
         const data = await res.json();
         
         if (data && data.length > 1) {
+           if (data && data.length > 1) {
             const lastRow = data[data.length - 1];
             const kpVal = parseFloat(lastRow[1]);
+            const timeStr = lastRow[0]; // UTC-aika muodossa "2024-03-20 18:00:00.000"
+            
+            // Muunnetaan UTC-aika paikalliseksi kellonajaksi
+            const date = new Date(timeStr + " UTC");
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const localTime = `${hours}:${minutes}`;
+
             const badge = document.getElementById('kpVal');
-            const desc = document.getElementById('kpDesc');
-            const kpFox = document.querySelector('.peeking-fox');
+            const timeDisplay = document.getElementById('kpTime');
 
             if (badge) {
                 badge.innerText = isNaN(kpVal) ? "--" : kpVal.toFixed(1);
@@ -221,6 +229,9 @@ async function fetchKPData() {
                     kpFox.className = "peeking-fox fox-animation " + foxClass;
                     kpFox.style.filter = (kpVal >= 3) ? `drop-shadow(0 0 10px ${color})` : "none";
                 }
+                if (timeDisplay) {
+                timeDisplay.innerText = `Updated: ${localTime}`;
+            
             }
         }
         handleKpVisibility();
