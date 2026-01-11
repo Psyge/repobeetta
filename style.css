@@ -1,4 +1,15 @@
-/* PC-TYYLI */
+#kpTime {
+    font-family: monospace;
+    letter-spacing: 0.5px;
+    text-align: center;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    #kpTime {
+        font-size: 8px !important; /* Vielä hieman pienempi mobiilissa */
+    }
+}/* PC-TYYLI */
 #places-toggle-wrapper {
     position: absolute !important;
     top: 230px !important; /* Forecast-napin alla */
