@@ -33,65 +33,67 @@
         </nav>
     </header>   
 
-<div class="unified-panel closed" id="main-panel">
-    <div class="panel-tabs">
-        <div class="tab" id="tab-actions">⚙️</div>
-        <div class="tab" id="tab-social">📱</div>
-    </div>
-
-    <div class="panel-content">
-        <div id="content-actions" class="content-section">
+<div id="container">
+        <div id="map">
+            <button id="locate-btn">Can I See Northern Lights now?</button>
+            <button id="markers-btn">Show markers</button>  
+            <button id="forecast-btn">3 Day Forecast</button>  
+            
+            <div class="map-controls" id="places-toggle-wrapper">
+                <div class="toggle-container">
+                    <span class="toggle-label">Show Places</span>
+                    <label class="switch">
+                        <input type="checkbox" id="toggle-places" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
             </div>
-        <div id="content-social" class="content-section">
-            <a href="https://instagram.com/repotracker_" target="_blank" class="soc-icon"><img src="ig-icon.png"></a>
-            <a href="https://www.tiktok.com/@repotracker" target="_blank" class="soc-icon"><img src="tiktok.png"></a>
-            <a href="https://www.buymeacoffee.com/repotracker" target="_blank" class="soc-icon">☕</a>
+        </div>
+
+        <div id="aurora-notifier">
+            <button onclick="sendAuroraReport()" class="report-btn">
+                <img src="fox-paw.png" alt="paw" class="btn-icon">
+                I see Northern Lights!
+            </button>
+            <div class="info-panel" id="kp-info-box">
+                <div class="peeking-fox fox-animation fox-mid"></div>
+                <div id="kp-restore-btn">KP</div>
+                <div id="idesc">KP-INDEX</div>
+                <div class="kp-badge" id="kpVal">--</div>
+                <div id="kpDesc">Loading...</div> 
+            </div>
+        </div>
+
+        <div class="unified-panel closed" id="main-panel">
+            <div class="panel-tabs">
+                <div class="tab" id="tab-actions">⚙️</div>
+                <div class="tab" id="tab-social">📱</div>
+            </div>
+            <div class="panel-content">
+                <div id="content-actions" class="content-section">
+                    </div>
+                <div id="content-social" class="content-section">
+                    <a href="https://instagram.com/repotracker_" target="_blank" class="soc-icon"><img src="ig-icon.png"></a>
+                    <a href="https://www.tiktok.com/@repotracker" target="_blank" class="soc-icon"><img src="tiktok.png"></a>
+                    <a href="https://www.buymeacoffee.com/repotracker" target="_blank" class="soc-icon">☕</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="forecast-popup" style="display:none;">
+            <div class="forecast-card">
+                <span id="close-forecast">&times;</span>
+                <div class="forecast-header"><h2>3-Päivän Kp-Ennuste</h2></div>
+                <div class="chart-container"><canvas id="kpChart"></canvas></div>
+                <div class="forecast-info">
+                    <div class="info-item"><span class="dot low"></span> Matala (0-3)</div>
+                    <div class="info-item"><span class="dot mod"></span> Kohtalainen (4)</div>
+                    <div class="info-item"><span class="dot high"></span> Korkea (5+)</div>
+                </div>
+                <div id="errorMessage"></div>
+            </div>
         </div>
     </div>
-</div>
-
-   
-</div>
-<div id="aurora-notifier">
-    <button onclick="sendAuroraReport()" class="report-btn">
-        <img src="fox-paw.png" alt="paw" class="btn-icon">
-        I see Northern Lights!
-    </button>
-   <div class="info-panel" id="kp-info-box">
-    <div class="peeking-fox fox-animation fox-mid"></div>
-    
-    <div class="snake-visual"></div>
-
-    <div id="kp-restore-btn">KP</div>
-    <div id="idesc" style="font-size: 8px; color: #00ffcc; opacity: 0.8; margin-bottom: 2px;">KP-INDEX</div>
-    <div class="kp-badge" id="kpVal">--</div>
-    <div id="kpDesc" style="font-size: 8px; color: #fff; margin-top: 5px; opacity: 0.9;">Loading...</div> 
-</div>
-
-    
-  <div id="forecast-popup">
-    <div class="forecast-card">
-      <span id="close-forecast">&times;</span>
-
-      <div class="forecast-header">
-        <h2>3-Päivän Kp-Ennuste</h2>
-      </div>
-
-      <div class="chart-container">
-        <canvas id="kpChart"></canvas>
-      </div>
-
-      <div class="forecast-info">
-        <div class="info-item"><span class="dot low"></span> Matala (0-3)</div>
-        <div class="info-item"><span class="dot mod"></span> Kohtalainen (4)</div>
-        <div class="info-item"><span class="dot high"></span> Korkea (5+)</div>
-      </div>
-
-      <div id="errorMessage"></div>
-    </div>
-  </div>   
-    
-</div>
 <section id="aurora-info" class="aurora-section">
    <div id="ads-only" class="ads-img">
   <a href="https://www.anrdoezrs.net/click-101584868-15877142" target="_top">
