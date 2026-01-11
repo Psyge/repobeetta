@@ -38,7 +38,7 @@
             <button id="locate-btn">Can I See Northern Lights now?</button>
             <button id="markers-btn">Show markers</button>  
             <button id="forecast-btn">3 Day Forecast</button>  
-            
+              
             <div class="map-controls" id="places-toggle-wrapper">
                 <div class="toggle-container">
                     <span class="toggle-label">Show Places</span>
@@ -320,7 +320,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const btns = ['locate-btn', 'forecast-btn', 'places-toggle-wrapper'];
         btns.forEach(id => {
             const el = document.getElementById(id);
-            if (el && contentActions) contentActions.appendChild(el);
+            if (el && contentActions) {
+                contentActions.appendChild(el); 
+                console.log("Siirretty paneeliin:", id);
         });
     }
 
