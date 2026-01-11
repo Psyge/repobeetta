@@ -1,13 +1,16 @@
 /* PC-TYYLI */
-.map-toggle-wrapper {
-    position: absolute;
-    top: 230px; /* Forecast-napin alla */
-    right: 18px; /* Keskitetty muihin oikean laidan nappeihin */
-    z-index: 1001;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+#places-toggle-wrapper {
+    position: absolute !important;
+    top: 230px !important; /* Forecast-napin alla */
+    right: 18px !important; 
+    z-index: 1001 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
     gap: 4px;
+    background: rgba(10, 15, 25, 0.7); /* Lisätty pieni tausta PC:lle */
+    padding: 5px;
+    border-radius: 8px;
 }
 
 .switch {
