@@ -1,25 +1,25 @@
 .map-toggle-wrapper {
-    position: absolute; /* Pakottaa kytkimen kartan päälle */
-    bottom: 30px;       /* Etäisyys kartan alareunasta */
-    left: 50%;
-    transform: translateX(-50%); /* Keskitys vaakasuunnassa */
-    z-index: 1001;      /* Leafletin oletuskerrosten yläpuolella */
+    position: absolute;
+    top: 225px; /* Säädä tätä niin, että se istuu Forecast-napin alle */
+    right: 10px;
+    z-index: 1001;
     display: flex;
-    justify-content: center;
-    pointer-events: auto; /* Varmistaa että kytkintä voi painaa */
+    flex-direction: column;
+    align-items: flex-end; /* Kohdistaa kytkimen nappien oikeaan reunaan */
 }
 
-/* --- KYTKIMEN ULKOASU (Sama tyyli kuin koodissasi) --- */
 .toggle-container {
-    background: rgba(0, 0, 0, 0.85); /* Hieman tummempi jotta erottuu kartasta */
-    padding: 8px 15px;
-    border-radius: 50px; /* Tehdään soikea kuten muutkin nappisi */
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px 15px;
+    border-radius: 50px;
     display: flex;
     align-items: center;
     gap: 12px;
-    border: 2px solid #00ffcc; /* Neon-reunus kuten raportointinapissa */
+    border: 2px solid #00ffcc;
+    backdrop-filter: blur(10px);
     box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
-    backdrop-filter: blur(5px);
+    /* Estää tekstin valitsemisen klikatessa */
+    user-select: none;
 }
 
 .toggle-label {
