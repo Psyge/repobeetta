@@ -197,48 +197,68 @@ async function fetchKPData() {
         const res = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json');
         const data = await res.json();
         
-       
-           if (data && data.length > 1) {
+        if (data && data.length > 1) {
             const lastRow = data[data.length - 1];
             const kpVal = parseFloat(lastRow[1]);
-            const timeStr = lastRow[0]; // UTC-aika muodossa "2024-03-20 18:00:00.000"
+            const timeStr = lastRow[0]; 
             
-            // Muunnetaan UTC-aika paikalliseksi kellonajaksi
+            // Kellonajan muunnos
             const date = new Date(timeStr + " UTC");
             const hours = date.getHours().toString().padStart(2, '0');
             const minutes = date.getMinutes().toString().padStart(2, '0');
             const localTime = `${hours}:${minutes}`;
 
+            // MÄÄRITELLÄÄN ELEMENTIT (Tämä korjaa ReferenceErrorin)
             const badge = document.getElementById('kpVal');
             const timeDisplay = document.getElementById('kpTime');
+            const desc = document.getElementById('kpDesc'); // TÄMÄ PUUTTUI
+            const kpFox = document.querySelector('.peeking-fox'); // TÄMÄ PUUTTUI
 
             if (badge) {
                 badge.innerText = isNaN(kpVal) ? "--" : kpVal.toFixed(1);
+                
                 let color = "#00ffcc";
                 let text = "● No northern lights";
                 let foxClass = "fox-low";
 
                 if (kpVal >= 5) {
-                    color = "#ff3366"; text = "● Widely visible"; foxClass = "fox-high";
+                    color = "#ff3366"; 
+                    text = "● Widely visible"; 
+                    foxClass = "fox-high";
                 } else if (kpVal >= 3) {
-                    color = "#ffcc00"; text = "● Chance to see"; foxClass = "fox-mid";
+                    color = "#ffcc00"; 
+                    text = "● Chance to see"; 
+                    foxClass = "fox-mid";
                 }
 
                 badge.style.color = color;
-                if (desc) { desc.innerText = text; desc.style.color = color; }
+                
+                // Tarkistetaan löytyykö desc-elementti ennen käyttöä
+                if (desc) { 
+                    desc.innerText = text; 
+                    desc.style.color = color; 
+                }
+                
+                // Tarkistetaan löytyykö kettu-elementti
                 if (kpFox) {
                     kpFox.className = "peeking-fox fox-animation " + foxClass;
                     kpFox.style.filter = (kpVal >= 3) ? `drop-shadow(0 0 10px ${color})` : "none";
                 }
             }
-                if (timeDisplay) {
+
+            if (timeDisplay) {
                 timeDisplay.innerText = `Updated: ${localTime}`;
-            
             }
         }
-        handleKpVisibility();
-    } catch(e) { console.error("KP-haku epäonnistui", e); 
-               }
+        
+        // Varmista että tämä funktio on olemassa koodissasi
+        if (typeof handleKpVisibility === "function") {
+            handleKpVisibility();
+        }
+
+    } catch(e) { 
+        console.error("KP-haku epäonnistui", e); 
+    }
 }
 
 function handleKpVisibility() {
