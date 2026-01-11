@@ -176,15 +176,16 @@ The colors on the map indicate the probability and intensity of the northern lig
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
 // --- GLOBALS & CONFIG ---
+// --- GLOBALS & CONFIG ---
 const WORKER_URL = 'https://report.masto84.workers.dev/';
 let pawLayerGroup;
 let kpHideTimeout = null;
 
 const pawIcon = L.icon({
     iconUrl: 'fox-paw.png',
-    iconSize: [40, 40],      // Pienennetään hieman (50->40), jotta ei peitä koko karttaa
-    iconAnchor: [20, 20],    // Keskipiste: puolet koosta
-    popupAnchor: [0, 0],   // Popup aukeaa ikonin päältä
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+    popupAnchor: [0, 0],
     className: 'paw-icon'
 });
 
@@ -193,50 +194,13 @@ window.OneSignalDeferred = window.OneSignalDeferred || [];
 OneSignalDeferred.push(async function(OneSignal) {
     await OneSignal.init({
         appId: "7b4a4513-fcc3-4efb-a5a1-1903f0c3615e",
-        // Huomaa lisätyt kauttaviivat polun alussa
         serviceWorkerPath: "OneSignalSDKWorker.js", 
         serviceWorkerParam: { scope: "/repobeetta/" },
-        allowLocalhostAsSecureOrigin: true // Auttaa joskus GitHubin uudelleenohjauksissa
+        allowLocalhostAsSecureOrigin: true
     });
-    console.log("OneSignal yrittää alustusta polulla: /repobeetta/"); 
 });
 
-// --- FUNKTIOT ---
-
-// Paneelien hallinta
-function setupMobilePanels() {
-    ['actions', 'social'].forEach(id => {
-        const panel = document.getElementById(id + '-panel');
-        const tab = document.getElementById(id + '-tab');
-        if (panel && tab) {
-            if (typeof L !== 'undefined' && L.DomEvent) {
-                L.DomEvent.disableClickPropagation(panel);
-            }
-            tab.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                panel.classList.toggle('closed');
-            });
-        }
-    });
-}
-
-// KP-laatikon näkyvyys
-function handleKpVisibility() {
-    const kpBox = document.getElementById('kp-info-box'); 
-    if (!kpBox) return;
-    if (window.innerWidth > 768) {
-        kpBox.classList.remove('fade-out');
-        return;
-    }
-    if (kpHideTimeout) clearTimeout(kpHideTimeout);
-    kpBox.classList.remove('fade-out');
-    kpHideTimeout = setTimeout(() => {
-        kpBox.classList.add('fade-out');
-    }, 8000); 
-}
-
-// KP-datan haku + OneSignal-integraatio
+// --- KP-DATAN HAKU ---
 async function fetchKPData() {
     try {
         const res = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json');
@@ -247,7 +211,7 @@ async function fetchKPData() {
             const kpVal = parseFloat(lastRow[1]);
             const badge = document.getElementById('kpVal');
             const desc = document.getElementById('kpDesc');
-            const kpFox = document.querySelector('.peeking-fox'); // Käytetään luokkaa jos ID:tä ei ole
+            const kpFox = document.querySelector('.peeking-fox');
 
             if (badge) {
                 badge.innerText = isNaN(kpVal) ? "--" : kpVal.toFixed(1);
@@ -256,100 +220,52 @@ async function fetchKPData() {
                 let foxClass = "fox-low";
 
                 if (kpVal >= 5) {
-                    color = "#ff3366";
-                    text = "● Widely visible";
-                    foxClass = "fox-high";
+                    color = "#ff3366"; text = "● Widely visible"; foxClass = "fox-high";
                 } else if (kpVal >= 3) {
-                    color = "#ffcc00";
-                    text = "● Chance to see";
-                    foxClass = "fox-mid";
+                    color = "#ffcc00"; text = "● Chance to see"; foxClass = "fox-mid";
                 }
 
                 badge.style.color = color;
-                if (desc) {
-                    desc.innerText = text;
-                    desc.style.color = color;
-                }
-
+                if (desc) { desc.innerText = text; desc.style.color = color; }
                 if (kpFox) {
                     kpFox.className = "peeking-fox fox-animation " + foxClass;
                     kpFox.style.filter = (kpVal >= 3) ? `drop-shadow(0 0 10px ${color})` : "none";
                 }
-
-                // --- ONESIGNAL HÄLYTYSTAGI ---
-                // Jos OneSignal on ladattu ja KP on korkea (testissä > 0.1)
-                window.OneSignalDeferred.push(async function(OneSignal) {
-                    if (kpVal >= 0.9) { // Voit nostaa tämän esim. 4.0 myöhemmin
-                        await OneSignal.User.addTag("kp_index", kpVal.toString());
-                        console.log("KP-tagi päivitetty OneSignaliin:", kpVal);
-                    }
-                });
             }
         }
         handleKpVisibility();
-    } catch(e) {
-        console.error("KP-haku epäonnistui", e);
-    }
+    } catch(e) { console.error("KP-haku epäonnistui", e); }
 }
 
-// Raporttien hallinta (Käpälät kartalla)
+function handleKpVisibility() {
+    const kpBox = document.getElementById('kp-info-box'); 
+    if (!kpBox || window.innerWidth > 768) return;
+    if (kpHideTimeout) clearTimeout(kpHideTimeout);
+    kpBox.classList.remove('fade-out');
+    kpHideTimeout = setTimeout(() => kpBox.classList.add('fade-out'), 8000); 
+}
+
+// --- RAPORTOINTI JA KARTTA ---
 function updatePawMarkers(reports) {
     if (typeof map === 'undefined' || !map) return;
-
-    // Jos ryhmää ei ole vielä luotu, luodaan se cluster-ominaisuudella
     if (!pawLayerGroup) {
         pawLayerGroup = L.markerClusterGroup({
             showCoverageOnHover: false,
-            spiderfyOnMaxZoom: true,
-            zoomToBoundsOnClick: true,
-            maxClusterRadius: 50 // Kuinka lähekkäin olevat ikonit ryhmitellään (pikseleinä)
+            maxClusterRadius: 50
         }).addTo(map);
     }
-
-    // Tyhjennetään vanhat ilmoitukset
     pawLayerGroup.clearLayers();
-    
     reports.forEach(r => {
         const lat = parseFloat(r.lat);
         const lon = parseFloat(r.lon);
         if (!isNaN(lat) && !isNaN(lon)) {
             const marker = L.marker([lat, lon], { icon: pawIcon });
             const minsAgo = Math.floor((Date.now() - r.time) / 60000);
-            const timeText = minsAgo < 1 ? "Just now" : `${minsAgo} min ago`;
-            marker.bindPopup(`<b>Aurora spotted!</b><br>${timeText}`);
-            
-            // Lisätään marker ryhmään
+            marker.bindPopup(`<b>Aurora spotted!</b><br>${minsAgo < 1 ? "Just now" : minsAgo + " min ago"}`);
             pawLayerGroup.addLayer(marker);
         }
     });
 }
-  function setupZoomListener() {
-    if (typeof map !== 'undefined' && map) {
-        map.on('zoomend', function() {
-            const currentZoom = map.getZoom();
-            let newSize = currentZoom * 4; 
-            if (newSize < 15) newSize = 15;
-            if (newSize > 50) newSize = 50;
-
-            pawIcon.options.iconSize = [newSize, newSize];
-            pawIcon.options.iconAnchor = [newSize / 2, newSize / 2]; 
-            pawIcon.options.popupAnchor = [0, 0];
-
-            if (pawLayerGroup) {
-                // Käydään läpi kaikki ryhmän sisällä olevat markerit
-                pawLayerGroup.eachLayer(function(layer) {
-                    if (layer instanceof L.Marker) {
-                        layer.setIcon(pawIcon); 
-                    }
-                });
-            }
-        });
-    } else {
-        setTimeout(setupZoomListener, 500);
-    }
-}
-// Käynnistetään tarkistus
-setupZoomListener();
 
 async function loadReports() {
     try {
@@ -374,38 +290,51 @@ function sendAuroraReport() {
     }
 }
 
-// --- ALUSTUS DOMContentLoaded ---
+// --- PANEELILOGIIKKA JA ALUSTUS ---
 document.addEventListener('DOMContentLoaded', () => {
-    setupMobilePanels();
-    fetchKPData();
-    setTimeout(loadReports, 2000);
+    const mainPanel = document.getElementById('main-panel');
+    const tabActions = document.getElementById('tab-actions');
+    const tabSocial = document.getElementById('tab-social');
+    const contentActions = document.getElementById('content-actions');
+    const contentSocial = document.getElementById('content-social');
+    const toggleWrapper = document.getElementById('places-toggle-wrapper');
+    const placesToggle = document.getElementById('toggle-places');
+
+    // Estetään klikkausten vuotaminen kartalle paneelin kohdalla
+    if (mainPanel) L.DomEvent.disableClickPropagation(mainPanel);
+    if (toggleWrapper) L.DomEvent.disableClickPropagation(toggleWrapper);
+
+    // Yhdistetty paneelin avaaminen/sulkeminen
+    function toggleSection(targetContent) {
+        const isClosed = mainPanel.classList.contains('closed');
+        const isTargetActive = targetContent.classList.contains('active');
+
+        if (isClosed) {
+            mainPanel.classList.remove('closed');
+            targetContent.classList.add('active');
+        } else if (isTargetActive) {
+            mainPanel.classList.add('closed');
+            targetContent.classList.remove('active');
+        } else {
+            contentActions.classList.remove('active');
+            contentSocial.classList.remove('active');
+            targetContent.classList.add('active');
+        }
+    }
+
+    if (tabActions) tabActions.addEventListener('click', () => toggleSection(contentActions));
+    if (tabSocial) tabSocial.addEventListener('click', () => toggleSection(contentSocial));
 
     // Mobiilinappien siirto paneeliin
     if (window.innerWidth <= 768) {
-        const actionsContent = document.getElementById('actions-content');
-        const locateBtn = document.getElementById('locate-btn');
-        const forecastBtn = document.getElementById('forecast-btn');
-        if (actionsContent) {
-            if (locateBtn) actionsContent.appendChild(locateBtn);
-            if (forecastBtn) actionsContent.appendChild(forecastBtn);
-        }
-    }
-// Lisää tämä DOMContentLoaded-funktion sisälle:
-const toggleWrapper = document.getElementById('places-toggle-wrapper');
-    const actionsContent = document.getElementById('actions-content');
-    const placesToggle = document.getElementById('toggle-places');
-
-    // Estä klikkauksen läpimeno kartalle
-    if (toggleWrapper) {
-        L.DomEvent.disableClickPropagation(toggleWrapper);
+        const btns = ['locate-btn', 'markers-btn', 'forecast-btn', 'places-toggle-wrapper'];
+        btns.forEach(id => {
+            const el = document.getElementById(id);
+            if (el && contentActions) contentActions.appendChild(el);
+        });
     }
 
-    // MOBIILI: Siirretään kytkin ⚙️-paneeliin
-    if (window.innerWidth <= 768 && actionsContent && toggleWrapper) {
-        actionsContent.appendChild(toggleWrapper);
-    }
-
-    // Toiminto
+    // Show Places -kytkimen toiminta
     if (placesToggle) {
         placesToggle.addEventListener('change', function() {
             if (typeof window.togglePlaces === 'function') {
@@ -413,13 +342,13 @@ const toggleWrapper = document.getElementById('places-toggle-wrapper');
             }
         });
     }
-    // Popupit
+
+    // Ennuste-popupin hallinta
     const forecastBtn = document.getElementById('forecast-btn');
-    const forecastPopup = document.getElementById('forecast-popup');
-    if (forecastBtn && forecastPopup) {
+    if (forecastBtn) {
         forecastBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            forecastPopup.style.display = 'flex';
+            document.getElementById('forecast-popup').style.display = 'flex';
             if (typeof updateKpChart === 'function') updateKpChart();
         });
     }
@@ -428,23 +357,22 @@ const toggleWrapper = document.getElementById('places-toggle-wrapper');
         document.getElementById('forecast-popup').style.display = 'none';
     });
 
-    // Splash
+    // Perustoiminnot
+    fetchKPData();
+    setTimeout(loadReports, 2000);
+
+    // Splash-ruudun poisto
     const splash = document.getElementById('mobile-splash');
     if (splash) {
         setTimeout(() => {
             splash.classList.add('hidden');
-            setTimeout(() => splash.remove(), 1000); 
+            setTimeout(() => splash.remove(), 1000);
         }, 3000);
     }
 
-    // KP-palautus ja interaktiot
+    // KP-laatikon palautus klikkauksesta
     document.getElementById('kp-restore-btn')?.addEventListener('click', (e) => {
         e.preventDefault(); e.stopPropagation();
-        handleKpVisibility(); 
-    });
-
-    document.addEventListener('touchstart', (e) => {
-        if (e.target.closest('#kp-restore-btn') || e.target.closest('.side-panel')) return;
         handleKpVisibility();
     });
 });
