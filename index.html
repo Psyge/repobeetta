@@ -316,7 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Mobiilinappien siirto paneeliin
     if (window.innerWidth <= 768) {
-        const btns = ['locate-btn', 'markers-btn', 'forecast-btn', 'places-toggle-wrapper'];
+        const btns = ['locate-btn', 'forecast-btn', 'places-toggle-wrapper'];
         btns.forEach(id => {
             const el = document.getElementById(id);
             if (el && contentActions) contentActions.appendChild(el);
