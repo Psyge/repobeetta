@@ -846,27 +846,24 @@ header.banner::before {
 
     /* SHOW PLACES -KYTKIN PANEELISSA */
   .places-toggle-wrapper {
-      position: static !important; /* Pakottaa kytkimen paneelin listaan */
-        margin: 10px 0 !important;
+     position: static !important; /* Poistaa "kellunnan" */
+        margin: 15px 0 !important;
         display: flex !important;
-        background: transparent !important;
-        border: none !important;
-        padding: 0 !important;
+        flex-direction: column !important;
+        align-items: center !important;
         width: 100% !important;
+        transform: none !important;
     }
 
     .toggle-container {
       display: flex !important;
-        flex-direction: column-reverse !important; 
-        align-items: center !important;
-        gap: 4px !important;
+        flex-direction: column-reverse !important;
+        gap: 6px !important;
     }
 
    .toggle-label {
-        font-size: 7px !important; /* Erittäin pieni teksti */
+       font-size: 10px !important; /* Hieman isompi luettavuus */
         color: #00ffcc !important;
-        text-align: center !important;
-        width: 100% !important;
     }
 
     .switch {
