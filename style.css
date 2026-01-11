@@ -1,5 +1,5 @@
 /* PC-TYYLI */
-.map-toggle-wrapper {
+.places-toggle-wrapper {
     position: absolute;
     top: 230px; /* Forecast-napin alla */
     right: 18px; /* Keskitetty muihin oikean laidan nappeihin */
@@ -842,11 +842,17 @@ header.banner::before {
     #forecast-btn::before { content: "📊"; font-size: 20px; }
 
     /* SHOW PLACES -KYTKIN PANEELISSA */
-  .map-toggle-wrapper {
-        margin-top: 10px !important;
-        padding: 5px !important;
-        background: rgba(255, 255, 255, 0.05) !important;
-        border-radius: 8px !important;
+  .places-toggle-wrapper {
+        position: absolute !important;
+        top: 130px !important; /* Laskettu zoom-nappien (+ / -) alapuolelle */
+        right: 10px !important;
+        z-index: 1000 !important;
+        background: rgba(10, 15, 25, 0.9);
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 255, 204, 0.3);
+        display: block !important;
+        width: auto !important;
     }
 
     .toggle-container {
