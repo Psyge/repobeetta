@@ -845,7 +845,7 @@ header.banner::before {
     #forecast-btn::before { content: "📊"; font-size: 20px; }
 
     /* SHOW PLACES -KYTKIN PANEELISSA */
-  .places-toggle-wrapper {
+  .map-controls, #places-toggle-wrapper {
      position: static !important; /* Poistaa "kellunnan" */
         margin: 15px 0 !important;
         display: flex !important;
