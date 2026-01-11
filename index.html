@@ -230,13 +230,15 @@ async function fetchKPData() {
                     kpFox.className = "peeking-fox fox-animation " + foxClass;
                     kpFox.style.filter = (kpVal >= 3) ? `drop-shadow(0 0 10px ${color})` : "none";
                 }
+            }
                 if (timeDisplay) {
                 timeDisplay.innerText = `Updated: ${localTime}`;
             
             }
         }
         handleKpVisibility();
-    } catch(e) { console.error("KP-haku epäonnistui", e); }
+    } catch(e) { console.error("KP-haku epäonnistui", e); 
+               }
 }
 
 function handleKpVisibility() {
