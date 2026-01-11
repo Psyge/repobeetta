@@ -388,7 +388,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (forecastBtn) actionsContent.appendChild(forecastBtn);
         }
     }
-
+// Lisää tämä DOMContentLoaded-funktion sisälle:
+const placesToggle = document.getElementById('toggle-places');
+if (placesToggle) {
+    placesToggle.addEventListener('change', function() {
+        // Kutsutaan marker.js:stä löytyvää funktiota
+        if (typeof window.togglePlaces === 'function') {
+            window.togglePlaces(this.checked, map);
+        }
+    });
+}
     // Popupit
     const forecastBtn = document.getElementById('forecast-btn');
     const forecastPopup = document.getElementById('forecast-popup');
