@@ -280,11 +280,11 @@ let probability = Math.min((score / 4) * 100, 100);
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; border-top: 1px solid #333; padding-top: 10px;">
         <div style="text-align: left;">
             <div style="font-size: 9px; color: #888;">AURORA</div>
-            <div style="font-size: 14px; font-weight: bold; color: #000000;">✨ ${auroraIntensity.toFixed(1)}</div>
+            <div style="font-size: 14px; font-weight: bold; color: #fff;">✨ ${auroraIntensity.toFixed(1)}</div>
         </div>
         <div style="text-align: right;">
             <div style="font-size: 9px; color: #888;">CLOUDS</div>
-            <div style="font-size: 14px; font-weight: bold; color: #000000;">☁️ ${clouds}%</div>
+            <div style="font-size: 14px; font-weight: bold; color: #fff;">☁️ ${clouds}%</div>
         </div>
         </div>
         </div>
@@ -293,7 +293,7 @@ let probability = Math.min((score / 4) * 100, 100);
   if (showGoogleMapsLink) {
     popupContent += `<br><div style="text-align: left;">
             <div style="font-size: 9px; color: #888;">TEMP</div>
-            <div style="font-size: 14px; font-weight: bold; color: #000000;">🌡️ ${weather ? weather.temp + '°C' : 'N/A'}</div>
+            <div style="font-size: 14px; font-weight: bold; color: #fff;">🌡️ ${weather ? weather.temp + '°C' : 'N/A'}</div>
         </div><br>
       <div style="text-align: right;">
             <div style="font-size: 9px; color: #888;">MAPS</div>
