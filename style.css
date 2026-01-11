@@ -847,7 +847,7 @@ header.banner::before {
     /* SHOW PLACES -KYTKIN PANEELISSA */
   .map-controls, #places-toggle-wrapper {
      position: static !important; /* Poistaa "kellunnan" */
-        margin: 15px 0 !important;
+        margin-left: 25px;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
