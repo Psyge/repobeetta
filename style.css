@@ -696,15 +696,33 @@ header.banner::before {
     #container {
         overflow: hidden;
     }
-
+.kp-badge {
+        font-size: 18px !important;
+        font-weight: bold !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        line-height: 1.2 !important;
+    }
+    .kp-badge::before {
+        content: "KP";
+        display: block;
+        font-size: 8px;
+        color: #00ffcc;
+        opacity: 0.7;
+    }
     /* KP-INFO BOX ja sen animaatiot */
-    #kp-info-box {
-        top: 170px !important;
-        left: 10px;
-        opacity: 1;
-        visibility: visible;
-        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s !important;
-        z-index: 9999;
+   #kp-info-box {
+        top: 140px !important; /* Säädetty zoom-nappien alle */
+        left: 10px !important;
+        width: 60px !important; /* Kiinteä leveys mobiilissa */
+        height: auto !important;
+        padding: 5px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        background: rgba(10, 15, 25, 0.9) !important;
+        border: 1px solid rgba(0, 255, 204, 0.3) !important;
+        border-radius: 12px !important;
     }
 
     #kp-info-box.fade-out {
@@ -714,27 +732,12 @@ header.banner::before {
         pointer-events: none !important;
     }
 
-    #kp-restore-btn {
-        display: flex;
-        position: absolute;
-        top: 0;
-        left: 100%;
-        width: 30px;
-        height: 100%;
-        background: rgba(10, 15, 25, 0.9);
-        border: 1px solid rgba(0, 255, 204, 0.3);
-        border-left: none;
-        border-radius: 0 8px 8px 0;
-        color: #00ffcc;
-        font-size: 10px;
-        font-weight: bold;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s;
-        pointer-events: auto !important;
+ #kp-restore-btn {
+        left: 100% !important;
+        width: 25px !important;
+        font-size: 10px !important;
+        background: rgba(10, 15, 25, 0.95) !important;
+        border-left: none !important;
     }
 
     #kp-info-box.fade-out #kp-restore-btn {
@@ -742,7 +745,9 @@ header.banner::before {
         visibility: visible;
     }
 
-    #kpDesc { display: none; }
+    #kpDesc, #idesc {
+        display: none !important;
+    }
     #idesc { font-size: 0 !important; }
     #idesc::after {
         content: "KP-IND";
@@ -835,12 +840,11 @@ header.banner::before {
     #forecast-btn::before { content: "📊"; font-size: 20px; }
 
     /* SHOW PLACES -KYTKIN PANEELISSA */
-    .map-toggle-wrapper {
-        position: static !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        margin-top: 5px !important;
+  .map-toggle-wrapper {
+        margin-top: 10px !important;
+        padding: 5px !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+        border-radius: 8px !important;
     }
 
     .toggle-container {
@@ -852,10 +856,11 @@ header.banner::before {
         gap: 4px !important;
     }
 
-    .toggle-label {
-        font-size: 8px !important;
-        text-transform: uppercase;
-        color: #00ffcc;
+   .toggle-label {
+        font-size: 7px !important; /* Erittäin pieni teksti */
+        color: #00ffcc !important;
+        text-align: center !important;
+        width: 100% !important;
     }
 
     .switch {
