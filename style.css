@@ -703,6 +703,10 @@ header.banner::before {
     #container {
         overflow: hidden;
     }
+     .leaflet-top.leaflet-left {
+        top: -25px !important; /* Lasketaan valikon alapuolelle */
+     
+    }
 .info-panel { min-width: auto; }    
 #kpDesc { display: none; }
 #idesc {
