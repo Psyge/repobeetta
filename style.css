@@ -557,18 +557,18 @@ header.banner::before {
     box-shadow: 0 0 25px rgba(0, 255, 204, 0.6);
     transform: scale(1.05); }
 
-#menu-btn {
+/*#menu-btn {
     position: relative; 
-    z-index: 10002 !important; /* Varmistetaan, että on logon ja bannerin päällä */
+    z-index: 10002 !important; 
     color: #00ffcc;
-    font-size: 35px; /* Hieman isompi */
+    font-size: 35px; 
     cursor: pointer !important;
     display: flex;
     align-items: center;
     padding: 10px;
     user-select: none;
     transition: 0.3s;
-}
+}*/
 #menu {
     display: none; 
     position: fixed; 
