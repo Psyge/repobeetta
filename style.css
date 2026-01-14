@@ -601,15 +601,33 @@ header.banner::before {
 }
 
 /* Uusi tyyli menun otsikoille */
+/* Piilotetaan alasvetovalikko oletuksena */
+.dropdown-content {
+    display: none;
+    background: rgba(255, 255, 255, 0.05); /* Hieman eri tausta erottumaan */
+    margin-left: 10px; /* Sisennys, jotta näyttää alavalikolta */
+}
+
+/* Näytetään sisältö, kun hiiri on dropdown-alueen päällä */
+.places-dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Muokataan menu-headeria, jotta se tuntuu interaktiiviselta */
 .menu-header {
-    padding: 15px 20px 5px 20px;
-    font-size: 0.75rem;
-    color: #00ffcc; /* Sama väri kuin hovershadowissa */
+    cursor: default;
+    padding: 12px 20px; /* Samat pehmusteet kuin linkeillä */
+    color: #00ffcc;
+    font-size: 0.8em;
     text-transform: uppercase;
-    letter-spacing: 1px;
     font-weight: bold;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    margin-bottom: 5px;
+    letter-spacing: 1px;
+}
+
+/* Varmistetaan, että alavalikon linkit eivät ole liian isoja */
+.dropdown-content a {
+    padding: 10px 25px !important;
+    font-size: 0.95em;
 }
 
 /* ALKUPERÄISET POPUP-TYYLIT (Nämä vaikuttavat kartan pinneihin) */
