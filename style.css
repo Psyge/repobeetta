@@ -1,19 +1,30 @@
-#mainos-alue {
+#mainos-kontti {
+        position: relative;
         width: 100%;
         max-width: 600px;
-        min-height: 150px;
-        overflow: hidden;
-        /* Pehmeä siirtymä: 0.8 sekuntia */
-        transition: opacity 2s ease-in-out;
-        opacity: 1;
+        height: 200px; /* Säädä mainosten korkeuden mukaan */
+        margin: 0 auto;
     }
 
-    /* Tyyli, jota käytetään vaihdon aikana */
-    .piilossa {
+    .mainos-elementti {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
         opacity: 0;
+        transition: opacity 1.5s ease-in-out; /* Tässä säädät pehmeyden (1.5 sekuntia) */
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
-    #mainos-alue img {
+    .mainos-elementti.aktiivinen {
+        opacity: 1;
+        z-index: 10;
+    }
+
+    .mainos-elementti img {
         max-width: 100%;
         height: auto;
     }
