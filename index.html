@@ -108,10 +108,9 @@
         </div>
     </div>
 <section id="aurora-info" class="aurora-section">
+    <div id="mainos-alue"></div>
    <div id="ads-only" class="ads-img">
-  <a href="https://www.anrdoezrs.net/click-101584868-15877142" target="_top">
-    <img src="https://www.tqlkg.com/image-101584868-15877142" alt="Advertisement" />
-  </a>
+ 
 </div>
     <h2>Northern Lights forecast and real-time aurora map – RepoTracker</h2>
     <p></p>RepoTracker shows the Northern Lights in real time in Finland and the Nordic countries.
@@ -418,5 +417,33 @@ document.addEventListener('DOMContentLoaded', () => {
 <footer>
   <p>© 2026 RepoTracker.fi | <a href="/privacy/">Privacy Policy</a> | <a href="/contact/">Contact</a></p>
 </footer>
+<script>
+    // Tähän listaan voit kopioida mainostajien antamat koodit kokonaisuudessaan
+    const mainokset = [
+        '<a href="https://tc.tradetracker.net/?c=2883&m=1421995&a=504001&r=&u=" target="_blank" rel="sponsored nofollow"><img src="https://ti.tradetracker.net/?c=2883&m=1421995&a=504001&r=&t=html" width="728" height="90" border="0" alt="" /></a>',
+        ' <a href="https://www.anrdoezrs.net/click-101584868-15877142" target="_top">
+    <img src="https://www.tqlkg.com/image-101584868-15877142" alt="Advertisement" />
+  </a>'
+        
+    ];
+
+    let indeksi = 0;
+
+    function vaihdaMainos() {
+        const kohde = document.getElementById("mainos-alue");
+        
+        // Vaihdetaan koko HTML-sisältö listasta
+        kohde.innerHTML = mainokset[indeksi];
+
+        // Lasketaan seuraava indeksi (palataan alkuun listan päätyttyä)
+        indeksi = (indeksi + 1) % mainokset.length;
+    }
+
+    // Vaihtoväli millisekunteina (esim. 7000 ms = 7 sekuntia)
+    setInterval(vaihdaMainos, 7000);
+
+    // Ajetaan funktio heti kerran, jotta ensimmäinen mainos näkyy heti
+    vaihdaMainos();
+</script>    
 </body>
 </html>
