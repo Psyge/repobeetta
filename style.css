@@ -1,18 +1,22 @@
 #mainos-alue {
-    width: 100%;
-    max-width: 600px; /* Säädä mainoksen maksimileveys */
-    min-height: 100px; /* Estää sivun hyppimisen, jos kuva latautuu hitaasti */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-}
+        width: 100%;
+        max-width: 600px;
+        min-height: 150px;
+        overflow: hidden;
+        /* Pehmeä siirtymä: 0.8 sekuntia */
+        transition: opacity 0.8s ease-in-out;
+        opacity: 1;
+    }
 
-#mainos-alue img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-}
+    /* Tyyli, jota käytetään vaihdon aikana */
+    .piilossa {
+        opacity: 0;
+    }
+
+    #mainos-alue img {
+        max-width: 100%;
+        height: auto;
+    }
 .leaflet-popup-content-wrapper {
     background: rgba(10, 15, 25, 0.95) !important;
     color: #fff !important;
