@@ -421,23 +421,31 @@ document.addEventListener('DOMContentLoaded', () => {
         ' <a href="https://www.anrdoezrs.net/click-101584868-15877142" target="_top"><img src="https://www.tqlkg.com/image-101584868-15877142" alt="Advertisement" /></a>'
         ];
 
-    let indeksi = 0;
+   let indeksi = 0;
+const mainosElementti = document.getElementById("mainos-alue");
 
-    function vaihdaMainos() {
-        const kohde = document.getElementById("mainos-alue");
+function vaihdaMainosPehmeasti() {
+    // 1. Aloitetaan häivytys pois (opacity -> 0)
+    mainosElementti.classList.add("piilossa");
+
+    // 2. Odotetaan, että häivytys on valmis (800ms) ennen sisällön vaihtoa
+    setTimeout(() => {
+        mainosElementti.innerHTML = mainokset[indeksi];
         
-        // Vaihdetaan koko HTML-sisältö listasta
-        kohde.innerHTML = mainokset[indeksi];
+        // 3. Tuodaan uusi mainos näkyviin (opacity -> 1)
+        mainosElementti.classList.remove("piilossa");
 
-        // Lasketaan seuraava indeksi (palataan alkuun listan päätyttyä)
+        // Päivitetään indeksi seuraavaa kertaa varten
         indeksi = (indeksi + 1) % mainokset.length;
-    }
+    }, 800); 
+}
 
-    // Vaihtoväli millisekunteina (esim. 7000 ms = 7 sekuntia)
-    setInterval(vaihdaMainos, 5000);
+// Vaihdetaan mainos 7 sekunnin välein
+setInterval(vaihdaMainosPehmeasti, 7000);
 
-    // Ajetaan funktio heti kerran, jotta ensimmäinen mainos näkyy heti
-    vaihdaMainos();
+// Näytetään ensimmäinen mainos heti
+mainosElementti.innerHTML = mainokset[indeksi];
+indeksi++;
 </script>    
 </body>
 </html>
