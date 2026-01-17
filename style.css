@@ -4,7 +4,7 @@
         min-height: 150px;
         overflow: hidden;
         /* Pehmeä siirtymä: 0.8 sekuntia */
-        transition: opacity 0.8s ease-in-out;
+        transition: opacity 2s ease-in-out;
         opacity: 1;
     }
 
