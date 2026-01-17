@@ -108,7 +108,8 @@
         </div>
     </div>
 <section id="aurora-info" class="aurora-section">
-    <div id="mainos-alue"></div>
+    <div id="mainos-kontti">
+    </div>
     <h2>Northern Lights forecast and real-time aurora map – RepoTracker</h2>
     <p></p>RepoTracker shows the Northern Lights in real time in Finland and the Nordic countries.
         The map shows where the Northern Lights are visible right now and in the coming hours.</p>
@@ -421,31 +422,33 @@ document.addEventListener('DOMContentLoaded', () => {
         ' <a href="https://www.anrdoezrs.net/click-101584868-15877142" target="_top"><img src="https://www.tqlkg.com/image-101584868-15877142" alt="Advertisement" /></a>'
         ];
 
-   let indeksi = 0;
-const mainosElementti = document.getElementById("mainos-alue");
+const kontti = document.getElementById("mainos-kontti");
 
-function vaihdaMainosPehmeasti() {
-    // 1. Aloitetaan häivytys pois (opacity -> 0)
-    mainosElementti.classList.add("piilossa");
+// 1. Luodaan jokaiselle mainokselle oma kerros (div)
+mainosKoodit.forEach((koodi, i) => {
+    const div = document.createElement("div");
+    div.className = "mainos-elementti";
+    if (i === 0) div.classList.add("aktiivinen");
+    div.innerHTML = koodi;
+    kontti.appendChild(div);
+});
 
-    // 2. Odotetaan, että häivytys on valmis (800ms) ennen sisällön vaihtoa
-    setTimeout(() => {
-        mainosElementti.innerHTML = mainokset[indeksi];
-        
-        // 3. Tuodaan uusi mainos näkyviin (opacity -> 1)
-        mainosElementti.classList.remove("piilossa");
+let nykyinenIndeksi = 0;
+const elementit = document.querySelectorAll(".mainos-elementti");
 
-        // Päivitetään indeksi seuraavaa kertaa varten
-        indeksi = (indeksi + 1) % mainokset.length;
-    }, 800); 
+function vaihdaMainos() {
+    // Poistetaan nykyiseltä näkyvyys
+    elementit[nykyinenIndeksi].classList.remove("aktiivinen");
+
+    // Lasketaan seuraava
+    nykyinenIndeksi = (nykyinenIndeksi + 1) % elementit.length;
+
+    // Lisätään uudelle näkyvyys
+    elementit[nykyinenIndeksi].classList.add("aktiivinen");
 }
 
-// Vaihdetaan mainos 7 sekunnin välein
-setInterval(vaihdaMainosPehmeasti, 7000);
-
-// Näytetään ensimmäinen mainos heti
-mainosElementti.innerHTML = mainokset[indeksi];
-indeksi++;
+// Vaihtoväli esim. 6 sekuntia
+setInterval(vaihdaMainos, 6000);
 </script>    
 </body>
 </html>
