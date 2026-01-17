@@ -1,3 +1,18 @@
+#mainos-alue {
+    width: 100%;
+    max-width: 600px; /* Säädä mainoksen maksimileveys */
+    min-height: 100px; /* Estää sivun hyppimisen, jos kuva latautuu hitaasti */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+#mainos-alue img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
 .leaflet-popup-content-wrapper {
     background: rgba(10, 15, 25, 0.95) !important;
     color: #fff !important;
