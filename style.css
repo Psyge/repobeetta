@@ -1,3 +1,10 @@
+.leaflet-popup-tip {
+ 
+    border: 1px solid rgba(0, 255, 204, 0.3);
+}
+
+user agent stylesheet
+di
 #mainos-kontti {
         position: relative;
         width: 100%;
