@@ -41,10 +41,11 @@
 
     // layerGroup oikein
     if (markersLayer) {
-      markersLayer.clearLayers();
-    } else {
-      markersLayer = L.layerGroup().addTo(map);
-    }
+    markersLayer.clearLayers();
+} else {
+    // Luodaan ryhmä, mutta EI lisätä sitä kartalle (addTo(map) poistettu)
+    markersLayer = L.layerGroup(); 
+}
 
     places.forEach(place => {
       const customIcon = L.divIcon({
