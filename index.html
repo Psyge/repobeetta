@@ -370,6 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Show Places -kytkimen toiminta
     if (placesToggle) {
+        L.DomEvent.disableClickPropagation(placesToggle);
         placesToggle.addEventListener('change', function() {
             if (typeof window.togglePlaces === 'function') {
                 window.togglePlaces(this.checked, map);
