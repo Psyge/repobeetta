@@ -280,7 +280,7 @@ let probability = Math.min((score / 4) * 100, 100);
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; border-top: 1px solid #333; padding-top: 10px;">
         <div style="text-align: left;">
             <div style="font-size: 9px; color: #888;">AURORA</div>
-            <div style="font-size: 14px; font-weight: bold; color: #fff;">✨ ${auroraIntensity.toFixed(1)}</div>
+            <div style="font-size: 14px; font-weight: bold; color: #fff;">✨ ${auroraIntensity.toFixed(1)} / 100</div>
         </div>
         <div style="text-align: right;">
             <div style="font-size: 9px; color: #888;">CLOUDS</div>
