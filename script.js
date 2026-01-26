@@ -274,9 +274,9 @@ async function showAuroraPopup(lat, lon, marker = null, showGoogleMapsLink = tru
   // 4. Status-värit ja tekstit
   let statusEmoji = '🔴', statusText = 'Low chance', statusColor = '#ff3366';
 
-  if (finalProbability >= 60) {
+  if (finalProbability >= 70) {
     statusEmoji = '🟢'; statusText = 'High chance!'; statusColor = '#00ffcc';
-  } else if (finalProbability >= 20) {
+  } else if (finalProbability >= 30) {
     statusEmoji = '🟡'; statusText = 'Moderate chance'; statusColor = '#ffcc00';
   }
 
