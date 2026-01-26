@@ -248,6 +248,7 @@ async function showAuroraPopup(lat, lon, marker = null, showGoogleMapsLink = tru
   // Sää (pilvisyys)
   const weather = await getWeather(lat, lon);
   const clouds = weather ? weather.clouds : 100;
+  const source = weather ? weather.source : 'Unknown';
   if (clouds < 30) score += 2;
   else if (clouds < 60) score += 1;
 
@@ -287,6 +288,9 @@ let probability = Math.min((score / 4) * 100, 100);
             <div style="font-size: 14px; font-weight: bold; color: #fff;">☁️ ${clouds}%</div>
         </div>
         </div>
+        <div style="font-size: 8px; color: #555; margin-top: 10px; text-align: center;">
+        Data source: ${source}
+    </div>
         </div>
   `;
 
