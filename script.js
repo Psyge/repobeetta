@@ -25,7 +25,8 @@ async function getWeather(lat, lon) {
       wind: data.wind.speed,
       desc: data.weather[0]?.description ?? '',
       icon: data.weather[0]?.icon ?? '01d',
-      clouds: data.clouds?.all ?? 100
+      clouds: data.clouds?.all ?? 100,
+      source: data.source || 'OpenWeather'
     };
   } catch (err) {
     console.error('Weather fetch error:', err);
