@@ -242,8 +242,29 @@ async function showAuroraPopup(lat, lon, marker = null, showGoogleMapsLink = tru
       if (dist < minDist) { minDist = dist; nearest = intensity; }
     });
     auroraIntensity = nearest || 0;
-    if (auroraIntensity > 60) score += 2;
-    else if (auroraIntensity > 30) score += 1;
+    if (auroraIntensity > 50) score += 3;
+    else if (auroraIntensity > 20) score += 2;
+    else if (auroraIntensity > 5) score += 1;
+  }
+
+  // 2. Sää (pilvisyys)
+  const weather = await getWeather(lat, lon);
+  const clouds = weather ? weather.clouds : 100;
+  const source = weather ? weather.source : 'Unknown';
+
+  // Sää antaa pisteitä VAIN jos intensiteettiä on edes vähän (auroraIntensity > 2)
+  // Tai sää voi toimia kertoimena
+  if (auroraIntensity > 2) {
+    if (clouds < 20) score += 2;
+    else if (clouds < 50) score += 1;
+  }
+
+  // 3. Lasketaan prosentti (nyt asteikolla 0-5)
+  // Jos score on 0, prob on 0%. Jos score on 5, prob on 100%.
+  let probability = Math.min((score / 5) * 100, 100);
+
+  // Jos intensiteetti on täysin nolla, pakotetaan prosentti alas
+  if (auroraIntensity < 1) probability = 0;
   }
 
   // Sää (pilvisyys)
