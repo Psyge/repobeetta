@@ -224,7 +224,6 @@ async function openPlaceFromUrlParam() {
 // Auroran mahdollisuus -popup valitusta
 // ---------------------------------------
 async function showAuroraPopup(lat, lon, marker = null, showGoogleMapsLink = true) {
-  let score = 0;
   let auroraIntensity = 0;
 
   // 1. Haetaan revontulien intensiteetti (Ovation-data)
@@ -234,53 +233,64 @@ async function showAuroraPopup(lat, lon, marker = null, showGoogleMapsLink = tru
       let pointLon = p[0] < 0 ? p[0] + 360 : p[0];
       const pointLat = p[1], intensity = p[2];
       const dist = Math.hypot(pointLat - lat, Math.abs(pointLon - lon));
-      if (dist < minDist) { minDist = dist; nearest = intensity; }
+      if (dist < minDist) {
+        minDist = dist;
+        nearest = intensity;
+      }
     });
     auroraIntensity = nearest || 0;
-
-    // Intensiteettipisteet (max 3)
-    if (auroraIntensity > 50) score += 3;
-    else if (auroraIntensity > 20) score += 2;
-    else if (auroraIntensity > 5) score += 1;
   }
 
-  // 2. Haetaan sää uuden Workerin kautta
+  // 2. Haetaan sää uuden Workerin kautta (FMI tai OpenWeather)
   const weather = await getWeather(lat, lon);
   const clouds = weather ? weather.clouds : 100;
   const source = weather ? weather.source : 'Unknown';
+  const temp = weather ? weather.temp : 'N/A';
 
-  // Sääpisteet (max 2) - Annetaan vain jos on edes vähän revontuliaktiivisuutta
-  if (auroraIntensity > 2) {
-    if (clouds < 20) score += 2;
-    else if (clouds < 50) score += 1;
+  // 3. LASKENTALOGIIKKA (Kerroin-malli)
+  
+  // A. Teoreettinen potentiaali (0-100%)
+  // Skaalataan intensiteetti 0-50 välillä siten, että 50+ on täysi 100% potentiaali
+  let baseProbability = Math.min((auroraIntensity / 50) * 100, 100);
+  
+  // B. Pilvikerroin (Näkyvyys)
+  // 0% pilviä = 1.0 (täysi näkyvyys), 100% pilviä = 0.0 (nolla näkyvyys)
+  let cloudVisibility = (100 - clouds) / 100;
+  
+  // C. Lopullinen todennäköisyys
+  // Kerrotaan potentiaali näkyvyydellä. Esim. 80% potentiaali * 0.5 (puolipilvinen) = 40%
+  let finalProbability = Math.round(baseProbability * cloudVisibility);
+
+  // D. Pakotetut kynnykset realistisuuden vuoksi
+  if (clouds > 85) {
+    // Jos on lähes täyspilvistä, revontulia on lähes mahdoton nähdä
+    finalProbability = Math.min(finalProbability, 5);
+  }
+  if (auroraIntensity < 2) {
+    // Jos aktiivisuutta ei ole nimeksikään, prosentti on nolla
+    finalProbability = 0;
   }
 
-  // 3. Lasketaan todennäköisyys (asteikko 0-5)
-  let probability = Math.min((score / 5) * 100, 100);
-  
-  // Jos intensiteetti on lähellä nollaa, mahdollisuus on nolla
-  if (auroraIntensity < 1) probability = 0;
-
-  // 4. Liikennevalostatus
+  // 4. Status-värit ja tekstit
   let statusEmoji = '🔴', statusText = 'Low chance', statusColor = '#ff3366';
 
-  if (probability >= 70) { 
-      statusEmoji = '🟢'; statusText = 'High chance!'; statusColor = '#00ffcc'; 
-  } else if (probability >= 30) { 
-      statusEmoji = '🟡'; statusText = 'Moderate chance'; statusColor = '#ffcc00'; 
+  if (finalProbability >= 60) {
+    statusEmoji = '🟢'; statusText = 'High chance!'; statusColor = '#00ffcc';
+  } else if (finalProbability >= 20) {
+    statusEmoji = '🟡'; statusText = 'Moderate chance'; statusColor = '#ffcc00';
   }
 
-  // 5. Rakennetaan Popup-sisältö
+  // 5. Popup-sisältö
   let popupContent = `
     <div style="text-align: center; font-family: 'Arial', sans-serif; min-width: 200px; padding: 5px;">
       <div style="font-size: 10px; text-transform: uppercase; color: #888; letter-spacing: 1px; margin-bottom: 2px;">Chance now</div>
-      <div style="font-size: 36px; font-weight: 900; color: ${statusColor}; margin: 0; line-height: 1;">${probability}%</div>
+      <div style="font-size: 36px; font-weight: 900; color: ${statusColor}; margin: 0; line-height: 1;">${finalProbability}%</div>
       <div style="font-size: 14px; font-weight: bold; color: ${statusColor}; margin-top: 5px; text-transform: uppercase;">
           ${statusEmoji} ${statusText}
       </div>
 
       <div style="width: 100%; height: 6px; background: #333; border-radius: 10px; margin: 15px 0;">
-          <div style="width: ${probability}%; height: 100%; background: ${statusColor}; border-radius: 10px; box-shadow: 0 0 8px ${statusColor}77;"></div>
+          <div style="width: ${finalProbability}%; height: 100%; background: ${statusColor}; border-radius: 10px; box-shadow: 0 0 8px ${statusColor}77;"></div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; border-top: 1px solid #333; padding-top: 10px;">
@@ -305,12 +315,12 @@ async function showAuroraPopup(lat, lon, marker = null, showGoogleMapsLink = tru
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; border-top: 1px solid #333; padding-top: 5px;">
         <div style="text-align: left;">
             <div style="font-size: 9px; color: #888;">TEMP</div>
-            <div style="font-size: 14px; font-weight: bold; color: #fff;">🌡️ ${weather ? weather.temp + '°C' : 'N/A'}</div>
+            <div style="font-size: 14px; font-weight: bold; color: #fff;">🌡️ ${temp}°C</div>
         </div>
         <div style="text-align: right;">
             <div style="font-size: 9px; color: #888;">MAPS</div>
             <div style="font-size: 14px;">
-                <a href="https://www.google.com/maps?q=${lat},${lon}" target="_blank" style="text-decoration: none; color: #00ffcc;">📍 Open</a>
+                <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}" target="_blank" style="text-decoration: none; color: #00ffcc;">📍 Open</a>
             </div>
         </div>
       </div>`;
@@ -323,9 +333,6 @@ async function showAuroraPopup(lat, lon, marker = null, showGoogleMapsLink = tru
     L.popup().setLatLng([lat, lon]).setContent(popupContent).openOn(map);
   }
 }
-// ------------------------
-// UI-painikkeiden init
-// ------------------------
 
 
 function initButtons() {
