@@ -220,11 +220,6 @@ async function openPlaceFromUrlParam() {
   existing.openPopup();
 }
 
-
-
-
-
-
 // ---------------------------------------
 // Auroran mahdollisuus -popup valitusta
 // ---------------------------------------
@@ -232,7 +227,7 @@ async function showAuroraPopup(lat, lon, marker = null, showGoogleMapsLink = tru
   let score = 0;
   let auroraIntensity = 0;
 
-  // Lähin piste intensiteeteistä
+  // 1. Haetaan revontulien intensiteetti (Ovation-data)
   if (currentData && Array.isArray(currentData.coordinates)) {
     let nearest = null, minDist = Infinity;
     currentData.coordinates.forEach((p) => {
@@ -242,99 +237,92 @@ async function showAuroraPopup(lat, lon, marker = null, showGoogleMapsLink = tru
       if (dist < minDist) { minDist = dist; nearest = intensity; }
     });
     auroraIntensity = nearest || 0;
+
+    // Intensiteettipisteet (max 3)
     if (auroraIntensity > 50) score += 3;
     else if (auroraIntensity > 20) score += 2;
     else if (auroraIntensity > 5) score += 1;
   }
 
-  // 2. Sää (pilvisyys)
+  // 2. Haetaan sää uuden Workerin kautta
   const weather = await getWeather(lat, lon);
   const clouds = weather ? weather.clouds : 100;
   const source = weather ? weather.source : 'Unknown';
 
-  // Sää antaa pisteitä VAIN jos intensiteettiä on edes vähän (auroraIntensity > 2)
-  // Tai sää voi toimia kertoimena
+  // Sääpisteet (max 2) - Annetaan vain jos on edes vähän revontuliaktiivisuutta
   if (auroraIntensity > 2) {
     if (clouds < 20) score += 2;
     else if (clouds < 50) score += 1;
   }
 
-  // 3. Lasketaan prosentti (nyt asteikolla 0-5)
-  // Jos score on 0, prob on 0%. Jos score on 5, prob on 100%.
+  // 3. Lasketaan todennäköisyys (asteikko 0-5)
   let probability = Math.min((score / 5) * 100, 100);
-
-  // Jos intensiteetti on täysin nolla, pakotetaan prosentti alas
+  
+  // Jos intensiteetti on lähellä nollaa, mahdollisuus on nolla
   if (auroraIntensity < 1) probability = 0;
+
+  // 4. Liikennevalostatus
+  let statusEmoji = '🔴', statusText = 'Low chance', statusColor = '#ff3366';
+
+  if (probability >= 70) { 
+      statusEmoji = '🟢'; statusText = 'High chance!'; statusColor = '#00ffcc'; 
+  } else if (probability >= 30) { 
+      statusEmoji = '🟡'; statusText = 'Moderate chance'; statusColor = '#ffcc00'; 
   }
 
-  // Sää (pilvisyys)
-  const weather = await getWeather(lat, lon);
-  const clouds = weather ? weather.clouds : 100;
-  const source = weather ? weather.source : 'Unknown';
-  if (clouds < 30) score += 2;
-  else if (clouds < 60) score += 1;
-
-  // Liikennevalostatus
-  let statusEmoji = '🔴', statusText = 'Low chance';
-    let statusColor = '#ff3366'; // Oletus: Punainen
-
-    if (score >= 3) { 
-        statusEmoji = '🟢'; 
-        statusText = 'High chance!'; 
-        statusColor = '#00ffcc'; 
-    } else if (score === 2) { 
-        statusEmoji = '🟡'; 
-        statusText = 'Moderate chance'; 
-        statusColor = '#ffcc00'; 
-    }
-let probability = Math.min((score / 4) * 100, 100);
+  // 5. Rakennetaan Popup-sisältö
   let popupContent = `
     <div style="text-align: center; font-family: 'Arial', sans-serif; min-width: 200px; padding: 5px;">
-    <div style="font-size: 10px; text-transform: uppercase; color: #888; letter-spacing: 1px; margin-bottom: 2px;">Chance now</div>
-    <div style="font-size: 36px; font-weight: 900; color: ${statusColor}; margin: 0; line-height: 1;">${probability}%</div>
-    <div style="font-size: 14px; font-weight: bold; color: ${statusColor}; margin-top: 5px; text-transform: uppercase;">
-        ${statusEmoji} ${statusText}
-    </div>
+      <div style="font-size: 10px; text-transform: uppercase; color: #888; letter-spacing: 1px; margin-bottom: 2px;">Chance now</div>
+      <div style="font-size: 36px; font-weight: 900; color: ${statusColor}; margin: 0; line-height: 1;">${probability}%</div>
+      <div style="font-size: 14px; font-weight: bold; color: ${statusColor}; margin-top: 5px; text-transform: uppercase;">
+          ${statusEmoji} ${statusText}
+      </div>
 
-    <div style="width: 100%; height: 6px; background: #333; border-radius: 10px; margin: 15px 0;">
-        <div style="width: ${probability}%; height: 100%; background: ${statusColor}; border-radius: 10px; box-shadow: 0 0 8px ${statusColor}77;"></div>
-    </div>
+      <div style="width: 100%; height: 6px; background: #333; border-radius: 10px; margin: 15px 0;">
+          <div style="width: ${probability}%; height: 100%; background: ${statusColor}; border-radius: 10px; box-shadow: 0 0 8px ${statusColor}77;"></div>
+      </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; border-top: 1px solid #333; padding-top: 10px;">
-        <div style="text-align: left;">
-            <div style="font-size: 9px; color: #888;">AURORA</div>
-            <div style="font-size: 14px; font-weight: bold; color: #fff;">✨ ${auroraIntensity.toFixed(1)} / 100</div>
-        </div>
-        <div style="text-align: right;">
-            <div style="font-size: 9px; color: #888;">CLOUDS</div>
-            <div style="font-size: 14px; font-weight: bold; color: #fff;">☁️ ${clouds}%</div>
-        </div>
-        </div>
-        <div style="font-size: 8px; color: #555; margin-top: 10px; text-align: center;">
-        Data source: ${source}
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; border-top: 1px solid #333; padding-top: 10px;">
+          <div style="text-align: left;">
+              <div style="font-size: 9px; color: #888;">AURORA</div>
+              <div style="font-size: 14px; font-weight: bold; color: #fff;">✨ ${auroraIntensity.toFixed(1)} / 100</div>
+          </div>
+          <div style="text-align: right;">
+              <div style="font-size: 9px; color: #888;">CLOUDS</div>
+              <div style="font-size: 14px; font-weight: bold; color: #fff;">☁️ ${clouds}%</div>
+          </div>
+      </div>
+      
+      <div style="font-size: 8px; color: #555; margin-top: 10px; text-align: center;">
+          Data source: ${source}
+      </div>
     </div>
-        </div>
   `;
 
   if (showGoogleMapsLink) {
-    popupContent += `<br><div style="text-align: left;">
+    popupContent += `
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; border-top: 1px solid #333; padding-top: 5px;">
+        <div style="text-align: left;">
             <div style="font-size: 9px; color: #888;">TEMP</div>
             <div style="font-size: 14px; font-weight: bold; color: #fff;">🌡️ ${weather ? weather.temp + '°C' : 'N/A'}</div>
-        </div><br>
-      <div style="text-align: right;">
+        </div>
+        <div style="text-align: right;">
             <div style="font-size: 9px; color: #888;">MAPS</div>
             <div style="font-size: 14px;">
-                <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}" target="_blank" style="text-decoration: none;">📍 Open</a>
-            </div>`;
+                <a href="https://www.google.com/maps?q=${lat},${lon}" target="_blank" style="text-decoration: none; color: #00ffcc;">📍 Open</a>
+            </div>
+        </div>
+      </div>`;
   }
 
+  // 6. Näytetään popup
   if (marker) {
     marker.setLatLng([lat, lon]).bindPopup(popupContent).openPopup();
   } else {
     L.popup().setLatLng([lat, lon]).setContent(popupContent).openOn(map);
   }
 }
-
 // ------------------------
 // UI-painikkeiden init
 // ------------------------
