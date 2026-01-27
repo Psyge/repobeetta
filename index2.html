@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RepoTracker - Revontuliennuste & Seuranta</title>
+    <link rel="icon" href="iconi.png">
+    
+    <style>
+        :root {
+            --neon-green: #00ffcc;
+            --dark-bg: #0a111a;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --transition: 0.3s ease;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--dark-bg);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* HEADER & NAV */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background: rgba(0, 0, 0, 0.9);
+            border-bottom: 1px solid var(--neon-green);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .menu-trigger { font-size: 28px; cursor: pointer; color: var(--neon-green); }
+        .logo { height: 35px; }
+        .search-trigger { font-size: 22px; cursor: pointer; color: var(--neon-green); }
+
+        /* SIDE MENU */
+        #side-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 260px;
+            height: 100%;
+            background: #0d1621;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+            transition: var(--transition);
+            z-index: 2000;
+            padding: 30px 20px;
+        }
+        #side-menu.open { left: 0; }
+        .close-btn { text-align: right; font-size: 30px; cursor: pointer; color: var(--neon-green); }
+        .nav-links { display: flex; flex-direction: column; gap: 25px; margin-top: 40px; }
+        .nav-links a { color: white; text-decoration: none; font-size: 1.1rem; font-weight: 500; }
+        .nav-links a:hover { color: var(--neon-green); }
+        .menu-social { margin-top: auto; padding-top: 50px; display: flex; gap: 20px; }
+        .menu-social img { width: 30px; opacity: 0.8; }
+
+        /* SEARCH BAR */
+        #search-container {
+            display: none;
+            padding: 20px;
+            background: #111;
+            text-align: center;
+            border-bottom: 1px solid #222;
+        }
+        #search-container input {
+            width: 70%;
+            padding: 12px 20px;
+            border-radius: 25px;
+            border: 1px solid var(--neon-green);
+            background: #000;
+            color: white;
+            outline: none;
+        }
+        #search-container button {
+            padding: 12px 20px;
+            border-radius: 25px;
+            border: none;
+            background: var(--neon-green);
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        /* LOCATIONS GRID */
+        .locations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .place-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(0, 255, 204, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: var(--transition);
+        }
+        .place-card:hover { border-color: var(--neon-green); transform: translateY(-5px); }
+        .place-card h2 { margin: 0; font-size: 1.4rem; color: var(--neon-green); }
+        .kp-value { font-size: 2.8rem; font-weight: bold; margin: 15px 0; color: white; }
+        .place-meta { display: flex; justify-content: space-around; font-size: 0.9rem; opacity: 0.8; }
+
+        /* MAP CTA */
+        .cta-section { text-align: center; padding: 40px 20px; }
+        .map-btn {
+            display: inline-block;
+            background: var(--neon-green);
+            color: black;
+            padding: 18px 45px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+            transition: var(--transition);
+        }
+        .map-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(0, 255, 204, 0.5); }
+
+        /* CONTENT AREA */
+        .info-section {
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            line-height: 1.7;
+        }
+        .info-section h2 { color: var(--neon-green); margin-top: 40px; }
+        .faq-item { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 50px 20px;
+            border-top: 1px solid #222;
+            margin-top: 50px;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        /* MOBILE OPTIMIZATION */
+        @media (max-width: 600px) {
+            #search-container input { width: 90%; margin-bottom: 10px; }
+            .locations-grid { padding: 20px 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="side-menu">
+        <div class="close-btn" onclick="toggleMenu()">×</div>
+        <nav class="nav-links">
+            <a href="index.html">Live Map</a>
+            <a href="/info/faq/">FAQ - Tietoa revontulista</a>
+            <a href="/info/places/">Suositut katselupaikat</a>
+            <a href="/info/contact/">Ota yhteyttä</a>
+            <a href="/info/privacy/">Tietosuojaseloste</a>
+        </nav>
+        <div class="menu-social">
+            <a href="https://instagram.com/repotracker_" target="_blank"><img src="ig-icon.png" alt="Instagram"></a>
+            <a href="https://www.tiktok.com/@repotracker" target="_blank"><img src="tiktok.png" alt="TikTok"></a>
+        </div>
+    </div>
+
+    <header>
+        <div class="header-left">
+            <div class="menu-trigger" onclick="toggleMenu()">☰</div>
+            <img src="repo-neon.png" alt="RepoTracker" class="logo">
+        </div>
+        <div class="search-trigger" onclick="toggleSearch()">🔍</div>
+    </header>
+
+    <div id="search-container">
+        <input type="text" id="city-input" placeholder="Syötä paikkakunta (esim. Levi)...">
+        <button onclick="handleSearch()">Hae</button>
+        <div id="search-results-box"></div>
+    </div>
+
+    <main>
+        <div class="locations-grid">
+            <div class="place-card">
+                <h2>Rovaniemi</h2>
+                <div class="kp-value">3.2</div>
+                <div class="place-meta">
+                    <span>☁️ 12%</span>
+                    <span>🌡️ -12°C</span>
+                </div>
+            </div>
+            <div class="place-card">
+                <h2>Levi</h2>
+                <div class="kp-value">2.8</div>
+                <div class="place-meta">
+                    <span>☁️ 45%</span>
+                    <span>🌡️ -15°C</span>
+                </div>
+            </div>
+            <div class="place-card">
+                <h2>Utsjoki</h2>
+                <div class="kp-value">4.0</div>
+                <div class="place-meta">
+                    <span>☁️ 5%</span>
+                    <span>🌡️ -18°C</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="cta-section">
+            <a href="index.html" class="map-btn">AVAA REAALIAIKAINEN KARTTA</a>
+        </div>
+
+        <section class="info-section">
+            <h2>Revontuliennuste ja seuranta Suomessa</h2>
+            <p>RepoTracker on revontuliharrastajien kehittämä palvelu, joka yhdistää reaaliaikaisen geomagneettisen datan ja paikalliset sääennusteet. Meidän tavoitteenamme on tehdä revontulien bongaamisesta mahdollisimman helppoa niin aloittelijoille kuin kokeneille kuvaajille.</p>
+
+            <div class="faq-item">
+                <strong>Miten luen ennustetta?</strong><br>
+                KP-indeksi kertoo magneettisen aktiivisuuden tason. Mitä korkeampi luku, sitä etelämpänä loimuja voi näkyä. Muista aina tarkistaa myös pilvisyys!
+            </div>
+
+            <div class="faq-item">
+                <strong>Päivittyvätkö tiedot automaattisesti?</strong><br>
+                Kyllä, RepoTracker hakee uusimmat KP-arvot NOAA:n palvelimelta ja yhdistää ne tarkkoihin pilvisyysennusteisiin.
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2026 RepoTracker.fi | Seuraa revontulia reaaliajassa</p>
+        <div style="margin-top: 10px;">
+            <a href="/privacy/" style="color: #666; text-decoration: none;">Privacy Policy</a> | 
+            <a href="/contact/" style="color: #666; text-decoration: none;">Contact</a>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('side-menu').classList.toggle('open');
+        }
+
+        function toggleSearch() {
+            const search = document.getElementById('search-container');
+            search.style.display = (search.style.display === 'block') ? 'none' : 'block';
+        }
+
+        async function handleSearch() {
+            const city = document.getElementById('city-input').value;
+            if (!city) return;
+            
+            // Tässä kohtaa voit käyttää aiemmin sovittua Nominatim API -hakua
+            alert("Haetaan ennustetta kohteelle: " + city);
+            // Myöhemmin: fetchAuroraData(city);
+        }
+
+        // Tähän voit lisätä automaattisen KP-arvojen haun script.js-tiedostostasi
+    </script>
+</body>
+</html>
