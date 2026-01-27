@@ -213,6 +213,36 @@ footer a:hover { color: white; }
     .data-item .value { font-size: 0.95rem; }
     #search-container input { width: 85%; }
 }
+        .list-header {
+    max-width: 800px;
+    margin: 40px auto 10px;
+    padding: 0 15px;
+    text-align: left; /* Yr.no-tyylinen vasen tasaus */
+}
+
+.list-header h1 {
+    font-size: 1.6rem;
+    color: var(--neon-green);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.list-header p {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-top: 0;
+}
+
+/* Mobiiliviilaus otsikolle */
+@media (max-width: 600px) {
+    .list-header h1 {
+        font-size: 1.3rem;
+    }
+    .list-header p {
+        font-size: 0.85rem;
+    }
+}
     </style>
 </head>
 <body>
@@ -247,6 +277,10 @@ footer a:hover { color: white; }
     </div>
 
     <main>
+        <div class="list-header">
+    <h1>Revontuliennuste nyt</h1>
+    <p>Seuraa suosituimpien kohteiden tilannetta reaaliajassa.</p>
+</div>
        <div class="locations-list">
     <div class="place-row">
         <div class="place-name">Rovaniemi</div>
