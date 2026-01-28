@@ -7,12 +7,13 @@
     <link rel="icon" href="iconi.png">
     
     <style>
-       :root {
+ :root {
     --neon-green: #00ffcc;
-    --dark-bg: #0a111a;
+    --dark-bg: #0a111a; /* Sama väri koko sivulle */
     --card-bg: rgba(255, 255, 255, 0.05);
     --transition: 0.3s ease;
     --text-muted: rgba(255, 255, 255, 0.6);
+    --border-dim: rgba(0, 255, 204, 0.15); /* Himmeä viiva */
 }
 
 body {
@@ -30,11 +31,10 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px;
-    background: rgba(0, 0, 0, 0.9);
-    border-bottom: 1px solid var(--neon-green);
-    position: sticky;
-    top: 0;
+    padding: 20px 25px;
+    background: var(--dark-bg); /* Sama kuin tausta */
+    border-bottom: 1px solid var(--border-dim); /* Himmeä viiva */
+    position: relative; /* Ei enää sticky/fixed */
     z-index: 1000;
 }
 
@@ -264,7 +264,7 @@ footer a:hover { color: white; }
 
     <header>
         <div class="header-left">
-            <div class="menu-trigger" onclick="toggleMenu()">☰</div>
+            <div class="menu-trigger" onclick="toggleMenu()">☰ MENU</div>
             <img src="repo-neon.png" alt="RepoTracker" class="logo">
         </div>
         <div class="search-trigger" onclick="toggleSearch()">🔍</div>
