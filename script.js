@@ -378,16 +378,19 @@ function initButtons() {
     });
 
   // 2) Kontit (menu, forecastPopup, helpPopup): EI preventDefault
-  [menu, forecastPopup, helpPopup]
+[menu, forecastPopup, helpPopup]
     .filter(Boolean)
     .forEach(el => {
-      el.addEventListener('click', (e) => {
-        e.stopPropagation();
-      });
-      if (typeof L !== 'undefined') {
-        L.DomEvent.disableClickPropagation(el);
-        L.DomEvent.disableScrollPropagation(el);
-      }
+        el.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        // TÄMÄ OSA ON KRIITTINEN:
+        // Tarkistetaan, onko Leaflet (L) ladattu, ennen kuin kutsutaan sen metodeja
+        if (typeof L !== 'undefined' && L.DomEvent) {
+            L.DomEvent.disableClickPropagation(el);
+            L.DomEvent.disableScrollPropagation(el);
+        }
     });
 
   // 3) Menun linkit: navigoivat
