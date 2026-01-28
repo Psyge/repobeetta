@@ -747,7 +747,7 @@ async function updateFrontPageForecasts() {
     const featuredPlaces = [
         { id: 'rovaniemi', lat: 66.5039, lon: 25.7282 },
         { id: 'levi', lat: 67.8040, lon: 24.8082 },
-        { id: 'utsjoki', lat: 69.9089, lon: 27.0288 }
+        { id: 'saariselka', lat: 68.4202, lon: 27.4141 }
     ];
 
     console.log("Päivitetään etusivun kohteet...");
