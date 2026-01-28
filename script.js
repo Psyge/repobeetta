@@ -738,42 +738,100 @@ async function fetchAuroraForecast() {
     }
   }
 }
+// ==========================================
+// ETUSIVUN LISTAN PÄIVITYS (index2.html)
+// ==========================================
 
+async function updateFrontPageForecasts() {
+    // Määritellään paikat, jotka halutaan listalle (varmista että ID:t täsmäävät HTML:ään)
+    const featuredPlaces = [
+        { id: 'rovaniemi', lat: 66.5039, lon: 25.7282 },
+        { id: 'levi', lat: 67.8040, lon: 24.8082 },
+        { id: 'utsjoki', lat: 69.9089, lon: 27.0288 }
+    ];
+
+    console.log("Päivitetään etusivun kohteet...");
+
+    // 1. Haetaan KP-data NOAA:lta (käytetään jo olemassa olevaa logiikkaasi)
+    let currentKp = "--";
+    try {
+        const kpRes = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json');
+        const kpData = await kpRes.json();
+        if (kpData && kpData.length > 1) {
+            currentKp = parseFloat(kpData[kpData.length - 1][1]).toFixed(1);
+        }
+    } catch (e) { console.error("KP-haku listalle epäonnistui", e); }
+
+    // 2. Päivitetään jokainen rivi
+    for (const place of featuredPlaces) {
+        const row = document.getElementById(`row-${place.id}`);
+        if (!row) continue;
+
+        // Käytetään sinun omaa getWeather-funktiotasi
+        const weather = await getWeather(place.lat, place.lon);
+        
+        if (weather) {
+            // Päivitetään KP
+            const kpEl = row.querySelector('.kp-val');
+            if (kpEl) {
+                kpEl.innerText = currentKp;
+                // Väritys sinun logiikallasi
+                kpEl.style.color = currentKp >= 5 ? "#ff3366" : (currentKp >= 3 ? "#ffcc00" : "#00ffcc");
+            }
+
+            // Päivitetään pilvet
+            const cloudEl = row.querySelector('.cloud-val');
+            if (cloudEl) cloudEl.innerText = weather.clouds + "%";
+
+            // Päivitetään lämpötila
+            const tempEl = row.querySelector('.temp-val');
+            if (tempEl) tempEl.innerText = weather.temp + "°C";
+        }
+    }
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // 1) UI-napit (menu, help-popup, forecast, locate, jne.) AINA
-  if (typeof initButtons === 'function') {
-    try { initButtons(); } catch (e) { console.error('initButtons error:', e); }
-  }
-
-  // 2) Kartta vain jos #map löytyy ja Leaflet on ladattu
-  const hasMap = !!document.getElementById('map');
-  const leafletLoaded = (typeof L !== 'undefined');
-
-  if (hasMap && leafletLoaded && typeof initAppMap === 'function') {
-    try { 
-      await initAppMap(); 
-      
-      // --- LISÄTTY TÄMÄ OSA ---
-      // Kun kartta on alustettu (await valmis), pakotetaan koon tunnistus
-      // Tämä poistaa hyppimisen ja varmistaa, että kartta täyttää ruudun
-      setTimeout(() => {
-        if (typeof map !== 'undefined' && map) {
-          map.invalidateSize();
-          console.log("Kartan koko vakautettu latauksen jälkeen.");
-        }
-      }, 300);
-      // -------------------------
-
-    } catch (e) { console.error('initAppMap error:', e); }
-  }
-
-  // 3) Globaali koonmuutos-kuuntelija (varmistus mobiilikääntöihin)
-  window.addEventListener('resize', () => {
-    if (typeof map !== 'undefined' && map) {
-      map.invalidateSize();
+    // 1) UI-napit (hampurilaisvalikko jne.) - Suoritetaan aina jos funktio on olemassa
+    if (typeof initButtons === 'function') {
+        try { initButtons(); } catch (e) { console.error('initButtons error:', e); }
     }
-  });
+
+    // 2) TARKISTUS: Ollaanko ETUSIVULLA (index2.html)?
+    // Jos sivulta löytyy .locations-list, päivitetään sää- ja KP-tiedot riveihin
+    if (document.querySelector('.locations-list')) {
+        console.log("Etusivu tunnistettu, päivitetään listatiedot...");
+        if (typeof updateFrontPageForecasts === 'function') {
+            updateFrontPageForecasts();
+            // Päivitä automaattisesti 15 min välein
+            setInterval(updateFrontPageForecasts, 900000);
+        }
+    }
+
+    // 3) TARKISTUS: Ollaanko KARTTASIVULLA (index.html)?
+    const hasMap = !!document.getElementById('map');
+    const leafletLoaded = (typeof L !== 'undefined');
+
+    if (hasMap && leafletLoaded && typeof initAppMap === 'function') {
+        try { 
+            await initAppMap(); 
+            
+            // Kartan koon vakautus (estää tyhjät alueet ja hyppimisen)
+            setTimeout(() => {
+                if (typeof map !== 'undefined' && map) {
+                    map.invalidateSize();
+                    console.log("Kartan koko vakautettu latauksen jälkeen.");
+                }
+            }, 300);
+        } catch (e) { console.error('initAppMap error:', e); }
+    }
+
+    // 4) GLOBAALIT KUUNTELIJAT
+    // Varmistetaan kartan skaalautuvuus mobiilikäännöissä
+    window.addEventListener('resize', () => {
+        if (typeof map !== 'undefined' && map) {
+            map.invalidateSize();
+        }
+    });
 });
 
 
