@@ -738,55 +738,69 @@ async function fetchAuroraForecast() {
     }
   }
 }
-// ==========================================
-// ETUSIVUN LISTAN PÄIVITYS (index2.html)
-// ==========================================
+
 
 async function updateFrontPageForecasts() {
-    // Määritellään paikat, jotka halutaan listalle (varmista että ID:t täsmäävät HTML:ään)
-    const featuredPlaces = [
-        { id: 'rovaniemi', lat: 66.5039, lon: 25.7282 },
-        { id: 'levi', lat: 67.8040, lon: 24.8082 },
-        { id: 'saariselka', lat: 68.4202, lon: 27.4141 }
+    const allPossiblePlaces = [
+        { id: 'rovaniemi', name: 'Rovaniemi', lat: 66.50, lon: 25.72 },
+        { id: 'levi', name: 'Levi', lat: 67.80, lon: 24.80 },
+        { id: 'saariselka', name: 'Saariselkä', lat: 68.42, lon: 27.41 },
+        { id: 'inari', name: 'Inari', lat: 68.90, lon: 27.02 },
+        { id: 'kilpisjarvi', name: 'Kilpisjärvi', lat: 69.05, lon: 20.78 },
+        { id: 'pallas', name: 'Pallas', lat: 68.05, lon: 24.06 },
+        { id: 'utsjoki', name: 'Utsjoki', lat: 69.90, lon: 27.02 },
+        { id: 'pyha', name: 'Pyhä', lat: 67.02, lon: 27.22 }
     ];
 
-    console.log("Päivitetään etusivun kohteet...");
+    // 1. Arvotaan 3 paikkaa
+    const shuffled = allPossiblePlaces.sort(() => 0.5 - Math.random());
+    const selectedPlaces = shuffled.slice(0, 3);
 
-    // 1. Haetaan KP-data NOAA:lta (käytetään jo olemassa olevaa logiikkaasi)
+    const listContainer = document.querySelector('.locations-list');
+    if (!listContainer) return;
+
+    // Tyhjennetään lista ennen uusien luomista
+    listContainer.innerHTML = '';
+
+    // 2. Haetaan KP-data (NOAA)
     let currentKp = "--";
     try {
         const kpRes = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json');
         const kpData = await kpRes.json();
-        if (kpData && kpData.length > 1) {
-            currentKp = parseFloat(kpData[kpData.length - 1][1]).toFixed(1);
-        }
-    } catch (e) { console.error("KP-haku listalle epäonnistui", e); }
+        currentKp = parseFloat(kpData[kpData.length - 1][1]).toFixed(1);
+    } catch (e) { console.error("KP-haku epäonnistui"); }
 
-    // 2. Päivitetään jokainen rivi
-    for (const place of featuredPlaces) {
-        const row = document.getElementById(`row-${place.id}`);
-        if (!row) continue;
-
-        // Käytetään sinun omaa getWeather-funktiotasi
-        const weather = await getWeather(place.lat, place.lon);
+    // 3. Luodaan rivit ja haetaan sää
+    for (const place of selectedPlaces) {
+        // Luodaan HTML-rakenne dynaamisesti
+        const row = document.createElement('div');
+        row.className = 'place-row';
+        row.id = `row-${place.id}`;
+        row.onclick = () => window.location.href = `index.html?kohde=${place.id}`;
         
-        if (weather) {
-            // Päivitetään KP
-            const kpEl = row.querySelector('.kp-val');
-            if (kpEl) {
-                kpEl.innerText = currentKp;
-                // Väritys sinun logiikallasi
-                kpEl.style.color = currentKp >= 5 ? "#ff3366" : (currentKp >= 3 ? "#ffcc00" : "#00ffcc");
+        row.innerHTML = `
+            <div class="place-name">${place.name}</div>
+            <div class="data-group">
+                <div class="data-item"><span class="label">KP</span><span class="value kp-val">${currentKp}</span></div>
+                <div class="data-item"><span class="label">PILVET</span><span class="value cloud-val">--</span></div>
+                <div class="data-item"><span class="label">TEMP</span><span class="value temp-val">--</span></div>
+            </div>
+        `;
+        listContainer.appendChild(row);
+
+        // Haetaan sää sinun getWeather-funktiolla
+        getWeather(place.lat, place.lon).then(weather => {
+            if (weather) {
+                row.querySelector('.cloud-val').innerText = weather.clouds + "%";
+                row.querySelector('.temp-val').innerText = weather.temp + "°C";
+                
+                // KP-väritys
+                const kpEl = row.querySelector('.kp-val');
+                if (currentKp >= 5) kpEl.style.color = "#ff3366";
+                else if (currentKp >= 3) kpEl.style.color = "#ffcc00";
+                else kpEl.style.color = "#00ffcc";
             }
-
-            // Päivitetään pilvet
-            const cloudEl = row.querySelector('.cloud-val');
-            if (cloudEl) cloudEl.innerText = weather.clouds + "%";
-
-            // Päivitetään lämpötila
-            const tempEl = row.querySelector('.temp-val');
-            if (tempEl) tempEl.innerText = weather.temp + "°C";
-        }
+        });
     }
 }
 
