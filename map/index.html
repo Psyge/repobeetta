@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Revontulikartta - Reaaliaikainen seuranta</title>
+    
+    <link rel="stylesheet" href="../style.css">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <style>
+        /* Karttasivun erityissäädöt */
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Estää sivun skrollauksen, vain kartta liikkuu */
+        }
+
+        .map-wrapper {
+            flex-grow: 1; /* Täyttää kaiken tilan headerin ja footerin välissä */
+            position: relative;
+            width: 100%;
+            background: #000;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Kartan päällä olevat napit (Locate, Forecast jne.) */
+        .map-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-btn {
+            background: rgba(20, 20, 20, 0.9);
+            border: 1px solid var(--border-dim);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: 0.3s;
+        }
+
+        .control-btn:hover {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        footer {
+            margin-top: 0 !important; /* Poistaa välin kartasta */
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="logo">REPO<span>TRACKER</span></div>
+        <nav class="nav-menu">
+            <a href="/">Etusivu</a>
+            <a href="/map/" class="active">Kartta</a>
+            <a href="/faq/">UKK</a>
+        </nav>
+    </header>
+
+    <div class="map-wrapper">
+        <div id="map"></div>
+        
+        <div class="map-controls">
+            <button class="control-btn" id="locate-btn" title="Oma sijainti">📍</button>
+            <button class="control-btn" id="forecast-btn" title="Ennuste">📊</button>
+        </div>
+        
+        <div id="kp-info-box" class="kp-floating-badge">
+            <span id="kpVal">--</span> KP
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <p>&copy; 2026 RepoTracker | <a href="/privacy/">Tietosuoja</a></p>
+            <div class="social-links">
+                </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+    <script src="../markers.js"></script>
+</body>
+</html>
