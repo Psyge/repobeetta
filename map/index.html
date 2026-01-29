@@ -62,6 +62,9 @@
 <script src="../markers.js"></script>
     <script src="../script.js"></script>
  <script>
+     document.addEventListener('DOMContentLoaded', () => {
+   
+    const placesToggle = document.getElementById('toggle-places');
         if (placesToggle) {
         L.DomEvent.disableClickPropagation(placesToggle);
         placesToggle.addEventListener('change', function() {
