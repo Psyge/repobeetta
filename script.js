@@ -39,24 +39,29 @@ async function getWeather(lat, lon) {
 // ----------------------------------------------
 async function loadPlaces() {
   try {
+    // 1. Määritetään oikea polun alku (jos ollaan /map/ kansiossa, tarvitaan ../)
     const prefix = window.location.pathname.includes('/map/') ? '../' : '';
-    const res = await fetch('../kohteet/index.json', { cache: 'no-cache' });
-    if (!res.ok) throw new Error('../kohteet/index.json ei löydy');
+    
+    // 2. Käytetään prefix-muuttujaa fetch-kutsussa
+    const res = await fetch(`${prefix}kohteet/index.json`, { cache: 'no-cache' });
+    if (!res.ok) throw new Error(`${prefix}kohteet/index.json ei löydy`);
+    
     const manifest = await res.json();
     const files = Array.isArray(manifest.files) ? manifest.files : [];
 
     const loaded = await Promise.all(
       files.map(async (file) => {
-        const metaRes = await fetch(`../kohteet/${file}`, { cache: 'no-cache' });
+        // Käytetään prefixiä myös yksittäisten JSON-tiedostojen hakuun
+        const metaRes = await fetch(`${prefix}kohteet/${file}`, { cache: 'no-cache' });
         if (!metaRes.ok) throw new Error(`Virhe ladattaessa ${file}`);
         const meta = await metaRes.json();
 
         const id = file.replace(/\.json$/i, '');
 
-        // Tuki joko suoraan JSON "description" -kentälle tai erilliselle HTML-tiedostolle "descriptionFile"
         let description = meta.description || '';
         if (!description && meta.descriptionFile) {
-          const htmlRes = await fetch(`../kohteet/${meta.descriptionFile}`, { cache: 'no-cache' });
+          // Käytetään prefixiä myös HTML-kuvausten hakuun
+          const htmlRes = await fetch(`${prefix}kohteet/${meta.descriptionFile}`, { cache: 'no-cache' });
           description = htmlRes.ok ? await htmlRes.text() : '';
         }
 
@@ -66,7 +71,8 @@ async function loadPlaces() {
           lat: meta.lat,
           lon: meta.lon,
           url: meta.url || '',
-          icon: meta.icon || '../images/iconi.png',
+          // Ikoniin myös prefix, jos ikoni on images-kansiossa
+          icon: meta.icon || `${prefix}images/iconi.png`, 
           short: meta.short || '',
           description: description || '',
           stream: meta.stream || '',
