@@ -59,6 +59,20 @@
     </footer>
 <script src="../markers.js"></script>
     <script src="../script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+    const placesToggle = document.getElementById('places-toggle');
     
+    if (placesToggle) {
+        placesToggle.addEventListener('change', function() {
+            if (this.checked) {
+                map.addLayer(markersLayer); // markersLayer on se LayerGroup mihin pinnit ladattiin
+            } else {
+                map.removeLayer(markersLayer);
+            }
+        });
+    }
+});
+    </script>
 </body>
 </html>
