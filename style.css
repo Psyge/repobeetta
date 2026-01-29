@@ -470,7 +470,7 @@ a:link {
 
 body, html {
     margin: 0; padding: 0; min-height: 100%;
-    background: #000 url('revontulet.png') no-repeat center top;
+    background: #000 url('revontulet1.png') no-repeat center top;
     background-size: cover; background-attachment: fixed;
 }
 
@@ -483,7 +483,7 @@ header.banner {
     max-width: 1400px;
     height: 70px;
     background: rgba(5, 12, 24, 0.7); /* Erittäin tumma lasi */
-     background: url('revontulet.png') no-repeat center bottom;
+     background: url('revontulet1.png') no-repeat center bottom;
   background-size: cover;
   background-position: center 87%;
     backdrop-filter: blur(25px) saturate(150%);
