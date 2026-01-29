@@ -36,16 +36,16 @@
    * @param {(place:Object)=>void} showPlaceInfoFn
    * @param {Array<Object>} places
    */
-  function initMarkers(map, getWeatherFn, showPlaceInfoFn, places = []) {
+function initMarkers(map, getWeatherFn, showPlaceInfoFn, places = []) {
     if (!map || !Array.isArray(places)) return;
 
-    // layerGroup oikein
     if (markersLayer) {
-    markersLayer.clearLayers();
-} else {
-    // Luodaan ryhmä, mutta EI lisätä sitä kartalle (addTo(map) poistettu)
-    markersLayer = L.layerGroup(); 
-}
+        markersLayer.clearLayers();
+    } else {
+        markersLayer = L.layerGroup();
+        // TÄMÄ RIVI ON TÄRKEÄ: tallennetaan taso globaalisti kytkintä varten
+        window.markerGroup = markersLayer; 
+    }
 
     places.forEach(place => {
       const customIcon = L.divIcon({
