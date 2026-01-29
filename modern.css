@@ -94,7 +94,60 @@ header {
 }
 #locate-btn { top: 20px; } /* Säädetty kartan sisälle */
 #forecast-btn { top: 85px; }
+/* --- 3. KARTAN POPUP-TYYLIT (Vanhat tyylit palautettu) --- */
+.leaflet-popup-content-wrapper {
+    background: rgba(10, 15, 25, 0.95) !important;
+    color: #fff !important;
+    border: 1px solid var(--neon-green) !important;
+    backdrop-filter: blur(10px);
+    border-radius: 12px !important;
+    padding: 5px;
+}
 
+.leaflet-popup-tip {
+    background: rgba(10, 15, 25, 0.95) !important;
+    border: 1px solid var(--neon-green);
+}
+
+.leaflet-popup-content {
+    font-family: 'Segoe UI', sans-serif !important;
+    font-size: 14px;
+    line-height: 1.4;
+}
+/* --- 5. INFO-SECTION (Tekstityylit palautettu) --- */
+.info-section {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.info-section h2 { 
+    color: var(--neon-green); 
+    font-size: 1.5rem; 
+    margin-bottom: 20px;
+}
+
+.info-section p {
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 25px;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.faq-item { 
+    background: rgba(255, 255, 255, 0.03); 
+    padding: 18px; 
+    border-radius: 12px; 
+    margin-bottom: 15px;
+    border-left: 3px solid var(--neon-green);
+}
+
+.faq-item strong {
+    display: block;
+    color: var(--neon-green);
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+}
 /* Show Places Slider */
 #places-toggle-wrapper {
     position: absolute; top: 150px; right: 20px; z-index: 1001;
