@@ -38,55 +38,55 @@ async function getWeather(lat, lon) {
 // Places loader (kohteet/index.json + per-kohde)
 // ----------------------------------------------
 async function loadPlaces() {
-  try {
-    // 1. Määritetään oikea polun alku (jos ollaan /map/ kansiossa, tarvitaan ../)
+    try {
+        // Määritetään prefix: jos ollaan /map/ kansiossa, tarvitaan ../
+        const prefix = window.location.pathname.includes('/map/') ? '../' : '';
+        
+        const res = await fetch(`${prefix}kohteet/index.json`, { cache: 'no-cache' });
+        if (!res.ok) throw new Error(`${prefix}kohteet/index.json ei löydy`);
+        
+        const manifest = await res.json();
+        const files = Array.isArray(manifest.files) ? manifest.files : [];
+
+        const loaded = await Promise.all(
+            files.map(async (file) => {
+                const metaRes = await fetch(`${prefix}kohteet/${file}`, { cache: 'no-cache' });
+                const meta = await metaRes.json();
+
+                return {
+                    ...meta,
+                    id: file.replace(/\.json$/i, ''),
+                    // KORJAUS: Lisätään prefix ikonin polkuun, jos se on suhteellinen
+                    icon: meta.icon ? (meta.icon.startsWith('http') ? meta.icon : prefix + meta.icon) : `${prefix}images/iconi.png`
+                };
+            })
+        );
+        return loaded;
+    } catch (e) {
+        console.error('Paikkojen lataus epäonnistui:', e);
+        return [];
+    }
+}
+
+// Markerien luonti (L.divIcon)
+function createCustomMarker(place) {
     const prefix = window.location.pathname.includes('/map/') ? '../' : '';
     
-    // 2. Käytetään prefix-muuttujaa fetch-kutsussa
-    const res = await fetch(`${prefix}kohteet/index.json`, { cache: 'no-cache' });
-    if (!res.ok) throw new Error(`${prefix}kohteet/index.json ei löydy`);
-    
-    const manifest = await res.json();
-    const files = Array.isArray(manifest.files) ? manifest.files : [];
+    // Varmistetaan, että pinni.png löytyy oikeasta paikasta
+    const pinUrl = `${prefix}pinni.png`; 
 
-    const loaded = await Promise.all(
-      files.map(async (file) => {
-        // Käytetään prefixiä myös yksittäisten JSON-tiedostojen hakuun
-        const metaRes = await fetch(`${prefix}kohteet/${file}`, { cache: 'no-cache' });
-        if (!metaRes.ok) throw new Error(`Virhe ladattaessa ${file}`);
-        const meta = await metaRes.json();
-
-        const id = file.replace(/\.json$/i, '');
-
-        let description = meta.description || '';
-        if (!description && meta.descriptionFile) {
-          // Käytetään prefixiä myös HTML-kuvausten hakuun
-          const htmlRes = await fetch(`${prefix}kohteet/${meta.descriptionFile}`, { cache: 'no-cache' });
-          description = htmlRes.ok ? await htmlRes.text() : '';
-        }
-
-        return {
-          id,
-          name: meta.name,
-          lat: meta.lat,
-          lon: meta.lon,
-          url: meta.url || '',
-          // Ikoniin myös prefix, jos ikoni on images-kansiossa
-          icon: meta.icon || `${prefix}images/iconi.png`, 
-          short: meta.short || '',
-          description: description || '',
-          stream: meta.stream || '',
-          streamWidth: meta.streamWidth || 320,
-          streamHeight: meta.streamHeight || 180
-        };
-      })
-    );
-
-    return loaded;
-  } catch (e) {
-    console.error('Paikkojen lataus epäonnistui:', e);
-    return [];
-  }
+    const html = `
+        <div class="marker-wrapper">
+            <img src="${pinUrl}" class="pin" alt="pin">
+            <img src="${place.icon}" class="pin-icon" alt="icon">
+        </div>
+    `;
+    return L.divIcon({
+        html: html,
+        className: 'custom-marker',
+        iconSize: [32, 48],
+        iconAnchor: [16, 48]
+    });
 }
 
 // ------------------------------------
