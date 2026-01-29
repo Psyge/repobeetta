@@ -872,7 +872,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
+// Funktio kytkimen toiminnan varmistamiseksi
+function setupPlacesToggle() {
+    const placesToggle = document.getElementById('places-toggle');
+    
+    // Varmistetaan että ollaan sivulla jossa on kartta ja kytkin
+    if (placesToggle && typeof map !== 'undefined' && typeof markersLayer !== 'undefined') {
+        
+        // Kloonaus poistaa mahdolliset vanhat jumittuneet kuuntelijat
+        const newToggle = placesToggle.cloneNode(true);
+        placesToggle.parentNode.replaceChild(newToggle, placesToggle);
 
+        newToggle.addEventListener('change', function() {
+            if (this.checked) {
+                console.log("Näytetään paikat");
+                markersLayer.addTo(map);
+            } else {
+                console.log("Piilotetaan paikat");
+                map.removeLayer(markersLayer);
+            }
+        });
+        
+        // Asetetaan kytkimen tila vastaamaan kerroksen näkyvyyttä latauksessa
+        newToggle.checked = map.hasLayer(markersLayer);
+    }
+}
+
+// Suoritetaan haku ja kytkentä
+document.addEventListener('DOMContentLoaded', () => {
+    // Käynnistetään kytkimen haku heti ja uudestaan pienen viiveen jälkeen
+    // (tärkeää mobiilipaneelin dynaamisuuden takia)
+    setupPlacesToggle();
+    setTimeout(setupPlacesToggle, 1500); 
+});
 
 
 
