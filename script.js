@@ -40,7 +40,7 @@ async function getWeather(lat, lon) {
 async function loadPlaces() {
   try {
     const res = await fetch('kohteet/index.json', { cache: 'no-cache' });
-    if (!res.ok) throw new Error('index.json ei löydy');
+    if (!res.ok) throw new Error('/kohteet/index.json ei löydy');
     const manifest = await res.json();
     const files = Array.isArray(manifest.files) ? manifest.files : [];
 
