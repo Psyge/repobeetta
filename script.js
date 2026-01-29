@@ -874,24 +874,33 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Funktio kytkimen toiminnan varmistamiseksi
 function setupPlacesToggle() {
-    const placesToggle = document.getElementById('places-toggle');
+    // Käytetään HTML-koodissasi olevaa ID:tä
+    const placesToggle = document.getElementById('toggle-places');
     
-    // Tarkistetaan löytyykö nappi ja onko moduulin markersLayer asetettu globaaliksi
-    if (placesToggle && typeof map !== 'undefined' && window.markersLayer) {
+    // Tarkistetaan onko kartta ja markerGroup valmiina
+    // window.markerGroup on se muuttuja, jonka initMarkers luo
+    if (placesToggle && typeof map !== 'undefined' && window.markerGroup) {
         
+        console.log("Kytkin löydetty, alustetaan toiminta...");
+
+        // Poistetaan vanhat kuuntelijat kloonaamalla (varmuuden vuoksi)
         const newToggle = placesToggle.cloneNode(true);
         placesToggle.parentNode.replaceChild(newToggle, placesToggle);
 
         newToggle.addEventListener('change', function() {
-            // Käytetään moduulin tarjoamaa togglePlaces-funktiota
-            if (typeof window.togglePlaces === 'function') {
-                window.togglePlaces(this.checked, map);
-                console.log("Pinnit " + (this.checked ? "näkyvissä" : "piilotettu"));
+            if (this.checked) {
+                console.log("Pinnit päälle");
+                window.markerGroup.addTo(map);
+            } else {
+                console.log("Pinnit pois");
+                map.removeLayer(window.markerGroup);
             }
         });
         
-        // Asetetaan kytkimen alkutila
-        newToggle.checked = map.hasLayer(window.markersLayer);
+        // Asetetaan kytkimen tila sen mukaan, onko taso jo kartalla
+        newToggle.checked = map.hasLayer(window.markerGroup);
+    } else {
+        console.warn("Kytkintä tai markerGroupia ei vielä löytynyt. Yritetään uudelleen...");
     }
 }
 
