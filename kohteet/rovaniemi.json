@@ -4,7 +4,7 @@
   "lat": 66.5,
   "lon": 25.7,
   "url": "https://visitrovaniemi.fi",
-  "icon": "roic.png",
+  "icon": "../roic.png",
   "short": "Rovaniemi – Lapin pääkaupunki ja Joulupukin virallinen kotikaupunki",
   "descriptionFile": "rovaniemi.html"
 }
