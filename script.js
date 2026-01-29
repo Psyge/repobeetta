@@ -872,45 +872,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
-// Funktio kytkimen toiminnan varmistamiseksi
-function setupPlacesToggle() {
-    const placesToggle = document.getElementById('toggle-places');
-    
-    // Tarkistetaan onko kartta ja window.markerGroup (markers.js:stä) olemassa
-    if (placesToggle && typeof map !== 'undefined' && window.markerGroup) {
-        
-        // Estetään klikkausten vuotaminen kartalle (Leaflet-ominaisuus)
-        if (typeof L !== 'undefined') {
-            L.DomEvent.disableClickPropagation(placesToggle);
-        }
-
-        // Poistetaan vanhat kuuntelijat, jotta kytkin ei "sekoile"
-        const newToggle = placesToggle.cloneNode(true);
-        placesToggle.parentNode.replaceChild(newToggle, placesToggle);
-
-        newToggle.addEventListener('change', function() {
-            // Käytetään suoraan Leafletin omia addTo/removeLayer -komentoja
-            if (this.checked) {
-                window.markerGroup.addTo(map);
-                console.log("Pinnit kytketty päälle");
-            } else {
-                map.removeLayer(window.markerGroup);
-                console.log("Pinnit piilotettu");
-            }
-        });
-        
-        // Synkronoidaan kytkimen asento tason tilan kanssa
-        newToggle.checked = map.hasLayer(window.markerGroup);
-    }
-}
-
-// Suoritetaan haku ja kytkentä
-document.addEventListener('DOMContentLoaded', () => {
-    // Käynnistetään kytkimen haku heti ja uudestaan pienen viiveen jälkeen
-    // (tärkeää mobiilipaneelin dynaamisuuden takia)
-    setupPlacesToggle();
-    setTimeout(setupPlacesToggle, 1500); 
-});
 
 
 
