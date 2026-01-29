@@ -1,142 +1,123 @@
 /* ==========================================================================
-   MODERN.CSS - PUHDISTETTU JA OPTIMOITU VERSIO
+   MODERN.CSS - Käytössä: index2.html ja map.html
    ========================================================================== */
 
 :root {
     --neon-green: #00ffcc;
     --dark-bg: #0a111a;
-    --card-bg: rgba(255, 255, 255, 0.05);
-    --transition: 0.3s ease;
-    --text-muted: rgba(255, 255, 255, 0.6);
-    --border-dim: rgba(0, 255, 204, 0.15);
+    --panel-bg: rgba(10, 15, 25, 0.95);
+    --border-dim: rgba(0, 255, 204, 0.3);
 }
 
-/* 1. PERUSTYYLIT & BANNERI */
 body, html {
     margin: 0; padding: 0; min-height: 100%;
-    background: #000 url('revontulet1.png') no-repeat center top;
+    background: #000 url('revontulet.png') no-repeat center top;
     background-size: cover; background-attachment: fixed;
-    font-family: 'Segoe UI', sans-serif;
-    color: white;
+    font-family: 'Segoe UI', sans-serif; color: white;
 }
 
-header.banner {
-    position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
-    width: 95%; max-width: 1400px; height: 70px;
-    background: url('revontulet.png') no-repeat center bottom;
-    background-size: cover; background-position: center 87%;
-    backdrop-filter: blur(25px) saturate(150%);
+/* --- 1. HEADER & BANNER (Molemmat sivut) --- */
+header {
+    height: 70px; padding: 0 25px;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0 25px; z-index: 10000; border-radius: 20px;
-    border: 1px solid rgba(0, 255, 204, 0.3);
+    background: rgba(5, 12, 24, 0.7); backdrop-filter: blur(25px);
+    border-bottom: 1px solid var(--border-dim);
+    position: sticky; top: 0; z-index: 10000;
 }
 
-/* 2. KARTTA JA SEN HALLINTA */
-#map { width: 100%; height: 75vh; position: relative; z-index: 1; }
+.header-left { display: flex; align-items: center; gap: 15px; }
+.logo { height: 50px; width: auto; filter: drop-shadow(0 0 10px rgba(0, 255, 204, 0.3)); }
+.menu-trigger { cursor: pointer; font-weight: bold; color: var(--neon-green); letter-spacing: 1px; }
+.search-trigger { cursor: pointer; font-size: 20px; }
 
-#locate-btn, #forecast-btn, .report-btn {
-    position: absolute; right: 18px; z-index: 1001;
-    background: rgba(0, 255, 200, 0.2); border: 2px solid #00ffcc;
+/* --- 2. MAP.HTML KOHTAISET TYYLIT (Kartta & Napit) --- */
+#map { width: 100%; height: 80vh; position: relative; z-index: 1; border-bottom: 1px solid var(--border-dim); }
+
+#locate-btn, #forecast-btn {
+    position: absolute; right: 20px; z-index: 1001;
+    background: rgba(0, 255, 200, 0.2); border: 2px solid var(--neon-green);
     color: #fff; padding: 12px 20px; border-radius: 50px;
-    cursor: pointer; font-weight: bold; display: flex;
-    align-items: center; gap: 10px; backdrop-filter: blur(10px);
-    transition: all 0.3s ease; box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+    cursor: pointer; font-weight: bold; backdrop-filter: blur(10px);
 }
-#locate-btn { top: 120px; }
-#forecast-btn { top: 180px; }
+#locate-btn { top: 100px; }
+#forecast-btn { top: 165px; }
 
-/* 3. SHOW PLACES -KYTKIN (SLIDER) */
+/* Show Places -kytkin */
 #places-toggle-wrapper {
-    position: absolute; top: 240px; right: 18px; z-index: 1001;
-    display: flex; flex-direction: column; align-items: center;
-    gap: 4px; background: rgba(10, 15, 25, 0.7);
-    padding: 8px; border-radius: 8px; border: 1px solid var(--border-dim);
+    position: absolute; top: 230px; right: 20px; z-index: 1001;
+    background: var(--panel-bg); padding: 10px; border-radius: 12px;
+    border: 1px solid var(--border-dim); text-align: center;
 }
-
-.switch { position: relative; display: inline-block; width: 30px; height: 16px; }
+.switch { position: relative; display: inline-block; width: 34px; height: 20px; }
 .switch input { opacity: 0; width: 0; height: 0; }
-
 .slider {
     position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.5); border: 1px solid #00ffcc;
-    border-radius: 20px; transition: 0.3s;
+    background: #222; border: 1px solid var(--neon-green); border-radius: 34px; transition: 0.4s;
 }
-
 .slider:before {
-    position: absolute; content: ""; height: 10px; width: 10px;
-    left: 2px; bottom: 2px; background-color: white;
-    transition: 0.3s; border-radius: 50%;
+    position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px;
+    background-color: var(--neon-green); border-radius: 50%; transition: 0.4s;
 }
-
-input:checked + .slider { background-color: #00ffcc; }
 input:checked + .slider:before { transform: translateX(14px); }
 
-.toggle-label { color: #fff; font-size: 8px; font-weight: bold; text-transform: uppercase; opacity: 0.8; }
+/* --- 3. INDEX2.HTML KOHTAISET TYYLIT (Lista-näkymä) --- */
+.list-header { text-align: center; padding: 50px 20px; }
+.list-header h1 { font-size: 2.5rem; margin-bottom: 10px; color: var(--neon-green); text-shadow: 0 0 20px rgba(0, 255, 204, 0.4); }
 
-/* 4. KP-INFO PANEELI & KÄÄRME-TEHOSTE */
-.info-panel {
-    position: absolute; top: 195px; left: 10px;
-    background: rgba(10, 15, 25, 0.85); padding: 12px;
-    border-radius: 12px; border: 1px solid rgba(0, 255, 204, 0.2);
-    z-index: 999; backdrop-filter: blur(10px); min-width: 120px;
+.locations-list { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+.place-row {
+    background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-dim);
+    margin-bottom: 12px; padding: 25px; border-radius: 18px;
+    display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer; transition: all 0.3s ease;
+}
+.place-row:hover { background: rgba(0, 255, 204, 0.07); transform: translateY(-3px); border-color: var(--neon-green); }
+.place-name { font-size: 1.4rem; font-weight: bold; letter-spacing: 1px; }
+
+.data-group { display: flex; gap: 25px; }
+.data-item { text-align: center; min-width: 60px; }
+.data-item .label { display: block; font-size: 0.7rem; color: var(--neon-green); opacity: 0.7; margin-bottom: 4px; text-transform: uppercase; }
+.data-item .value { font-size: 1.1rem; font-weight: 800; }
+
+.map-cta-box {
+    max-width: 900px; margin: 60px auto; background: linear-gradient(135deg, rgba(10,17,26,0.9), rgba(26,38,57,0.9));
+    padding: 40px; border-radius: 25px; border: 1px solid var(--neon-green); text-align: center;
+}
+.map-btn {
+    display: inline-block; padding: 18px 40px; background: var(--neon-green);
+    color: #000; text-decoration: none; font-weight: bold; border-radius: 50px;
+    margin-top: 20px; transition: 0.3s; box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+}
+.map-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(0, 255, 204, 0.6); }
+
+/* --- 4. SIVUMENU & HAKU --- */
+#side-menu {
+    position: fixed; top: 0; left: -320px; width: 300px; height: 100%;
+    background: var(--panel-bg); z-index: 20000; transition: 0.5s; padding: 60px 20px;
+    border-right: 1px solid var(--neon-green);
+}
+#side-menu.open { left: 0; }
+.close-btn { position: absolute; top: 20px; right: 25px; font-size: 35px; cursor: pointer; color: var(--neon-green); }
+
+#search-container {
+    display: none; padding: 20px; background: rgba(0,0,0,0.8);
+    position: absolute; width: 100%; box-sizing: border-box; z-index: 9999;
 }
 
-.snake-visual {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    border-radius: 12px; overflow: hidden; z-index: 1;
-}
+/* --- 5. MAINOKSET & KETTU (Aiemmasta tiedostosta) --- */
+#mainos-kontti { position: relative; width: 100%; max-width: 728px; height: 90px; margin: 30px auto; overflow: hidden; }
+.mainos-elementti { position: absolute; width: 100%; opacity: 0; transition: opacity 1.5s ease-in-out; display: flex; justify-content: center; }
+.mainos-elementti.aktiivinen { opacity: 1; z-index: 10; }
 
-.snake-visual::before {
-    content: ''; position: absolute; top: -150%; left: -150%; width: 400%; height: 400%;
-    background: conic-gradient(from 0deg, transparent 0%, #00ffcc 25%, transparent 10%);
-    animation: rotate-border 15s linear infinite;
-}
-
-.snake-visual::after { content: ''; position: absolute; inset: 3px; background: #0a111a; border-radius: 9px; }
-
-@keyframes rotate-border { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-.kp-badge {
-    position: relative; z-index: 5; font-size: 1.8rem; font-weight: 900;
-    color: #00ffcc; text-shadow: 0 0 15px #00ffcc; animation: kp-pulse 3s infinite ease-in-out;
-}
-
-/* 5. KETTU-ANIMAATIOT */
-.peeking-fox {
-    position: absolute; top: -42px; left: 50%; transform: translateX(-50%);
-    z-index: 0; animation: fox-peek-move 5s infinite ease-in-out;
-}
-
+.peeking-fox { position: absolute; top: -42px; left: 50%; transform: translateX(-50%); z-index: 0; animation: fox-peek-move 5s infinite ease-in-out; }
 .fox-animation { background-repeat: no-repeat; display: block; margin: 0 auto; }
 .fox-low { width: 51.2px; height: 54.6px; background-image: url('spritesheet.png'); background-size: 256px auto; animation: kettu-low 8s steps(5) infinite; }
-.fox-mid { width: 51.62px; height: 54.6px; background-image: url('spritesheet2.png'); background-size: 258.4px auto; animation: kettu-mid 8s steps(5) infinite; }
-.fox-high { width: 37.4px; height: 64.4px; background-image: url('spritesheet3.png'); background-size: 187px auto; animation: kettu-high 5s steps(5) infinite; }
 
 @keyframes kettu-low { from { background-position: 0px 0px; } to { background-position: -256px 0px; } }
-@keyframes kettu-mid { from { background-position: 0px 0px; } to { background-position: -258.4px 0px; } }
-@keyframes kettu-high { from { background-position: 0px 0px; } to { background-position: -187px 0px; } }
+@keyframes fox-peek-move { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(5px); } }
 
-/* 6. LEAFLET POPUPIT */
+/* --- 6. LEAFLET POPUPIT --- */
 .leaflet-popup-content-wrapper {
-    background: rgba(10, 15, 25, 0.95) !important;
-    color: #fff !important; border: 1px solid rgba(0, 255, 204, 0.3);
-    backdrop-filter: blur(10px);
-}
-.leaflet-popup-tip { background: rgba(10, 15, 25, 0.95) !important; }
-
-/* 7. MOBIILI-SOVITUKSET (Media Queries) */
-@media (max-width: 768px) {
-    header.banner { background: none !important; border: none !important; box-shadow: none !important; top: 0 !important; }
-    
-    .unified-panel {
-        position: fixed !important; right: 0 !important; top: 3% !important;
-        z-index: 20000 !important; display: flex !important;
-        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    }
-    .unified-panel.closed { transform: translateX(65px) !important; }
-    
-    #locate-btn, #forecast-btn {
-        position: static !important; width: 45px !important; height: 45px !important;
-        border-radius: 50% !important; font-size: 0 !important;
-    }
+    background: var(--panel-bg) !important; color: #fff !important;
+    border: 1px solid var(--neon-green); backdrop-filter: blur(10px);
 }
