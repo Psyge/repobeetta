@@ -37,7 +37,32 @@ header {
 .menu-trigger { font-size: 26px; cursor: pointer; color: var(--neon-green); }
 .logo { height: 100px; width: auto; }
 .search-trigger { font-size: 20px; cursor: pointer; color: var(--neon-green); }
-
+#search-container {
+    display: none;
+    padding: 15px 20px;
+    background: #111;
+    text-align: center;
+    border-bottom: 1px solid #222;
+}
+#search-container input {
+    width: 65%;
+    padding: 10px 18px;
+    border-radius: 20px;
+    border: 1px solid var(--neon-green);
+    background: #000;
+    color: white;
+    outline: none;
+    font-size: 16px; /* Estää zoomauksen iOS:lla */
+}
+#search-container button {
+    padding: 10px 18px;
+    border-radius: 20px;
+    border: none;
+    background: var(--neon-green);
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 8px;
+}
 /* Side Menu */
 #side-menu {
     position: fixed; top: 0; left: -300px; width: 260px; height: 100%;
