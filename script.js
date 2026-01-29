@@ -876,25 +876,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 function setupPlacesToggle() {
     const placesToggle = document.getElementById('places-toggle');
     
-    // Varmistetaan että ollaan sivulla jossa on kartta ja kytkin
-    if (placesToggle && typeof map !== 'undefined' && typeof markersLayer !== 'undefined') {
+    // Tarkistetaan löytyykö nappi ja onko moduulin markersLayer asetettu globaaliksi
+    if (placesToggle && typeof map !== 'undefined' && window.markersLayer) {
         
-        // Kloonaus poistaa mahdolliset vanhat jumittuneet kuuntelijat
         const newToggle = placesToggle.cloneNode(true);
         placesToggle.parentNode.replaceChild(newToggle, placesToggle);
 
         newToggle.addEventListener('change', function() {
-            if (this.checked) {
-                console.log("Näytetään paikat");
-                markersLayer.addTo(map);
-            } else {
-                console.log("Piilotetaan paikat");
-                map.removeLayer(markersLayer);
+            // Käytetään moduulin tarjoamaa togglePlaces-funktiota
+            if (typeof window.togglePlaces === 'function') {
+                window.togglePlaces(this.checked, map);
+                console.log("Pinnit " + (this.checked ? "näkyvissä" : "piilotettu"));
             }
         });
         
-        // Asetetaan kytkimen tila vastaamaan kerroksen näkyvyyttä latauksessa
-        newToggle.checked = map.hasLayer(markersLayer);
+        // Asetetaan kytkimen alkutila
+        newToggle.checked = map.hasLayer(window.markersLayer);
     }
 }
 
