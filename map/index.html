@@ -62,18 +62,22 @@
 <script src="../markers.js"></script>
     <script src="../script.js"></script>
  <script>
-     document.addEventListener('DOMContentLoaded', () => {
-   
+ document.addEventListener('DOMContentLoaded', () => {
     const placesToggle = document.getElementById('toggle-places');
-        if (placesToggle) {
-        L.DomEvent.disableClickPropagation(placesToggle);
+    if (placesToggle) {
+        // Estetään klikkauksen läpimeno kartalle
+        if (typeof L !== 'undefined') {
+            L.DomEvent.disableClickPropagation(placesToggle);
+        }
+        
         placesToggle.addEventListener('change', function() {
             if (typeof window.togglePlaces === 'function') {
+                // Kutsutaan funktiota ja lähetetään kytkimen tila ja kartta-olio
                 window.togglePlaces(this.checked, map);
             }
         });
     }
-}      
+});  
  </script>
 </body>
 </html>
