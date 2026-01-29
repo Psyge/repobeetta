@@ -4,7 +4,7 @@
   "lat": 67.57,
   "lon": 24.20,
   "url": "https://yllas.fi/",
-  "icon": "../yllas.png",
+  "icon": "yllas.png",
   "short": "Ylläs – Suomen suurin hiihtokeskus",
   "descriptionFile": "yllas.html"
 } 
