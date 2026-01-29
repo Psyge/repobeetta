@@ -874,33 +874,33 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Funktio kytkimen toiminnan varmistamiseksi
 function setupPlacesToggle() {
-    // Käytetään HTML-koodissasi olevaa ID:tä
     const placesToggle = document.getElementById('toggle-places');
     
-    // Tarkistetaan onko kartta ja markerGroup valmiina
-    // window.markerGroup on se muuttuja, jonka initMarkers luo
+    // Tarkistetaan onko kartta ja window.markerGroup (markers.js:stä) olemassa
     if (placesToggle && typeof map !== 'undefined' && window.markerGroup) {
         
-        console.log("Kytkin löydetty, alustetaan toiminta...");
+        // Estetään klikkausten vuotaminen kartalle (Leaflet-ominaisuus)
+        if (typeof L !== 'undefined') {
+            L.DomEvent.disableClickPropagation(placesToggle);
+        }
 
-        // Poistetaan vanhat kuuntelijat kloonaamalla (varmuuden vuoksi)
+        // Poistetaan vanhat kuuntelijat, jotta kytkin ei "sekoile"
         const newToggle = placesToggle.cloneNode(true);
         placesToggle.parentNode.replaceChild(newToggle, placesToggle);
 
         newToggle.addEventListener('change', function() {
+            // Käytetään suoraan Leafletin omia addTo/removeLayer -komentoja
             if (this.checked) {
-                console.log("Pinnit päälle");
                 window.markerGroup.addTo(map);
+                console.log("Pinnit kytketty päälle");
             } else {
-                console.log("Pinnit pois");
                 map.removeLayer(window.markerGroup);
+                console.log("Pinnit piilotettu");
             }
         });
         
-        // Asetetaan kytkimen tila sen mukaan, onko taso jo kartalla
+        // Synkronoidaan kytkimen asento tason tilan kanssa
         newToggle.checked = map.hasLayer(window.markerGroup);
-    } else {
-        console.warn("Kytkintä tai markerGroupia ei vielä löytynyt. Yritetään uudelleen...");
     }
 }
 
