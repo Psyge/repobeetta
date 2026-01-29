@@ -39,14 +39,14 @@ async function getWeather(lat, lon) {
 // ----------------------------------------------
 async function loadPlaces() {
   try {
-    const res = await fetch('kohteet/index.json', { cache: 'no-cache' });
+    const res = await fetch('../kohteet/index.json', { cache: 'no-cache' });
     if (!res.ok) throw new Error('/kohteet/index.json ei löydy');
     const manifest = await res.json();
     const files = Array.isArray(manifest.files) ? manifest.files : [];
 
     const loaded = await Promise.all(
       files.map(async (file) => {
-        const metaRes = await fetch(`kohteet/${file}`, { cache: 'no-cache' });
+        const metaRes = await fetch(`../kohteet/${file}`, { cache: 'no-cache' });
         if (!metaRes.ok) throw new Error(`Virhe ladattaessa ${file}`);
         const meta = await metaRes.json();
 
@@ -55,7 +55,7 @@ async function loadPlaces() {
         // Tuki joko suoraan JSON "description" -kentälle tai erilliselle HTML-tiedostolle "descriptionFile"
         let description = meta.description || '';
         if (!description && meta.descriptionFile) {
-          const htmlRes = await fetch(`kohteet/${meta.descriptionFile}`, { cache: 'no-cache' });
+          const htmlRes = await fetch(`../kohteet/${meta.descriptionFile}`, { cache: 'no-cache' });
           description = htmlRes.ok ? await htmlRes.text() : '';
         }
 
@@ -65,7 +65,7 @@ async function loadPlaces() {
           lat: meta.lat,
           lon: meta.lon,
           url: meta.url || '',
-          icon: meta.icon || 'images/iconi.png',
+          icon: meta.icon || '../images/iconi.png',
           short: meta.short || '',
           description: description || '',
           stream: meta.stream || '',
