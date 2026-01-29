@@ -52,7 +52,7 @@ function initMarkers(map, getWeatherFn, showPlaceInfoFn, places = []) {
         className: 'custom-marker',
         html: `
           <div class="marker-wrapper">
-            <img src="pinni.png" class="pin"><img src="${place.icon}" class="pin-icon">
+            <img src="../pinni.png" class="pin"><img src="${place.icon}" class="pin-icon">
           </div>
         `,
         iconSize: [32, 48],
