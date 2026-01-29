@@ -189,9 +189,18 @@ async function initAppMap() {
   map.setMaxBounds([[-90, -180], [90, 180]]);
   map.on('click', onMapClick);
 
-  const places = await loadPlaces();
+ const places = await loadPlaces();
   if (places.length > 0 && typeof initMarkers === 'function') {
       initMarkers(map, getWeather, showPlaceInfo, places);
+      
+      // Lisätään paikat kartalle oletuksena
+      if (window.markerGroup) {
+          window.markerGroup.addTo(map);
+      }
+      
+      // Varmistetaan että kytkin on "päällä" asennossa alussa
+      const placesToggle = document.getElementById('toggle-places');
+      if (placesToggle) placesToggle.checked = true;
   }
 
   fetchAuroraData();
