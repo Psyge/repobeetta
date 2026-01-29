@@ -78,6 +78,23 @@
         });
     }
 });  
+      function toggleMenu() {
+            document.getElementById('side-menu').classList.toggle('open');
+        }
+
+        function toggleSearch() {
+            const search = document.getElementById('search-container');
+            search.style.display = (search.style.display === 'block') ? 'none' : 'block';
+        }
+
+        async function handleSearch() {
+            const city = document.getElementById('city-input').value;
+            if (!city) return;
+            
+            // Tässä kohtaa voit käyttää aiemmin sovittua Nominatim API -hakua
+            alert("Haetaan ennustetta kohteelle: " + city);
+            // Myöhemmin: fetchAuroraData(city);
+        }
  </script>
 </body>
 </html>
