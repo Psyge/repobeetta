@@ -70,13 +70,13 @@ async function loadPlaces() {
 
 // Markerien luonti (L.divIcon)
 function createCustomMarker(place) {
-    // Pakotetaan prefix: jos osoitteessa on sana /map/, mennään yksi askel ylös
-    // Muuten ollaan juuressa (tyhjä prefix)
-    const prefix = window.location.href.includes('/map/') ? '../' : '';
+    // Haetaan sivun juuriosoite (esim. https://psyge.github.io/repobeetta/)
+    const root = window.location.origin + window.location.pathname.split('/map/')[0];
     
-    // Testataan konsoliin, mitä polkua koodi tarjoaa
-    const pinUrl = `${prefix}pinni.png`;
-    console.log("Pinnin polku:", pinUrl); 
+    // Varmistetaan että polku päättyy vinoviivaan ja lisätään tiedosto
+    const pinUrl = root.replace(/\/$/, "") + "/pinni.png";
+    
+    console.log("DEBUG: Pinnin lopullinen polku:", pinUrl);
 
     const html = `
         <div class="marker-wrapper">
