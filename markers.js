@@ -39,20 +39,25 @@
 function initMarkers(map, getWeatherFn, showPlaceInfoFn, places = []) {
     if (!map || !Array.isArray(places)) return;
 
+    // 1. Määritetään dynaaminen polku (jos ollaan /map/ kansiossa, hypätään ylös)
+    const prefix = window.location.pathname.includes('/map/') ? '../' : '';
+
     if (markersLayer) {
         markersLayer.clearLayers();
     } else {
         markersLayer = L.layerGroup();
-        // TÄMÄ RIVI ON TÄRKEÄ: tallennetaan taso globaalisti kytkintä varten
-        window.markerGroup = markersLayer; 
+        // Tallennetaan taso globaalisti, jotta script.js pääsee siihen käsiksi
+        window.markersLayer = markersLayer; 
     }
 
     places.forEach(place => {
+      // 2. Käytetään prefixiä pinni.png-kuvassa
       const customIcon = L.divIcon({
         className: 'custom-marker',
         html: `
           <div class="marker-wrapper">
-            <img src="pinni.png" class="pin"><img src="${place.icon}" class="pin-icon">
+            <img src="${prefix}pinni.png" class="pin">
+            <img src="${place.icon}" class="pin-icon">
           </div>
         `,
         iconSize: [32, 48],
