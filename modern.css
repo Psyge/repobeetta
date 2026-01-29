@@ -94,25 +94,112 @@ header {
 }
 #locate-btn { top: 20px; } /* Säädetty kartan sisälle */
 #forecast-btn { top: 85px; }
-/* --- 3. KARTAN POPUP-TYYLIT (Vanhat tyylit palautettu) --- */
-.leaflet-popup-content-wrapper {
+/* --- PINNIT JA MARKERIT --- */
+.marker-wrapper { 
+    position: relative; 
+    width: 32px; 
+    height: 48px; 
+    animation: float 2s infinite; 
+}
+
+.marker-wrapper img.pin { 
+    width: 32px !important; 
+    height: 48px !important; 
+    object-fit: contain; 
+}
+
+.marker-wrapper img.pin-icon {
+    position: absolute; 
+    top: 4px; 
+    left: 50%; 
+    transform: translateX(-50%);
+    width: 20px !important; 
+    height: 20px !important; 
+    border-radius: 50%;
+    background: white; 
+    padding: 2px; 
+    box-shadow: 0 0 2px rgba(0,0,0,0.3);
+}
+
+.pin { 
+    width: 100%; 
+    height: auto; 
+    max-width: 32px; 
+    max-height: 48px; 
+}
+
+.pin-icon {
+    position: absolute; 
+    top: 4px; 
+    left: 50%; 
+    transform: translateX(-50%);
+    width: 20px; 
+    height: 20px; 
+    border-radius: 50%; 
+    background: white; 
+    padding: 2px;
+}
+
+@keyframes float { 
+    0% { transform: scale(0.9); } 
+    50% { transform: scale(1.2); } 
+}
+
+/* --- LEAFLET POPUP JA SISÄLTÖ --- */
+.custom-popup .leaflet-popup-content-wrapper { 
+    width: 280px !important; 
     background: rgba(10, 15, 25, 0.95) !important;
     color: #fff !important;
-    border: 1px solid var(--neon-green) !important;
+    border: 1px solid rgba(0, 255, 204, 0.3);
     backdrop-filter: blur(10px);
-    border-radius: 12px !important;
-    padding: 5px;
+}
+
+.custom-popup .leaflet-popup-content { 
+    width: auto !important; 
+    padding: 0; 
+    text-align: center; 
 }
 
 .leaflet-popup-tip {
     background: rgba(10, 15, 25, 0.95) !important;
-    border: 1px solid var(--neon-green);
+    border: 1px solid rgba(0, 255, 204, 0.3);
 }
 
-.leaflet-popup-content {
-    font-family: 'Segoe UI', sans-serif !important;
-    font-size: 14px;
-    line-height: 1.4;
+.popup-stream iframe { 
+    display: block; 
+    max-width: none; 
+}
+
+.custom-popup .popup-stream iframe { 
+    width: 100% !important; 
+    height: auto; 
+}
+
+/* Yleiset popup-elementit (otsikot ja pyöreät ikonit) */
+.popup-header {
+    position: relative; 
+    text-align: center; 
+    margin-bottom: 8px; 
+    min-height: 32px;
+}
+
+.popup-header img {
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 30px; 
+    height: 30px; 
+    border-radius: 50%;
+}
+
+.popup-title { 
+    font-size: 1.1em; 
+    display: inline-block; 
+}
+
+.circle-icon { 
+    border-radius: 50%; 
+    border: 2px solid #fff; 
 }
 /* --- 5. INFO-SECTION (Tekstityylit palautettu) --- */
 .info-section {
