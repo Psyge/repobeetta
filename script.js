@@ -70,10 +70,13 @@ async function loadPlaces() {
 
 // Markerien luonti (L.divIcon)
 function createCustomMarker(place) {
-    const prefix = window.location.pathname.includes('/map/') ? '../' : '';
+    // Pakotetaan prefix: jos osoitteessa on sana /map/, mennään yksi askel ylös
+    // Muuten ollaan juuressa (tyhjä prefix)
+    const prefix = window.location.href.includes('/map/') ? '../' : '';
     
-    // Varmistetaan, että pinni.png löytyy oikeasta paikasta
-    const pinUrl = `${prefix}pinni.png`; 
+    // Testataan konsoliin, mitä polkua koodi tarjoaa
+    const pinUrl = `${prefix}pinni.png`;
+    console.log("Pinnin polku:", pinUrl); 
 
     const html = `
         <div class="marker-wrapper">
@@ -81,11 +84,13 @@ function createCustomMarker(place) {
             <img src="${place.icon}" class="pin-icon" alt="icon">
         </div>
     `;
+    
     return L.divIcon({
         html: html,
         className: 'custom-marker',
         iconSize: [32, 48],
-        iconAnchor: [16, 48]
+        iconAnchor: [16, 48],
+        popupAnchor: [0, -40]
     });
 }
 
