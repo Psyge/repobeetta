@@ -282,3 +282,26 @@ footer a:hover { color: white; }
         font-size: 0.85rem;
     }
 }
+.map-wrapper {
+            flex-grow: 1; /* Täyttää kaiken tilan headerin ja footerin välissä */
+            position: relative;
+            width: 100%;
+            background: #000;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Kartan päällä olevat napit (Locate, Forecast jne.) */
+        .map-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
