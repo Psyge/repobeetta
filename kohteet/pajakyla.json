@@ -3,7 +3,7 @@
     "lat": 66.54, 
     "lon": 25.84, 
     "url": "https://santaclausvillage.info/", 
-    "icon": "pukki.png", 
+    "icon": "../pukki.png", 
     "stream": "https://www.youtube.com/embed/Cp4RRAEgpeU", 
     "streamWidth": 320, 
     "streamHeight": 180, 
