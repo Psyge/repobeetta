@@ -8,10 +8,33 @@
 }
 
 body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: var(--dark-bg);
+    color: white;
+    overflow-x: hidden; /* Sallii pystysuunnan skrollauksen */
+    line-height: 1.5;
+}
+
+/* KARTTASIVUN BODY (Vain map-page luokalla) */
+body.map-page {
+    height: 100vh;      /* Pakottaa korkeuden näytön kokoiseksi */
     display: flex;
     flex-direction: column;
-    min-height: 100vh; /* Koko näytön korkeus */
-    margin: 0;
+    overflow: hidden;   /* Estää koko sivun skrollauksen */
+}
+
+/* KARTAN KORKEUS */
+body.map-page .map-wrapper {
+    flex: 1;            /* Täyttää headerin ja footerin välin */
+    min-height: 0;      /* Estää flex-laatikkoa pullistumasta ulos */
+    position: relative;
+}
+
+body.map-page #map {
+    height: 100%;       /* Nyt se tietää ottavansa 100% wrapperista */
+    width: 100%;
 }
 
 /* HEADER & NAV */
