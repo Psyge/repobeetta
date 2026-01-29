@@ -35,7 +35,15 @@
             <span id="kpVal">--</span> KP
         </div>
     </div>
-
+<div id="forecast-popup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(5px);">
+    <div style="background:#1a1a1a; padding:20px; border-radius:15px; width:90%; max-width:600px; border:1px solid var(--border-dim);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h3 style="margin:0;">3-Day Forecast</h3>
+            <button id="close-forecast" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;">&times;</button>
+        </div>
+        <div style="height:300px;"><canvas id="kpChart"></canvas></div>
+    </div>
+</div>
     <footer class="main-footer">
         <div class="footer-content">
             <p>&copy; 2026 RepoTracker | <a href="/privacy/">Tietosuoja</a></p>
