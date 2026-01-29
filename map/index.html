@@ -60,18 +60,30 @@
 <script src="../markers.js"></script>
     <script src="../script.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+    // Funktio kytkimen toiminnan varmistamiseksi
+function setupPlacesToggle() {
     const placesToggle = document.getElementById('places-toggle');
     
     if (placesToggle) {
-        placesToggle.addEventListener('change', function() {
+        // Poistetaan vanhat kuuntelijat varmuuden vuoksi
+        placesToggle.replaceWith(placesToggle.cloneNode(true));
+        const newToggle = document.getElementById('places-toggle');
+
+        newToggle.addEventListener('change', function() {
             if (this.checked) {
-                map.addLayer(markersLayer); // markersLayer on se LayerGroup mihin pinnit ladattiin
+                console.log("Näytetään paikat");
+                if (!map.hasLayer(markersLayer)) markersLayer.addTo(map);
             } else {
+                console.log("Piilotetaan paikat");
                 map.removeLayer(markersLayer);
             }
         });
     }
+}
+
+// Suoritetaan haku ja kytkentä sivun latautuessa
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(setupPlacesToggle, 1000); // Pieni viive varmistaa, että mobiilipaneeli on valmis
 });
     </script>
 </body>
