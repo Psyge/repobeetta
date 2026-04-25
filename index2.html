@@ -3,27 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RepoTracker - Revontuliennuste & Seuranta</title>
-     <link rel="stylesheet" href="modern.css">
+    <title>RepoTracker — Revontuliennuste & Reaaliaikainen seuranta</title>
+    <meta name="description" content="Reaaliaikainen revontuliennuste Suomeen. KP-indeksi, pilvisyys ja paikkakohtaiset ennusteet Lapin parhaimmille katselupaikoille.">
+    <link rel="stylesheet" href="modern.css">
     <link rel="icon" href="iconi.png">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 
     <div id="side-menu">
         <div class="close-btn" onclick="toggleMenu()">×</div>
         <nav class="nav-links">
-            <a href="index.html">Live Map</a>
+            <!-- FIX: linkki johtaa /map/ alikansioon -->
+            <a href="map/index.html">Live Map</a>
             <a href="/info/faq/">FAQ - Tietoa revontulista</a>
             <a href="/info/places/">Suositut katselupaikat</a>
             <a href="/info/contact/">Ota yhteyttä</a>
             <a href="/info/privacy/">Tietosuojaseloste</a>
         </nav>
         <div class="menu-social">
-            <a href="https://instagram.com/repotracker_" target="_blank"><img src="ig-icon.png" alt="Instagram"></a>
-            <a href="https://www.tiktok.com/@repotracker" target="_blank"><img src="tiktok.png" alt="TikTok"></a>
+            <a href="https://instagram.com/repotracker_" target="_blank" rel="noopener"><img src="ig-icon.png" alt="Instagram"></a>
+            <a href="https://www.tiktok.com/@repotracker" target="_blank" rel="noopener"><img src="tiktok.png" alt="TikTok"></a>
         </div>
     </div>
 
@@ -35,7 +36,7 @@
         <div class="search-trigger" onclick="toggleSearch()">🔍</div>
     </header>
 
-    <div id="search-container">
+    <div id="search-container" style="display:none;">
         <input type="text" id="city-input" placeholder="Syötä paikkakunta (esim. Levi)...">
         <button onclick="handleSearch()">Hae</button>
         <div id="search-results-box"></div>
@@ -43,76 +44,72 @@
 
     <main>
         <div class="list-header">
-    <h1>Revontuliennuste nyt</h1>
-    <p>Seuraa suosituimpien kohteiden tilannetta reaaliajassa.</p>
-</div>
-     <div class="locations-list">
-    <div class="place-row" id="row-rovaniemi" onclick="window.location.href='index.html?kohde=rovaniemi'">
-        <div class="place-name">Rovaniemi</div>
-        <div class="data-group">
-            <div class="data-item">
-                <span class="label">KP</span>
-                <span class="value kp-val">--</span>
-            </div>
-            <div class="data-item">
-                <span class="label">PILVET</span>
-                <span class="value cloud-val">--</span>
-            </div>
-            <div class="data-item">
-                <span class="label">TEMP</span>
-                <span class="value temp-val">--</span>
+            <h1>Revontuliennuste nyt</h1>
+            <p>Seuraa suosituimpien kohteiden tilannetta reaaliajassa.</p>
+        </div>
+
+        <!-- ============ MAINOSPAIKKA: ETUSIVU TOP ============ -->
+        <!-- Vaihda sisältö omaan bannerimainokseesi tai AdSense-koodiin -->
+        <div class="ad-slot" data-slot="home-top" aria-label="Mainos">
+            <!-- Esim. AdSense:
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-XXXXXXX"
+                 data-ad-slot="XXXXXXX"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+            -->
+            <a href="#" class="ad-placeholder">
+                <span>Mainospaikka — ota yhteyttä mainostilasta</span>
+            </a>
+        </div>
+
+        <!-- ============ KOHDELISTA (täytetään dynaamisesti script.js:llä) ============ -->
+        <div class="locations-list">
+            <!-- Vararivit jos JS ei lataudu — script.js korvaa nämä -->
+            <div class="place-row" id="row-rovaniemi" onclick="window.location.href='map/index.html?kohde=rovaniemi'">
+                <div class="place-name">Rovaniemi</div>
+                <div class="data-group">
+                    <div class="data-item"><span class="label">KP</span><span class="value kp-val">--</span></div>
+                    <div class="data-item"><span class="label">PILVET</span><span class="value cloud-val">--</span></div>
+                    <div class="data-item"><span class="label">TEMP</span><span class="value temp-val">--</span></div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="place-row" id="row-levi" onclick="window.location.href='index.html?kohde=levi'">
-        <div class="place-name">Levi</div>
-        <div class="data-group">
-            <div class="data-item">
-                <span class="label">KP</span>
-                <span class="value kp-val">--</span>
+        <!-- ============ KARTTAESIKATSELU ============ -->
+        <div class="map-cta-box">
+            <div class="map-cta-content">
+                <h2>Tutki revontulia kartalla</h2>
+                <p>Katso reaaliaikainen ennuste koko Suomeen.</p>
+                <!-- FIX: linkki menee /map/ alikansioon -->
+                <a href="map/index.html" class="map-btn">AVAA REAALIAIKAINEN KARTTA</a>
             </div>
-            <div class="data-item">
-                <span class="label">PILVET</span>
-                <span class="value cloud-val">--</span>
-            </div>
-            <div class="data-item">
-                <span class="label">TEMP</span>
-                <span class="value temp-val">--</span>
-            </div>
+            <!-- Pieni esikatselu staattisesta Leaflet-kartasta -->
+            <div id="map-preview" style="height:220px;border-radius:12px;overflow:hidden;margin-top:15px;cursor:pointer;" onclick="window.location.href='map/index.html'"></div>
         </div>
-    </div>
 
-    <div class="place-row" id="row-saariselka" onclick="window.location.href='index.html?kohde=saariselka'">
-        <div class="place-name">Saariselkä</div>
-        <div class="data-group">
-            <div class="data-item">
-                <span class="label">KP</span>
-                <span class="value kp-val">--</span>
-            </div>
-            <div class="data-item">
-                <span class="label">PILVET</span>
-                <span class="value cloud-val">--</span>
-            </div>
-            <div class="data-item">
-                <span class="label">TEMP</span>
-                <span class="value temp-val">--</span>
-            </div>
+        <!-- ============ MAINOSPAIKKA: KESKI ============ -->
+        <div class="ad-slot" data-slot="home-mid" aria-label="Mainos">
+            <a href="#" class="ad-placeholder">
+                <span>Mainospaikka 2</span>
+            </a>
         </div>
-    </div>
-</div>
 
-       <div class="map-cta-box">
-    <div class="map-cta-content">
-        <h2>Tutki revontulia kartalla</h2>
-        <p>Katso reaaliaikainen ennuste koko Suomeen.</p>
-        <a href="index.html" class="map-btn">AVAA REAALIAIKAINEN KARTTA</a>
-    </div>
-</div>
+        <!-- ============ ARTIKKELIT ============ -->
+        <section class="articles-section">
+            <h2>Uusimmat artikkelit</h2>
+            <p class="articles-intro">Vinkkejä ja oppaita revontulien metsästäjille.</p>
+            <div class="articles-grid" id="articles-grid">
+                <!-- Täytetään automaattisesti articles/index.json -tiedostosta -->
+                <div class="article-card-skeleton">Ladataan artikkeleita…</div>
+            </div>
+        </section>
 
         <section class="info-section">
             <h2>Revontuliennuste ja seuranta Suomessa</h2>
-            <p>RepoTracker on revontuliharrastajien kehittämä palvelu, joka yhdistää reaaliaikaisen geomagneettisen datan ja paikalliset sääennusteet. Meidän tavoitteenamme on tehdä revontulien bongaamisesta mahdollisimman helppoa niin aloittelijoille kuin kokeneille kuvaajille.</p>
+            <p>RepoTracker on revontuliharrastajien kehittämä palvelu, joka yhdistää reaaliaikaisen geomagneettisen datan ja paikalliset sääennusteet.</p>
 
             <div class="faq-item">
                 <strong>Miten luen ennustetta?</strong><br>
@@ -128,32 +125,76 @@
 
     <footer>
         <p>© 2026 RepoTracker.fi | Seuraa revontulia reaaliajassa</p>
-        <div style="margin-top: 10px;">
-            <a href="/privacy/" style="color: #666; text-decoration: none;">Privacy Policy</a> | 
-            <a href="/contact/" style="color: #666; text-decoration: none;">Contact</a>
+        <div style="margin-top:10px;">
+            <a href="/privacy/" style="color:#666;text-decoration:none;">Privacy Policy</a> |
+            <a href="/contact/" style="color:#666;text-decoration:none;">Contact</a>
         </div>
     </footer>
 
     <script>
-        function toggleMenu() {
-            document.getElementById('side-menu').classList.toggle('open');
-        }
-
+        function toggleMenu() { document.getElementById('side-menu').classList.toggle('open'); }
         function toggleSearch() {
-            const search = document.getElementById('search-container');
-            search.style.display = (search.style.display === 'block') ? 'none' : 'block';
+            const s = document.getElementById('search-container');
+            s.style.display = (s.style.display === 'block') ? 'none' : 'block';
         }
-
         async function handleSearch() {
             const city = document.getElementById('city-input').value;
             if (!city) return;
-            
-            // Tässä kohtaa voit käyttää aiemmin sovittua Nominatim API -hakua
             alert("Haetaan ennustetta kohteelle: " + city);
-            // Myöhemmin: fetchAuroraData(city);
         }
 
-        // Tähän voit lisätä automaattisen KP-arvojen haun script.js-tiedostostasi
+        // ============ KARTTAESIKATSELU ============
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof L !== 'undefined' && document.getElementById('map-preview')) {
+                const preview = L.map('map-preview', {
+                    center: [67.5, 26],
+                    zoom: 4,
+                    zoomControl: false,
+                    attributionControl: false,
+                    dragging: false,
+                    scrollWheelZoom: false,
+                    doubleClickZoom: false,
+                    touchZoom: false,
+                    boxZoom: false,
+                    keyboard: false
+                });
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(preview);
+                // Korostus-marker Lapin päälle
+                L.circleMarker([67.5, 26], {
+                    radius: 30, color: '#00ffcc', fillColor: '#00ffcc', fillOpacity: 0.2, weight: 2
+                }).addTo(preview);
+            }
+        });
+
+        // ============ ARTIKKELIEN LATAUS ============
+        async function loadArticles() {
+            const grid = document.getElementById('articles-grid');
+            if (!grid) return;
+            try {
+                const res = await fetch('articles/index.json', { cache: 'no-cache' });
+                if (!res.ok) throw new Error('Ei artikkeli-indeksiä');
+                const manifest = await res.json();
+                const files = Array.isArray(manifest.files) ? manifest.files : [];
+                const articles = await Promise.all(files.map(async (f) => {
+                    const r = await fetch(`articles/${f}`, { cache: 'no-cache' });
+                    return r.json();
+                }));
+                grid.innerHTML = articles.map(a => `
+                    <a class="article-card" href="${a.url || '#'}">
+                        ${a.image ? `<img src="${a.image}" alt="${a.title}" loading="lazy">` : ''}
+                        <div class="article-card-body">
+                            <h3>${a.title}</h3>
+                            <p>${a.excerpt || ''}</p>
+                            <span class="article-date">${a.date || ''}</span>
+                        </div>
+                    </a>
+                `).join('');
+            } catch (e) {
+                console.warn('Artikkeleita ei voitu ladata:', e.message);
+                grid.innerHTML = '<p style="color:#888;text-align:center;padding:20px;">Ei artikkeleita vielä. Lisää niitä luomalla <code>articles/index.json</code> ja artikkeli-JSON-tiedostot.</p>';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', loadArticles);
     </script>
     <script src="script.js"></script>
 </body>
