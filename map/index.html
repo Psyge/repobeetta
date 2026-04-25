@@ -26,13 +26,9 @@
         </nav>
     </div>
 
-    <header>
-        <div class="header-left">
-            <div class="menu-trigger" onclick="toggleMenu()">☰ MENU</div>
-            <img src="../repo-neon.png" alt="RepoTracker" class="logo">
-        </div>
-        <div class="search-trigger" onclick="toggleSearch()">🔍</div>
-    </header>
+    <!-- Minimal floating menu button (no banner) -->
+    <button id="menu-fab" class="menu-fab" onclick="toggleMenu()" aria-label="Avaa valikko">☰</button>
+    <button id="search-fab" class="search-fab" onclick="toggleSearch()" aria-label="Haku">🔍</button>
 
     <!-- FIX #5: search-container puuttui kokonaan, mutta header viittasi siihen -->
     <div id="search-container" style="display:none;">
@@ -78,10 +74,8 @@
         </div>
     </div>
 
-    <footer class="main-footer">
-        <div class="footer-content">
-            <p>&copy; 2026 RepoTracker | <a href="/privacy/">Tietosuoja</a></p>
-        </div>
+    <footer class="main-footer slim-footer">
+        &copy; 2026 RepoTracker · <a href="/privacy/">Tietosuoja</a>
     </footer>
 
     <script src="../markers.js"></script>
