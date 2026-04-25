@@ -1,11 +1,13 @@
-
 // ===============================
-// Markers (Leaflet) for RepoTracker
+// Markers (Leaflet) for RepoTracker — FIXED
 // ===============================
 (function () {
-  // Jos getWeather on jo määritelty (script.js), käytä sitä. Muuten tee kevyt fallback.
+  // FIX #1: Käytetään SAMAA Worker-URL:ää kuin script.js:ssä.
+  // Päivitä molemmat tarvittaessa. Vaihda alla oleva URL omaksi tuotanto-Workeriksi.
+  const WEATHER_WORKER_URL = 'https://proud-union-1e84.masto84.workers.dev';
+
   const getWeatherGlobal = window.getWeather || (async function (lat, lon) {
-    const url = `https://repotracker.masto84.workers.dev/?lat=${lat}&lon=${lon}`;
+    const url = `${WEATHER_WORKER_URL}/?lat=${lat}&lon=${lon}`;
     try {
       const res = await fetch(url, { cache: 'no-cache' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -23,41 +25,29 @@
     }
   });
 
-  // markersLayer pidetään moduulin sisällä, ei globaalina
   let markersLayer = null;
-
-  // Estä delegoitu kuuntelija lisääntymästä moneen kertaan
   let readMoreBound = false;
 
-  /**
-   * Luo markerit kartalle annetusta places-listasta
-   * @param {L.Map} map
-   * @param {(lat:number,lon:number)=>Promise<Weather|null>} getWeatherFn
-   * @param {(place:Object)=>void} showPlaceInfoFn
-   * @param {Array<Object>} places
-   */
-function initMarkers(map, getWeatherFn, showPlaceInfoFn, places = []) {
+  function initMarkers(map, getWeatherFn, showPlaceInfoFn, places = []) {
     if (!map || !Array.isArray(places)) return;
 
-    // 1. Määritetään dynaaminen polku (jos ollaan /map/ kansiossa, hypätään ylös)
     const prefix = window.location.pathname.includes('/map/') ? '../' : '';
 
     if (markersLayer) {
-        markersLayer.clearLayers();
+      markersLayer.clearLayers();
     } else {
-        markersLayer = L.layerGroup();
-        // Tallennetaan taso globaalisti, jotta script.js pääsee siihen käsiksi
-        window.markersLayer = markersLayer; 
+      markersLayer = L.layerGroup();
+      // FIX #3: Tallennetaan oikealla nimellä jotta script.js löytää sen.
+      window.markersLayer = markersLayer;
     }
 
     places.forEach(place => {
-      // 2. Käytetään prefixiä pinni.png-kuvassa
       const customIcon = L.divIcon({
         className: 'custom-marker',
         html: `
           <div class="marker-wrapper">
-            <img src="${prefix}pinni.png" class="pin">
-            <img src="${place.icon}" class="pin-icon">
+            <img src="${prefix}pinni.png" class="pin" alt="pin">
+            <img src="${place.icon}" class="pin-icon" alt="${place.name}">
           </div>
         `,
         iconSize: [32, 48],
@@ -70,17 +60,13 @@ function initMarkers(map, getWeatherFn, showPlaceInfoFn, places = []) {
           <img src="${place.icon}" alt="${place.name}">
           <strong class="popup-title">${place.name}</strong>
         </div>
-
         <div style="font-size:0.9em; margin:6px 0; max-width:250px;">
           ${place.short || ''}
         </div>
-
         <a href="#" class="read-more" data-place="${place.name}">Read more</a>
-
         <div class="weather-box" style="margin-top:10px;">
           <em>Retrieving weather data...</em>
         </div>
-
         ${
           place.stream
             ? `<div class="popup-stream"
@@ -96,16 +82,23 @@ function initMarkers(map, getWeatherFn, showPlaceInfoFn, places = []) {
         .bindPopup(popupContent, { className: 'custom-popup' })
         .addTo(markersLayer);
 
+      // Tallennetaan id → marker, jotta openPlaceFromUrlParam löytää sen
+      if (place.id && window.placeMarkers instanceof Map) {
+        window.placeMarkers.set(String(place.id).toLowerCase(), marker);
+      }
+
       marker.on('popupopen', async (e) => {
         const popupEl = e.popup.getElement();
-
-        // Sää
         const weatherBox = popupEl.querySelector('.weather-box');
         if (weatherBox && !weatherBox.dataset.loaded) {
           const weather = await (getWeatherFn || getWeatherGlobal)(place.lat, place.lon);
           if (weather) {
             weatherBox.innerHTML = `
-              <div class="weather-row"><img src="https://openweathermap.org/img/wn/${weather.icon}.png"><span>${weather.temp}°C — ${weather.desc}</span></div><small>Feels like ${weather.feels}°C | Wind ${weather.wind} m/s</small>
+              <div class="weather-row">
+                <img src="https://openweathermap.org/img/wn/${weather.icon}.png" alt="">
+                <span>${weather.temp}°C — ${weather.desc}</span>
+              </div>
+              <small>Feels like ${weather.feels}°C | Wind ${weather.wind} m/s</small>
             `;
           } else {
             weatherBox.textContent = 'Weather not available';
@@ -113,7 +106,6 @@ function initMarkers(map, getWeatherFn, showPlaceInfoFn, places = []) {
           weatherBox.dataset.loaded = 'true';
         }
 
-        // Stream upotus
         const container = popupEl.querySelector('.popup-stream');
         if (container && !container.querySelector('iframe')) {
           const iframe = document.createElement('iframe');
@@ -127,7 +119,6 @@ function initMarkers(map, getWeatherFn, showPlaceInfoFn, places = []) {
       });
     });
 
-    // Delegoitu "Read more" – sidotaan vain kerran
     if (!readMoreBound) {
       document.addEventListener('click', function (e) {
         const link = e.target.closest('.read-more');
@@ -143,9 +134,8 @@ function initMarkers(map, getWeatherFn, showPlaceInfoFn, places = []) {
     }
   }
 
- function togglePlaces(visible, map) {
+  function togglePlaces(visible, map) {
     if (!markersLayer || !map) return;
-    
     if (visible) {
       markersLayer.addTo(map);
     } else {
@@ -153,7 +143,6 @@ function initMarkers(map, getWeatherFn, showPlaceInfoFn, places = []) {
     }
   }
 
-  // Vie julkinen API: lisätään togglePlaces jo olemassa olevan initMarkersin kaveriksi
   window.initMarkers = initMarkers;
-  window.togglePlaces = togglePlaces; // Tämä on uusi rivi
+  window.togglePlaces = togglePlaces;
 })();
