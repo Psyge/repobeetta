@@ -693,7 +693,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       await initAppMap();
       setTimeout(() => { if (map) map.invalidateSize(); }, 300);
-    } catch (e) { console.error('initAppMap error:', e); }
+    } catch (e) { console.error('initAppMap error:', e); } 
   }
 
   // FIX #10: Resize + orientationchange (iOS-yhteensopivuus)
