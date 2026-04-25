@@ -3,16 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Revontulikartta - Reaaliaikainen seuranta</title>
-    
+    <title>Revontulikartta - Reaaliaikainen seuranta | RepoTracker</title>
+    <meta name="description" content="Reaaliaikainen revontulikartta Suomeen. Seuraa KP-indeksiä, pilvisyyttä ja revontulien todennäköisyyttä omalla alueellasi.">
+
     <link rel="stylesheet" href="../modern.css">
-    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
-   
+    <!-- FIX #9: Ladataan Chart.js etukäteen, jotta forecast-popup avautuu välittömästi -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
 </head>
 <body class="map-page">
+
+    <!-- FIX #5: Lisätty puuttuva side-menu, jotta toggleMenu() toimii -->
+    <div id="side-menu">
+        <div class="close-btn" onclick="toggleMenu()">×</div>
+        <nav class="nav-links">
+            <a href="../index.html">Live List</a>
+            <a href="/info/faq/">FAQ - Tietoa revontulista</a>
+            <a href="/info/places/">Suositut katselupaikat</a>
+            <a href="/info/contact/">Ota yhteyttä</a>
+            <a href="/info/privacy/">Tietosuojaseloste</a>
+        </nav>
+    </div>
 
     <header>
         <div class="header-left">
@@ -22,79 +34,86 @@
         <div class="search-trigger" onclick="toggleSearch()">🔍</div>
     </header>
 
+    <!-- FIX #5: search-container puuttui kokonaan, mutta header viittasi siihen -->
+    <div id="search-container" style="display:none;">
+        <input type="text" id="city-input" placeholder="Syötä paikkakunta...">
+        <button onclick="handleSearch()">Hae</button>
+    </div>
+
     <div class="map-wrapper">
         <div id="map"></div>
-        
+
+        <!-- FIX #11: Korjattu sisäkkäinen .map-controls. Nyt yksi kontti per ryhmä. -->
         <div class="map-controls">
             <button class="control-btn" id="locate-btn" title="Oma sijainti">📍</button>
-           
+            <button class="control-btn" id="forecast-btn" title="3-päivän ennuste">📊</button>
+        </div>
+
         <div class="map-controls" id="places-toggle-wrapper">
-                <div class="toggle-container">
-                    <span class="toggle-label">Show Places</span>
-                    <label class="switch">
-                        <input type="checkbox" id="toggle-places" autocomplete="off">
-                        <span class="slider"></span>
-                    </label>
-                </div>
+            <div class="toggle-container">
+                <span class="toggle-label">Show Places</span>
+                <label class="switch">
+                    <input type="checkbox" id="toggle-places" autocomplete="off" checked>
+                    <span class="slider"></span>
+                </label>
             </div>
         </div>
-        
+
         <div id="kp-info-box" class="kp-floating-badge">
             <span id="kpVal">--</span> KP
         </div>
+
+        <!-- FIX #5: Lisätty loader, jota script.js piilottaa kun data on ladattu -->
+        <div id="loader" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#00ffcc;z-index:500;">Ladataan revontulidataa…</div>
     </div>
-<div id="forecast-popup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(5px);">
-    <div style="background:#1a1a1a; padding:20px; border-radius:15px; width:90%; max-width:600px; border:1px solid var(--border-dim);">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <h3 style="margin:0;">3-Day Forecast</h3>
-            <button id="close-forecast" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;">&times;</button>
+
+    <div id="forecast-popup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(5px);">
+        <div style="background:#1a1a1a; padding:20px; border-radius:15px; width:90%; max-width:600px; border:1px solid rgba(0,255,204,0.3);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="margin:0;color:#fff;">3-Day Forecast</h3>
+                <button id="close-forecast" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;">&times;</button>
+            </div>
+            <div style="height:300px;"><canvas id="kpChart"></canvas></div>
+            <div id="errorMessage" style="margin-top:10px;"></div>
         </div>
-        <div style="height:300px;"><canvas id="kpChart"></canvas></div>
     </div>
-</div>
+
     <footer class="main-footer">
         <div class="footer-content">
             <p>&copy; 2026 RepoTracker | <a href="/privacy/">Tietosuoja</a></p>
-            <div class="social-links">
-                </div>
         </div>
     </footer>
-<script src="../markers.js"></script>
+
+    <script src="../markers.js"></script>
     <script src="../script.js"></script>
- <script>
- document.addEventListener('DOMContentLoaded', () => {
-    const placesToggle = document.getElementById('toggle-places');
-    if (placesToggle) {
-        // Estetään klikkauksen läpimeno kartalle
-        if (typeof L !== 'undefined') {
-            L.DomEvent.disableClickPropagation(placesToggle);
-        }
-        
-        placesToggle.addEventListener('change', function() {
-            if (typeof window.togglePlaces === 'function') {
-                // Kutsutaan funktiota ja lähetetään kytkimen tila ja kartta-olio
-                window.togglePlaces(this.checked, map);
+    <script>
+        // FIX #12: Käytetään window.map jotta varmasti viitataan globaaliin
+        document.addEventListener('DOMContentLoaded', () => {
+            const placesToggle = document.getElementById('toggle-places');
+            if (placesToggle) {
+                if (typeof L !== 'undefined') {
+                    L.DomEvent.disableClickPropagation(placesToggle);
+                }
+                placesToggle.addEventListener('change', function () {
+                    if (typeof window.togglePlaces === 'function') {
+                        window.togglePlaces(this.checked, window.map);
+                    }
+                });
             }
         });
-    }
-});  
-      function toggleMenu() {
+
+        function toggleMenu() {
             document.getElementById('side-menu').classList.toggle('open');
         }
-
         function toggleSearch() {
             const search = document.getElementById('search-container');
             search.style.display = (search.style.display === 'block') ? 'none' : 'block';
         }
-
         async function handleSearch() {
             const city = document.getElementById('city-input').value;
             if (!city) return;
-            
-            // Tässä kohtaa voit käyttää aiemmin sovittua Nominatim API -hakua
             alert("Haetaan ennustetta kohteelle: " + city);
-            // Myöhemmin: fetchAuroraData(city);
         }
- </script>
+    </script>
 </body>
 </html>
