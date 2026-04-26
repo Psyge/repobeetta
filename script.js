@@ -236,16 +236,47 @@ async function showAuroraPopup(lat, lon, marker = null, showGoogleMapsLink = tru
   const source = weather ? weather.source : 'Unknown';
   const temp = weather ? weather.temp : 'N/A';
 
-  let baseProbability = Math.min((auroraIntensity / 50) * 100, 100);
-  let cloudVisibility = (100 - clouds) / 100;
-  let finalProbability = Math.round(baseProbability * cloudVisibility);
+  // ===== UUSI MULTI-FACTOR ENNUSTUS =====
+  // OVATION: skaalataan intensity (0..50+) → todennäköisyys 0..100
+  const ovationProb = Math.min((auroraIntensity / 50) * 100, 100);
 
-  if (clouds > 85) finalProbability = Math.min(finalProbability, 5);
-  if (auroraIntensity < 2) finalProbability = 0;
+  // Aurinkotuuli (DSCOVR) jos saatavilla
+  let solarWindBoost = null;
+  if (window.SolarWind) {
+    try {
+      const sw = await window.SolarWind.getSolarWind();
+      solarWindBoost = window.SolarWind.computeBoost(sw);
+      window._lastSolarWind = sw; // talteen forecast-paneelia varten
+    } catch (e) { console.warn('SW fetch failed', e); }
+  }
 
+  // Aja multi-factor moottori
+  let result;
+  if (window.AuroraEngine) {
+    result = window.AuroraEngine.computeAuroraScore({
+      ovation: ovationProb,
+      clouds:  clouds,
+      lat, lon,
+      date: new Date(),
+      solarWind: solarWindBoost
+    });
+  } else {
+    // Fallback vanha logiikka
+    const cloudVis = (100 - clouds) / 100;
+    let p = Math.round(ovationProb * cloudVis);
+    if (clouds > 85) p = Math.min(p, 5);
+    if (auroraIntensity < 2) p = 0;
+    result = { score: p, status: p >= 70 ? 'high' : p >= 30 ? 'moderate' : 'low',
+               factors: { ovation: Math.round(ovationProb), clouds: Math.round(cloudVis*100),
+                          darkness: 100, moon: 100, latitude: 100, solarWind: 100, magLat: lat },
+               advice: '' };
+  }
+
+  const finalProbability = result.score;
   let statusEmoji = '🔴', statusText = 'Low chance', statusColor = '#ff3366';
-  if (finalProbability >= 70) { statusEmoji = '🟢'; statusText = 'High chance!'; statusColor = '#00ffcc'; }
-  else if (finalProbability >= 30) { statusEmoji = '🟡'; statusText = 'Moderate chance'; statusColor = '#ffcc00'; }
+  if (result.status === 'extreme')  { statusEmoji = '🟢'; statusText = 'EXTREME!';     statusColor = '#00ffcc'; }
+  else if (result.status === 'high'){ statusEmoji = '🟢'; statusText = 'High chance!'; statusColor = '#00ffcc'; }
+  else if (result.status === 'moderate'){ statusEmoji = '🟡'; statusText = 'Moderate'; statusColor = '#ffcc00'; }
 
   let popupContent = `
     <div style="text-align:center; font-family:'Arial',sans-serif; min-width:200px; padding:5px;">
@@ -257,6 +288,7 @@ async function showAuroraPopup(lat, lon, marker = null, showGoogleMapsLink = tru
       <div style="width:100%; height:6px; background:#333; border-radius:10px; margin:15px 0;">
         <div style="width:${finalProbability}%; height:100%; background:${statusColor}; border-radius:10px; box-shadow:0 0 8px ${statusColor}77;"></div>
       </div>
+      ${result.advice ? `<div style="font-size:11px; color:#ccc; margin:6px 0 10px; font-style:italic;">${result.advice}</div>` : ''}
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px; border-top:1px solid #333; padding-top:10px;">
         <div style="text-align:left;">
           <div style="font-size:9px; color:#888;">AURORA</div>
@@ -266,6 +298,18 @@ async function showAuroraPopup(lat, lon, marker = null, showGoogleMapsLink = tru
           <div style="font-size:9px; color:#888;">CLOUDS</div>
           <div style="font-size:14px; font-weight:bold; color:#fff;">☁️ ${clouds}%</div>
         </div>
+      </div>
+      <div style="margin-top:10px; padding:8px; background:rgba(0,255,204,0.05); border:1px solid rgba(0,255,204,0.15); border-radius:8px;">
+        <div style="font-size:9px; color:#888; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">Tekijät</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; font-size:10px; color:#ccc;">
+          <div>🌑 Pimeys<br><b style="color:#fff;">${result.factors.darkness}%</b></div>
+          <div>🌕 Kuu<br><b style="color:#fff;">${result.factors.moon}%</b></div>
+          <div>🧭 Mag.lat<br><b style="color:#fff;">${result.factors.magLat}°</b></div>
+          <div>☁ Pilvi<br><b style="color:#fff;">${result.factors.clouds}%</b></div>
+          <div>📡 Sol.wind<br><b style="color:#fff;">${result.factors.solarWind}%</b></div>
+          <div>✨ OVATION<br><b style="color:#fff;">${result.factors.ovation}%</b></div>
+        </div>
+        ${solarWindBoost ? `<div style="font-size:9px; color:#888; margin-top:6px; text-align:center;">${solarWindBoost.label}: ${solarWindBoost.detail}</div>` : ''}
       </div>
       <div style="font-size:8px; color:#555; margin-top:10px;">Data source: ${source}</div>
     </div>
@@ -693,7 +737,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       await initAppMap();
       setTimeout(() => { if (map) map.invalidateSize(); }, 300);
-    } catch (e) { console.error('initAppMap error:', e); } 
+    } catch (e) { console.error('initAppMap error:', e); }
   }
 
   // FIX #10: Resize + orientationchange (iOS-yhteensopivuus)
