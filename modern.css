@@ -88,7 +88,7 @@ header {
 #locate-btn, #forecast-btn {
     position: absolute; right: 20px; z-index: 1001;
     background: rgba(0, 255, 200, 0.2); border: 2px solid var(--neon-green);
-    color: #fff; padding: 12px 20px; border-radius: 50px;
+    color: #fff; border-radius: 50px;
     cursor: pointer; font-weight: bold; backdrop-filter: blur(10px);
     transition: var(--transition);
 }
