@@ -135,7 +135,7 @@
   }
 
   function togglePlaces(visible, map) {
-    if (!markersLayer || !map) return;
+    if (!markersLayer || !map) return; 
     if (visible) {
       markersLayer.addTo(map);
     } else {
