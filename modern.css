@@ -512,7 +512,7 @@ body.map-page #map {
 /* Oikean reunan kontrollinapit alemmas (pois search-fab:n alta) */
 body.map-page .map-controls {
     position: absolute !important;
-    top: 80px !important;   /* aiemmin ~10-20px → nyt search-fabin alle */
+    top: 10px !important;   /* aiemmin ~10-20px → nyt search-fabin alle */
     right: 18px !important;
     z-index: 1001 !important;
     display: flex;
