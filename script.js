@@ -436,6 +436,13 @@ async function showAuroraPopup(lat, lon, marker = null, showGoogleMapsLink = tru
     solarWind: solarWindBoost
   };
 
+  // Onko aurinkotuulesta oikeaa dataa? Jos ei → näytetään "—" 100%:n sijaan.
+  const hasSolarWind = !!(solarWindBoost && solarWindBoost.detail);
+  const solarWindDisplay = hasSolarWind ? (result.factors.solarWind + '%') : '—';
+  const solarWindTitle   = hasSolarWind
+    ? `Aurinkotuuli (DSCOVR): ${solarWindBoost.detail}`
+    : 'Aurinkotuulen reaaliaikaista dataa ei saatu — käytetään neutraalia arvoa.';
+
   const shownProb   = premium ? finalProbability : basicProbability;
   const shownEmoji  = premium ? statusEmoji      : basicEmoji;
   const shownText   = premium ? statusText       : basicText;
@@ -460,22 +467,22 @@ async function showAuroraPopup(lat, lon, marker = null, showGoogleMapsLink = tru
           <div style="font-size:14px; font-weight:bold; color:#fff;">✨ ${auroraIntensity.toFixed(1)} / 100</div>
         </div>
         <div style="text-align:right;">
-          <div style="font-size:9px; color:#888;">CLOUDS</div>
+          <div style="font-size:9px; color:#888;" title="Mitattu pilvisyys taivaalla (FMI/OWM). Korkea = huono.">PILVISYYS</div>
           <div style="font-size:14px; font-weight:bold; color:#fff;">☁️ ${clouds}%</div>
         </div>
       </div>
       ${premium ? `
       <div style="margin-top:10px; padding:8px; background:rgba(0,255,204,0.05); border:1px solid rgba(0,255,204,0.15); border-radius:8px;">
-        <div style="font-size:9px; color:#888; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">Tekijät · 6-faktorin malli</div>
+        <div style="font-size:9px; color:#888; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">Tekijät · 6-faktorin malli (100% = optimaalinen)</div>
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; font-size:10px; color:#ccc;">
-          <div>🌑 Pimeys<br><b style="color:#fff;">${result.factors.darkness}%</b></div>
-          <div>🌕 Kuu<br><b style="color:#fff;">${result.factors.moon}%</b></div>
-          <div>🧭 Mag.lat<br><b style="color:#fff;">${result.factors.magLat}°</b></div>
-          <div>☁ Pilvi<br><b style="color:#fff;">${result.factors.clouds}%</b></div>
-          <div>📡 Sol.wind<br><b style="color:#fff;">${result.factors.solarWind}%</b></div>
-          <div>✨ OVATION<br><b style="color:#fff;">${result.factors.ovation}%</b></div>
+          <div title="Auringon korkeus: 100% = täysi pimeys, 0% = päivä">🌑 Pimeys<br><b style="color:#fff;">${result.factors.darkness}%</b></div>
+          <div title="Kuun valo: 100% = uusikuu, 0% = täysikuu">🌕 Kuu<br><b style="color:#fff;">${result.factors.moon}%</b></div>
+          <div title="Geomagneettinen leveysaste — pohjoinen = parempi">🧭 Mag.lat<br><b style="color:#fff;">${result.factors.magLat}°</b></div>
+          <div title="Selkeän taivaan osuus — johdettu pilvisyydestä epälineaarisesti">🌤 Selkeys<br><b style="color:#fff;">${result.factors.clouds}%</b></div>
+          <div title="${solarWindTitle}">📡 Sol.wind<br><b style="color:#fff;">${solarWindDisplay}</b></div>
+          <div title="NOAA OVATION -malli: aurorin tn lähimmästä gridistä">✨ OVATION<br><b style="color:#fff;">${result.factors.ovation}%</b></div>
         </div>
-        ${solarWindBoost ? `<div style="font-size:9px; color:#888; margin-top:6px; text-align:center;">${solarWindBoost.label}: ${solarWindBoost.detail}</div>` : ''}
+        ${hasSolarWind ? `<div style="font-size:9px; color:#888; margin-top:6px; text-align:center;">${solarWindBoost.label}: ${solarWindBoost.detail}</div>` : `<div style="font-size:9px; color:#666; margin-top:6px; text-align:center; font-style:italic;">Aurinkotuulidata ei saatavilla juuri nyt</div>`}
       </div>
       ` : `
       <div style="margin-top:10px; padding:10px; background:rgba(0,255,204,0.04); border:1px dashed rgba(0,255,204,0.3); border-radius:8px; position:relative;">
@@ -484,8 +491,8 @@ async function showAuroraPopup(lat, lon, marker = null, showGoogleMapsLink = tru
           <div>🌑 Pimeys<br><b style="color:#fff;">${result.factors.darkness}%</b></div>
           <div>🌕 Kuu<br><b style="color:#fff;">${result.factors.moon}%</b></div>
           <div>🧭 Mag.lat<br><b style="color:#fff;">${result.factors.magLat}°</b></div>
-          <div>☁ Pilvi<br><b style="color:#fff;">${result.factors.clouds}%</b></div>
-          <div>📡 Sol.wind<br><b style="color:#fff;">${result.factors.solarWind}%</b></div>
+          <div>🌤 Selkeys<br><b style="color:#fff;">${result.factors.clouds}%</b></div>
+          <div>📡 Sol.wind<br><b style="color:#fff;">${solarWindDisplay}</b></div>
           <div>✨ OVATION<br><b style="color:#fff;">${result.factors.ovation}%</b></div>
         </div>
         <div style="font-size:10px; color:#aaa; margin-top:8px; text-align:center; line-height:1.4;">
