@@ -16,6 +16,139 @@ let placeMarkers = window.placeMarkers;
 let animationFrameId;
 let kpChartInstance = null;
 
+// =====================================================
+// PREMIUM-tila (mock — vaihdetaan oikeaan auth-flowiin myöhemmin)
+// Aktivointi:
+//   1) URL-parametri:  ?premium=1
+//   2) Koodi paneelista: AURORA2026
+//   3) Konsoli: localStorage.setItem('rt_premium','1')
+// Poisto: localStorage.removeItem('rt_premium')
+// =====================================================
+const PREMIUM_CODES = ['AURORA2026', 'TESTI'];
+function isPremium() {
+  try { return localStorage.getItem('rt_premium') === '1'; } catch (e) { return false; }
+}
+function setPremium(on) {
+  try {
+    if (on) localStorage.setItem('rt_premium', '1');
+    else    localStorage.removeItem('rt_premium');
+  } catch (e) {}
+  refreshPremiumUI();
+}
+window.RT_setPremium = setPremium;
+window.RT_isPremium  = isPremium;
+
+// Tarkista URL-parametri heti latauksessa
+(function checkPremiumFromUrl(){
+  try {
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('premium') === '1') localStorage.setItem('rt_premium', '1');
+    if (p.get('premium') === '0') localStorage.removeItem('rt_premium');
+  } catch (e) {}
+})();
+
+// Päivittää premium-teaser-paneelin tilan mukaan
+function refreshPremiumUI() {
+  const premium = isPremium();
+  const teaser  = document.getElementById('premium-teaser');
+  if (!teaser) return;
+
+  const lockIcon    = document.getElementById('premium-lock-icon');
+  const statusLabel = document.getElementById('premium-status-label');
+  const toggleLink  = document.getElementById('premium-toggle-link');
+  const title       = document.getElementById('premium-title');
+  const desc        = document.getElementById('premium-desc');
+  const ctaBtn      = document.getElementById('premium-cta-btn');
+  const list        = document.getElementById('premium-forecast-list');
+
+  if (premium) {
+    teaser.style.borderColor = 'rgba(0,255,204,0.6)';
+    teaser.style.boxShadow   = '0 10px 30px rgba(0,255,204,0.18)';
+    if (lockIcon)    lockIcon.textContent = '✓';
+    if (statusLabel) statusLabel.textContent = 'Premium aktiivinen';
+    if (toggleLink)  toggleLink.textContent = 'Vaihda perustilaan';
+    if (title)       title.textContent = 'Tunti-ennuste sijaintiisi';
+    if (desc)        desc.innerHTML = 'Klikkaa karttapistettä → näet 6h tarkan ennusteen valitulle sijainnille.';
+    if (ctaBtn)      ctaBtn.textContent = 'Avaa 3-päivän Kp-ennuste';
+  } else {
+    teaser.style.borderColor = 'rgba(0,255,204,0.25)';
+    teaser.style.boxShadow   = '0 10px 30px rgba(0,0,0,0.5)';
+    if (lockIcon)    lockIcon.textContent = '🔒';
+    if (statusLabel) statusLabel.textContent = 'Premium';
+    if (toggleLink)  toggleLink.textContent = 'Aktivoi';
+    if (title)       title.textContent = 'Tarkka tunti-ennuste';
+    if (desc)        desc.innerHTML = 'Karttaklikkaus näyttää karkean Kp-arvion. Premium paljastaa Bz:n, pimeyden, kuun ja sijainnin tarkan vaikutuksen.';
+    if (ctaBtn)      ctaBtn.textContent = 'Avaa Premium →';
+  }
+
+  // Päivitä tuntiennuste-teaser viimeisimmästä klikkauksesta
+  if (list) {
+    if (window._lastPopupContext) {
+      list.innerHTML = buildHourlyTeaserHTML(window._lastPopupContext, premium);
+    } else {
+      list.innerHTML = '<div style="opacity:0.5; text-align:center; padding:8px 0; font-size:10px;">Klikkaa karttaa ladataksesi…</div>';
+    }
+  }
+}
+window.refreshPremiumUI = refreshPremiumUI;
+
+// Rakentaa "tunti-ennusteen" — käyttää AuroraEngineä projektioon. Premium näkee kaikki 6 tuntia,
+// ilmainen näkee vain seuraavan tunnin trendinuolen + sumennetun listan.
+function buildHourlyTeaserHTML(ctx, premium) {
+  if (!window.AuroraEngine) return '<div style="font-size:10px; color:#888;">Ei dataa</div>';
+  const now = new Date();
+  const rows = [];
+  for (let h = 1; h <= 6; h++) {
+    const t = new Date(now.getTime() + h * 3600 * 1000);
+    // Yksinkertainen projektio: pidetään OVATION & sää vakiona, päivitetään pimeys/kuu ajan myötä.
+    // (Oikea malli vaatisi NOAA 3-day Kp -ennusteen interpolointia tunneiksi.)
+    let projected;
+    try {
+      projected = window.AuroraEngine.computeAuroraScore({
+        ovation:   ctx.ovationProb,
+        clouds:    ctx.clouds,
+        lat:       ctx.lat,
+        lon:       ctx.lon,
+        date:      t,
+        solarWind: ctx.solarWind
+      });
+    } catch (e) { projected = { score: ctx.premiumScore }; }
+    const hh = String(t.getHours()).padStart(2,'0');
+    const mm = String(t.getMinutes()).padStart(2,'0');
+    rows.push({ time: `${hh}:${mm}`, score: projected.score });
+  }
+  // Trendi
+  const trend = rows[rows.length-1].score - rows[0].score;
+  const trendLabel = trend > 5 ? 'nouseva ↑' : trend < -5 ? 'laskeva ↓' : 'tasainen →';
+  const trendColor = trend > 5 ? '#00ffcc' : trend < -5 ? '#ff3366' : '#ffcc00';
+
+  if (premium) {
+    const list = rows.map(r => {
+      const c = r.score >= 60 ? '#00ffcc' : r.score >= 30 ? '#ffcc00' : '#888';
+      const star = r.score >= 60 ? ' ✨' : '';
+      return `<div style="display:flex; justify-content:space-between; padding:2px 0;"><span>${r.time}</span><b style="color:${c};">${r.score}%${star}</b></div>`;
+    }).join('');
+    return `
+      <div style="font-size:9px; color:#888; margin-bottom:4px;">Trendi: <b style="color:${trendColor};">${trendLabel}</b></div>
+      ${list}
+    `;
+  } else {
+    // Ilmainen: näytä vain ensimmäinen tunti selvästi, loput sumennettu
+    const first = rows[0];
+    const c = first.score >= 60 ? '#00ffcc' : first.score >= 30 ? '#ffcc00' : '#888';
+    const blurredRest = rows.slice(1).map(r =>
+      `<div style="display:flex; justify-content:space-between; padding:2px 0; filter:blur(3.5px);"><span>${r.time}</span><b>${r.score}%</b></div>`
+    ).join('');
+    return `
+      <div style="font-size:9px; color:#888; margin-bottom:4px;">Seuraava tunti · trendi <b style="color:${trendColor};">${trendLabel}</b></div>
+      <div style="display:flex; justify-content:space-between; padding:2px 0;"><span>${first.time}</span><b style="color:${c};">${first.score}%</b></div>
+      <div style="position:relative; user-select:none; pointer-events:none;">
+        ${blurredRest}
+      </div>
+    `;
+  }
+}
+
 // Spritet ja säädöt
 let spriteGreen, spriteYellow, spriteRed, currentRadius = 0;
 
@@ -278,17 +411,49 @@ async function showAuroraPopup(lat, lon, marker = null, showGoogleMapsLink = tru
   else if (result.status === 'high'){ statusEmoji = '🟢'; statusText = 'High chance!'; statusColor = '#00ffcc'; }
   else if (result.status === 'moderate'){ statusEmoji = '🟡'; statusText = 'Moderate'; statusColor = '#ffcc00'; }
 
+  // ============================================================
+  // ILMAINEN vs PREMIUM näkymä
+  // Ilmainen: karkea Kp×pilvet (ei Bz/pimeys/kuu/lat -tarkennuksia)
+  // Premium:  täysi 6-faktorin erittely
+  // ============================================================
+  const premium = isPremium();
+
+  // Karkea Kp-pohjainen luku ilmaisille (sama logiikka kuin vanha fallback)
+  const cloudVisFree = (100 - clouds) / 100;
+  let basicProbability = Math.round(ovationProb * cloudVisFree);
+  if (clouds > 85) basicProbability = Math.min(basicProbability, 5);
+  if (auroraIntensity < 2) basicProbability = 0;
+  let basicEmoji = '🔴', basicText = 'Low chance', basicColor = '#ff3366';
+  if (basicProbability >= 60)      { basicEmoji = '🟢'; basicText = 'High chance!'; basicColor = '#00ffcc'; }
+  else if (basicProbability >= 30) { basicEmoji = '🟡'; basicText = 'Moderate';     basicColor = '#ffcc00'; }
+
+  // Tallenna premium-teaserille
+  window._lastPopupContext = {
+    lat, lon, clouds, ovationProb, auroraIntensity,
+    premiumScore: finalProbability,
+    basicScore: basicProbability,
+    factors: result.factors,
+    solarWind: solarWindBoost
+  };
+
+  const shownProb   = premium ? finalProbability : basicProbability;
+  const shownEmoji  = premium ? statusEmoji      : basicEmoji;
+  const shownText   = premium ? statusText       : basicText;
+  const shownColor  = premium ? statusColor      : basicColor;
+
   let popupContent = `
     <div style="text-align:center; font-family:'Arial',sans-serif; min-width:200px; padding:5px;">
-      <div style="font-size:10px; text-transform:uppercase; color:#888; letter-spacing:1px; margin-bottom:2px;">Chance now</div>
-      <div style="font-size:36px; font-weight:900; color:${statusColor}; line-height:1;">${finalProbability}%</div>
-      <div style="font-size:14px; font-weight:bold; color:${statusColor}; margin-top:5px; text-transform:uppercase;">
-        ${statusEmoji} ${statusText}
+      <div style="font-size:10px; text-transform:uppercase; color:#888; letter-spacing:1px; margin-bottom:2px;">
+        ${premium ? 'Tarkka ennuste · Premium ✓' : 'Karkea Kp-arvio'}
+      </div>
+      <div style="font-size:36px; font-weight:900; color:${shownColor}; line-height:1;">${shownProb}%</div>
+      <div style="font-size:14px; font-weight:bold; color:${shownColor}; margin-top:5px; text-transform:uppercase;">
+        ${shownEmoji} ${shownText}
       </div>
       <div style="width:100%; height:6px; background:#333; border-radius:10px; margin:15px 0;">
-        <div style="width:${finalProbability}%; height:100%; background:${statusColor}; border-radius:10px; box-shadow:0 0 8px ${statusColor}77;"></div>
+        <div style="width:${shownProb}%; height:100%; background:${shownColor}; border-radius:10px; box-shadow:0 0 8px ${shownColor}77;"></div>
       </div>
-      ${result.advice ? `<div style="font-size:11px; color:#ccc; margin:6px 0 10px; font-style:italic;">${result.advice}</div>` : ''}
+      ${premium && result.advice ? `<div style="font-size:11px; color:#ccc; margin:6px 0 10px; font-style:italic;">${result.advice}</div>` : ''}
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px; border-top:1px solid #333; padding-top:10px;">
         <div style="text-align:left;">
           <div style="font-size:9px; color:#888;">AURORA</div>
@@ -299,8 +464,9 @@ async function showAuroraPopup(lat, lon, marker = null, showGoogleMapsLink = tru
           <div style="font-size:14px; font-weight:bold; color:#fff;">☁️ ${clouds}%</div>
         </div>
       </div>
+      ${premium ? `
       <div style="margin-top:10px; padding:8px; background:rgba(0,255,204,0.05); border:1px solid rgba(0,255,204,0.15); border-radius:8px;">
-        <div style="font-size:9px; color:#888; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">Tekijät</div>
+        <div style="font-size:9px; color:#888; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">Tekijät · 6-faktorin malli</div>
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; font-size:10px; color:#ccc;">
           <div>🌑 Pimeys<br><b style="color:#fff;">${result.factors.darkness}%</b></div>
           <div>🌕 Kuu<br><b style="color:#fff;">${result.factors.moon}%</b></div>
@@ -311,6 +477,24 @@ async function showAuroraPopup(lat, lon, marker = null, showGoogleMapsLink = tru
         </div>
         ${solarWindBoost ? `<div style="font-size:9px; color:#888; margin-top:6px; text-align:center;">${solarWindBoost.label}: ${solarWindBoost.detail}</div>` : ''}
       </div>
+      ` : `
+      <div style="margin-top:10px; padding:10px; background:rgba(0,255,204,0.04); border:1px dashed rgba(0,255,204,0.3); border-radius:8px; position:relative;">
+        <div style="font-size:9px; color:#00ffcc; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; text-align:center;">🔒 Tarkka 6-faktorin ennuste</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; font-size:10px; color:#ccc; filter:blur(4px); user-select:none; pointer-events:none;">
+          <div>🌑 Pimeys<br><b style="color:#fff;">${result.factors.darkness}%</b></div>
+          <div>🌕 Kuu<br><b style="color:#fff;">${result.factors.moon}%</b></div>
+          <div>🧭 Mag.lat<br><b style="color:#fff;">${result.factors.magLat}°</b></div>
+          <div>☁ Pilvi<br><b style="color:#fff;">${result.factors.clouds}%</b></div>
+          <div>📡 Sol.wind<br><b style="color:#fff;">${result.factors.solarWind}%</b></div>
+          <div>✨ OVATION<br><b style="color:#fff;">${result.factors.ovation}%</b></div>
+        </div>
+        <div style="font-size:10px; color:#aaa; margin-top:8px; text-align:center; line-height:1.4;">
+          Premium näyttää Bz:n, pimeyden, kuun ja magneettisen leveysasteen vaikutuksen.<br>
+          <span style="color:#fff;">Tarkka arvio: <b style="color:#00ffcc;">${finalProbability}%</b></span> <span style="opacity:0.5;">(sumennettu)</span>
+        </div>
+        <button onclick="window.RT_openPremium && window.RT_openPremium();" style="margin-top:8px; width:100%; padding:6px; background:linear-gradient(135deg,#00ffcc,#00b894); border:none; border-radius:6px; color:#000; font-weight:bold; font-size:11px; cursor:pointer;">Avaa Premium →</button>
+      </div>
+      `}
       <div style="font-size:8px; color:#555; margin-top:10px;">Data source: ${source}</div>
     </div>
   `;
@@ -336,9 +520,82 @@ async function showAuroraPopup(lat, lon, marker = null, showGoogleMapsLink = tru
   } else {
     L.popup().setLatLng([lat, lon]).setContent(popupContent).openOn(map);
   }
+
+  // Päivitä premium-teaser uusilla tiedoilla
+  if (typeof refreshPremiumUI === 'function') refreshPremiumUI();
 }
 
 function initButtons() {
+  // ---- Premium-paneelin alustus + tilan päivitys ----
+  refreshPremiumUI();
+
+  const toggleLink   = document.getElementById('premium-toggle-link');
+  const activateBox  = document.getElementById('premium-activate-box');
+  const codeInput    = document.getElementById('premium-code-input');
+  const codeSubmit   = document.getElementById('premium-code-submit');
+  const ctaBtn       = document.getElementById('premium-cta-btn');
+
+  // Helper: avaa aktivointilaatikko (kutsutaan myös popupin "Avaa Premium" -napista)
+  window.RT_openPremium = function () {
+    if (activateBox) {
+      activateBox.style.display = 'block';
+      if (codeInput) { codeInput.focus(); codeInput.select(); }
+    }
+  };
+
+  if (toggleLink) {
+    toggleLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (isPremium()) {
+        // Kirjaudu ulos premiumista
+        if (confirm('Vaihda perustilaan? Premium-näkymä piilotetaan.')) setPremium(false);
+      } else {
+        window.RT_openPremium();
+      }
+    });
+  }
+
+  if (codeSubmit && codeInput) {
+    const tryActivate = () => {
+      const code = (codeInput.value || '').trim().toUpperCase();
+      if (PREMIUM_CODES.includes(code)) {
+        setPremium(true);
+        if (activateBox) activateBox.style.display = 'none';
+        codeInput.value = '';
+        // Päivitä avoinna oleva popup jos sellainen on
+        if (map && window._lastPopupContext) {
+          const c = window._lastPopupContext;
+          showAuroraPopup(c.lat, c.lon, null, true);
+        }
+      } else {
+        codeInput.style.borderColor = '#ff3366';
+        setTimeout(() => { codeInput.style.borderColor = '#333'; }, 1200);
+      }
+    };
+    codeSubmit.addEventListener('click', tryActivate);
+    codeInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryActivate(); });
+  }
+
+  if (ctaBtn) {
+    ctaBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (isPremium()) {
+        // Premium-tilassa nappi avaa 3-day forecastin
+        const fp = document.getElementById('forecast-popup');
+        if (fp) { fp.style.display = 'flex'; ensureChartJs().then(fetchAuroraForecast); }
+      } else {
+        window.RT_openPremium();
+      }
+    });
+  }
+
+  // Estä Leafletin click-propagaatio paneelilta
+  const teaser = document.getElementById('premium-teaser');
+  if (teaser && typeof L !== 'undefined' && L.DomEvent) {
+    L.DomEvent.disableClickPropagation(teaser);
+    L.DomEvent.disableScrollPropagation(teaser);
+  }
+
   // FIX #5: Kaikki nämä elementit ovat valinnaisia — käytä `?.`-tarkistusta
   const helpPopup = document.getElementById('help-popup');
   const closePopupBtn = document.getElementById('close-popup');
