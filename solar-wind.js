@@ -109,4 +109,4 @@
   }
 
   global.SolarWind = { getSolarWind, computeBoost };
-})(window);
+})(window); 
