@@ -441,8 +441,8 @@ input:checked + .slider:before { transform: translateX(14px); }
 }
 @media (max-width: 768px) {
     #places-toggle-wrapper {
-        top: auto !important;
-        bottom: 80px !important;
+        top: 160px !important;
+       
         right: 10px !important;
     }
 }
