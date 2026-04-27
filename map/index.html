@@ -26,9 +26,13 @@
         </nav>
     </div>
 
-    <!-- Minimal floating menu button (no banner) -->
-    <button id="menu-fab" class="menu-fab" onclick="toggleMenu()" aria-label="Avaa valikko">☰</button>
-    <button id="search-fab" class="search-fab" onclick="toggleSearch()" aria-label="Haku">🔍</button>
+    <header>
+        <div class="header-left">
+            <div class="menu-trigger" onclick="toggleMenu()">☰ MENU</div>
+            <img src="../repo-neon.png" alt="RepoTracker" class="logo">
+        </div>
+        <div class="search-trigger" onclick="toggleSearch()">🔍</div>
+    </header>
 
     <!-- FIX #5: search-container puuttui kokonaan, mutta header viittasi siihen -->
     <div id="search-container" style="display:none;">
@@ -57,26 +61,10 @@
 
         <div id="kp-info-box" class="kp-floating-badge">
             <span id="kpVal">--</span> KP
-            <span id="bzVal" style="margin-left:8px; font-size:11px; color:#9aa;">Bz <b style="color:#fff;">--</b></span>
         </div>
 
         <!-- FIX #5: Lisätty loader, jota script.js piilottaa kun data on ladattu -->
         <div id="loader" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#00ffcc;z-index:500;">Ladataan revontulidataa…</div>
-
-        <!-- Premium-teaser (lukittu tarkka tunti-ennuste) -->
-        <div id="premium-teaser" style="position:fixed; right:14px; bottom:48px; width:240px; background:linear-gradient(135deg,#1a1a2e,#0f0f1a); border:1px solid rgba(0,255,204,0.25); border-radius:12px; padding:12px; z-index:600; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
-          <div style="display:flex; align-items:center; gap:6px; font-size:10px; color:#00ffcc; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">
-            🔒 Premium
-          </div>
-          <div style="font-size:13px; color:#fff; font-weight:bold; margin-bottom:4px;">Tarkka tunti-ennuste</div>
-          <div style="font-size:11px; color:#aaa; line-height:1.4; margin-bottom:8px;">
-            Saat sijaintiisi 1h tarkkuudella ennustetut huippuhetket seuraaviksi 24 tunniksi.
-          </div>
-          <div style="filter:blur(3px); pointer-events:none; user-select:none; font-size:10px; color:#ccc; padding:6px; background:rgba(255,255,255,0.04); border-radius:6px;">
-            21:00 · 38%<br>22:00 · 64%<br>23:00 · 81% ✨<br>00:00 · 72%
-          </div>
-          <button onclick="alert('Tulossa pian — voit liittyä jonotuslistalle.');" style="margin-top:8px; width:100%; padding:8px; background:linear-gradient(135deg,#00ffcc,#00b894); border:none; border-radius:8px; color:#000; font-weight:bold; font-size:12px; cursor:pointer;">Avaa Premium →</button>
-        </div>
     </div>
 
     <div id="forecast-popup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(5px);">
@@ -90,13 +78,13 @@
         </div>
     </div>
 
-    <footer class="main-footer slim-footer">
-        &copy; 2026 RepoTracker · <a href="/privacy/">Tietosuoja</a>
+    <footer class="main-footer">
+        <div class="footer-content">
+            <p>&copy; 2026 RepoTracker | <a href="/privacy/">Tietosuoja</a></p>
+        </div>
     </footer>
 
     <script src="../markers.js"></script>
-    <script src="../aurora-engine.js"></script>
-    <script src="../solar-wind.js"></script>
     <script src="../script.js"></script>
     <script>
         // FIX #12: Käytetään window.map jotta varmasti viitataan globaaliin
@@ -112,21 +100,6 @@
                     }
                 });
             }
-
-            // Päivitä Bz-arvo badgeen 60s välein
-            async function refreshBz() {
-              if (!window.SolarWind) return;
-              try {
-                const sw = await window.SolarWind.getSolarWind();
-                const el = document.querySelector('#bzVal b');
-                if (el && sw) {
-                  el.textContent = sw.bz.toFixed(1) + ' nT';
-                  el.style.color = sw.bz <= -5 ? '#00ffcc' : sw.bz < 0 ? '#ffcc00' : '#ff6677';
-                }
-              } catch(e) {}
-            }
-            refreshBz();
-            setInterval(refreshBz, 60000);
         });
 
         function toggleMenu() {
