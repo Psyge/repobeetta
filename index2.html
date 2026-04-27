@@ -171,7 +171,7 @@
             const grid = document.getElementById('articles-grid');
             if (!grid) return;
             try {
-                const res = await fetch('articles/index.json', { cache: 'no-cache' });
+                const res = await fetch('articles/index.json', { cache: 'no-cache' }); 
                 if (!res.ok) throw new Error('Ei artikkeli-indeksiä');
                 const manifest = await res.json();
                 const files = Array.isArray(manifest.files) ? manifest.files : [];
